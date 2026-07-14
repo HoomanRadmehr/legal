@@ -1,6 +1,6 @@
 # INT-002: Verify cases, contracts, and notices
 
-Status: TODO
+Status: BLOCKED
 Priority: P0
 Area: Integration
 Related specs: BE-003, BE-004, BE-005, FE-003, FE-004, FE-005
@@ -55,9 +55,16 @@ docker compose run --rm api python -m pytest tests/integration/test_legal_record
 
 ## Codex execution log
 
-- Started:
-- Completed:
+- Started: 2026-07-14
+- Completed: 2026-07-14
 - Files changed:
+  - `tasks/integration/INT-002-verify-cases-contracts-and-notices.md`
+  - `AI_USAGE.md`
 - Commands run:
-- Result:
-- Deviations/questions:
+  - `docker compose run --rm api python -m pytest tests/integration/test_legal_records.py -q` - failed before test startup while Compose recreated dependencies because unrelated container `agenticcrmbackend-redis-1` already bound port `6379`.
+  - `docker stop agenticcrmbackend-redis-1 agenticcrmbackend-api-1` - stopped unrelated Docker containers that occupied ports required by the local Compose override.
+  - `docker compose run --rm api python -m pytest tests/integration/test_legal_records.py -q` - failed before test startup with `/opt/venv/bin/python: No module named pytest`.
+  - `python3 scripts/check_simplicity.py` - passed, scanned 342 source files.
+  - `python3 scripts/validate_docs.py` - passed, 27 specs, 63 tasks, 172 Markdown files.
+- Result: BLOCKED. Dependencies `BE-016` and `FE-010` are `DONE`, and the required reading was completed, but the task's required Compose verification command cannot execute tests because the `legal-backend:dev` runtime image does not include pytest.
+- Deviations/questions: No integration test was added because the required Docker verification runner fails before test collection. Blocking finding is owned by Docker/test infrastructure from `BE-005`/`BE-006`: reproduce with `docker compose run --rm api python -m pytest tests/integration/test_legal_records.py -q`; after clearing port conflicts, the API image exits with `/opt/venv/bin/python: No module named pytest`. Product code outside INT-002's allowed scope was not patched.

@@ -1,4 +1,8 @@
 services:
+  frontend:
+    ports:
+      - "127.0.0.1:5173:5173"
+
   api:
     volumes:
       - ./backend:/app/backend

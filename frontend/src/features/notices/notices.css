@@ -1,0 +1,157 @@
+.notice-filters,
+.notice-form {
+  display: grid;
+  gap: 16px;
+  margin-top: 24px;
+}
+
+.notice-filters {
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  align-items: end;
+}
+
+.notice-filters label,
+.notice-form label {
+  display: grid;
+  gap: 6px;
+  color: #344054;
+  font-weight: 700;
+}
+
+.notice-filters input,
+.notice-filters select,
+.notice-form input,
+.notice-form select,
+.notice-form textarea {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 40px;
+  border: 1px solid #d0d5dd;
+  border-radius: 8px;
+  padding: 8px 10px;
+  color: #101828;
+  font: inherit;
+}
+
+.notice-form fieldset {
+  display: grid;
+  gap: 16px;
+  border: 1px solid #d0d5dd;
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.notice-form legend {
+  color: #101828;
+  font-weight: 800;
+}
+
+.notice-form button,
+.notice-filters button,
+.page-header__actions a,
+.page-header__actions button,
+.notice-detail-grid a {
+  min-height: 40px;
+  box-sizing: border-box;
+  border: 1px solid #98a2b3;
+  border-radius: 8px;
+  padding: 8px 12px;
+  background: #ffffff;
+  color: #101828;
+  cursor: pointer;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.notice-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 24px;
+  margin-top: 24px;
+}
+
+.notice-detail-grid section {
+  min-width: 0;
+}
+
+.notice-definition-list {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+}
+
+.notice-definition-list div {
+  display: grid;
+  gap: 4px;
+}
+
+.notice-definition-list dt {
+  color: #667085;
+  font-size: 0.875rem;
+  font-weight: 700;
+}
+
+.notice-definition-list dd {
+  margin: 0;
+  color: #101828;
+  overflow-wrap: anywhere;
+}
+
+.notice-timeline,
+.notice-related-id-list {
+  display: grid;
+  gap: 12px;
+  padding: 0;
+  list-style: none;
+}
+
+.notice-timeline li,
+.notice-related-id-list li {
+  border: 1px solid #eaecf0;
+  border-radius: 8px;
+  padding: 12px;
+  background: #ffffff;
+}
+
+.notice-timeline time {
+  display: block;
+  margin-top: 4px;
+  color: #667085;
+}
+
+.notice-alert,
+.notice-help {
+  border: 1px solid #fedf89;
+  border-radius: 8px;
+  padding: 12px;
+  background: #fffcf5;
+  color: #93370d;
+}
+
+.notice-help {
+  margin: 0;
+}
+
+.notice-checkbox {
+  grid-template-columns: auto 1fr;
+  align-items: center;
+}
+
+.notice-checkbox input {
+  width: auto;
+}
+
+.notice-choice-group {
+  display: grid;
+  gap: 8px;
+}
+
+.notice-choice-group h3 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.notice-form__actions {
+  display: flex;
+  justify-content: flex-end;
+}

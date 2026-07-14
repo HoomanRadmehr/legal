@@ -1,0 +1,132 @@
+.contract-filters,
+.contract-form {
+  display: grid;
+  gap: 16px;
+  margin-top: 24px;
+}
+
+.contract-filters {
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  align-items: end;
+}
+
+.contract-filters label,
+.contract-form label {
+  display: grid;
+  gap: 6px;
+  color: #344054;
+  font-weight: 700;
+}
+
+.contract-filters input,
+.contract-filters select,
+.contract-form input,
+.contract-form select,
+.contract-form textarea {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 40px;
+  border: 1px solid #d0d5dd;
+  border-radius: 8px;
+  padding: 8px 10px;
+  color: #101828;
+  font: inherit;
+}
+
+.contract-form fieldset {
+  display: grid;
+  gap: 16px;
+  border: 1px solid #d0d5dd;
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.contract-form legend {
+  color: #101828;
+  font-weight: 800;
+}
+
+.contract-form button,
+.contract-filters button,
+.page-header__actions a,
+.page-header__actions button,
+.contract-detail-grid a {
+  min-height: 40px;
+  box-sizing: border-box;
+  border: 1px solid #98a2b3;
+  border-radius: 8px;
+  padding: 8px 12px;
+  background: #ffffff;
+  color: #101828;
+  cursor: pointer;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.contract-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 24px;
+  margin-top: 24px;
+}
+
+.contract-detail-grid section {
+  min-width: 0;
+}
+
+.contract-definition-list {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+}
+
+.contract-definition-list div {
+  display: grid;
+  gap: 4px;
+}
+
+.contract-definition-list dt {
+  color: #667085;
+  font-size: 0.875rem;
+  font-weight: 700;
+}
+
+.contract-definition-list dd {
+  margin: 0;
+  color: #101828;
+  overflow-wrap: anywhere;
+}
+
+.contract-date-state,
+.contract-alert {
+  border: 1px solid #fedf89;
+  border-radius: 8px;
+  padding: 12px;
+  background: #fffcf5;
+  color: #93370d;
+}
+
+.contract-timeline {
+  display: grid;
+  gap: 12px;
+  padding: 0;
+  list-style: none;
+}
+
+.contract-timeline li {
+  border: 1px solid #eaecf0;
+  border-radius: 8px;
+  padding: 12px;
+  background: #ffffff;
+}
+
+.contract-timeline time {
+  display: block;
+  margin-top: 4px;
+  color: #667085;
+}
+
+.contract-form__actions {
+  display: flex;
+  justify-content: flex-end;
+}

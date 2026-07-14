@@ -84,6 +84,19 @@ def test_development_settings_are_local_and_relaxed() -> None:
 
     assert development.DEBUG is True
     assert "localhost" in development.ALLOWED_HOSTS
+    assert "http://localhost:5173" in development.CORS_ALLOWED_ORIGINS
+    assert "http://127.0.0.1:5173" in development.CORS_ALLOWED_ORIGINS
+    assert "http://127.0.0.1:5173" in development.CSRF_TRUSTED_ORIGINS
     assert development.SECURE_SSL_REDIRECT is False
     assert development.SESSION_COOKIE_SECURE is False
     assert development.EMAIL_BACKEND == "django.core.mail.backends.console.EmailBackend"
+
+
+def test_cors_middleware_is_enabled_before_common_middleware() -> None:
+    base = import_fresh("config.settings.base")
+
+    assert "corsheaders" in base.INSTALLED_APPS
+    assert base.CORS_ALLOW_CREDENTIALS is True
+    assert base.MIDDLEWARE.index("corsheaders.middleware.CorsMiddleware") < base.MIDDLEWARE.index(
+        "django.middleware.common.CommonMiddleware",
+    )

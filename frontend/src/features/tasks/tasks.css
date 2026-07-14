@@ -1,0 +1,125 @@
+.task-filters,
+.task-form {
+  display: grid;
+  gap: 16px;
+  margin-top: 24px;
+}
+
+.task-filters {
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  align-items: end;
+}
+
+.task-filters label,
+.task-form label {
+  display: grid;
+  gap: 6px;
+  color: #344054;
+  font-weight: 700;
+}
+
+.task-filters input,
+.task-filters select,
+.task-form input,
+.task-form select,
+.task-form textarea {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 40px;
+  border: 1px solid #d0d5dd;
+  border-radius: 8px;
+  padding: 8px 10px;
+  color: #101828;
+  font: inherit;
+}
+
+.task-form fieldset {
+  display: grid;
+  gap: 16px;
+  border: 1px solid #d0d5dd;
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.task-form legend {
+  color: #101828;
+  font-weight: 800;
+}
+
+.task-form button,
+.task-filters button,
+.page-header__actions a,
+.page-header__actions button,
+.task-inline-actions button {
+  min-height: 40px;
+  box-sizing: border-box;
+  border: 1px solid #98a2b3;
+  border-radius: 8px;
+  padding: 8px 12px;
+  background: #ffffff;
+  color: #101828;
+  cursor: pointer;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.task-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 24px;
+  margin-top: 24px;
+}
+
+.task-detail-grid section {
+  min-width: 0;
+}
+
+.task-definition-list {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+}
+
+.task-definition-list div {
+  display: grid;
+  gap: 4px;
+}
+
+.task-definition-list dt {
+  color: #667085;
+  font-size: 0.875rem;
+  font-weight: 700;
+}
+
+.task-definition-list dd {
+  margin: 0;
+  color: #101828;
+  overflow-wrap: anywhere;
+}
+
+.task-alert {
+  border: 1px solid #fedf89;
+  border-radius: 8px;
+  padding: 12px;
+  background: #fffcf5;
+  color: #93370d;
+}
+
+.task-form__actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.task-matter-section,
+.task-inline-actions {
+  display: grid;
+  gap: 16px;
+  margin-top: 24px;
+}
+
+.task-inline-actions div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}

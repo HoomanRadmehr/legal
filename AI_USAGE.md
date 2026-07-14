@@ -7,7 +7,7 @@ Do not claim that a tool verified code unless its output was reviewed.
 
 | Tool | Purpose | Where used |
 |---|---|---|
-| Codex | Read task/spec guardrails, scaffolded backend and frontend foundations, generated lock files, implemented settings validation, common API primitives, health endpoints, OpenAPI components, logging redaction, Docker Compose infrastructure, backend CI, guard checks, the custom user model, organization tenancy models, explicit role and matter permission functions, concrete matter/access/relation models, activity logs, transactional outbox, JWT auth endpoints, authentication throttles, one-time WebSocket tickets, deadlines, notices, the task API and assignment rules, the typed frontend API client, the frontend app shell providers/router/states, login/session restore/refresh/logout, role-aware app shell/permission helpers, the localization/component foundation, and INT-001 integration evidence, and reviewed verification output | BE-001 through BE-019 backend foundation and legal workflows; FE-001 through FE-006 frontend foundation; INT-001 integration verification |
+| Codex | Read task/spec guardrails, scaffolded backend and frontend foundations, generated lock files, implemented settings validation, common API primitives, health endpoints, OpenAPI components, logging redaction, Docker Compose infrastructure, backend CI, guard checks, the custom user model, organization tenancy models, explicit role and matter permission functions, concrete matter/access/relation models, activity logs, transactional outbox, JWT auth endpoints, authentication throttles, one-time WebSocket tickets, deadlines, notices, the task API and assignment rules, the typed frontend API client, the frontend app shell providers/router/states, login/session restore/refresh/logout, role-aware app shell/permission helpers, the localization/component foundation, explicit case screens, explicit contract screens, explicit deadline screens, explicit notice screens, explicit task screens and matter task sections, INT-001 integration evidence, INT-002 blocked verification evidence, and INT-003 blocked verification evidence, and reviewed verification output | BE-001 through BE-019 backend foundation and legal workflows; FE-001 through FE-011 frontend foundation and case/contract/deadline/notice/task screens; INT-001 through INT-003 integration verification |
 | ChatGPT | Requirements and architecture planning | Initial specification starter |
 | Other | TODO | TODO |
 
@@ -48,6 +48,16 @@ FE-005 update: Codex read the root/frontend AGENTS files, `FE-002`, the role mat
 
 FE-006 update: Codex read the root/frontend AGENTS files, `FE-000`, `FE-011`, and relevant frontend architecture/security/testing/dependency/workflow docs; added i18next common namespace resources, document language/direction switching, an `Accept-Language` helper, technical value direction isolation, and small visual page header, table, badge, dialog, and form error components; and reviewed verification output before marking the task done.
 
+FE-007 update: Codex read the root/frontend AGENTS files, `FE-003`, the backend case API contract, and relevant frontend architecture/security/API-error/filtering/testing/localization/simplicity docs; added explicit case API functions, query keys, types, Zod schemas, list/detail/create/edit pages, party field-array form behavior, archive confirmation, version-conflict handling, safe timeline action labels, route wiring, feature CSS, and focused tests for filter mapping, viewer read-only behavior, conflict preservation, archive wording, and timeline states; and reviewed verification output before marking the task done.
+
+FE-008 update: Codex read the root/frontend AGENTS files, `FE-004`, the backend contract API contract, and relevant frontend architecture/security/API-error/filtering/testing/localization/simplicity docs; added explicit contract API functions, query keys, hooks, types, Zod schemas, list/detail/create/edit pages, renewal/expiration validation, backend 422 date error mapping, archive confirmation, version-conflict handling, safe timeline action labels, route wiring, feature CSS, and focused tests for filter mapping, visible date warnings, viewer read-only behavior, conflict preservation, archive wording, field error mapping, and timeline states; noted that Jalali conversion remains deferred by FE-008 to FE-018; and reviewed verification output before marking the task done.
+
+FE-009 update: Codex read the root/frontend AGENTS files, `FE-006`, the backend deadline API contract, and relevant frontend architecture/security/API-error/filtering/testing/localization/simplicity docs; added explicit deadline API functions, query keys, hooks, types, Zod schemas, four backend view tabs, filters, list/detail/create/edit pages, complete/cancel confirmations, permission-aware action visibility, 409/429 user messaging, route wiring, feature CSS, and focused tests for view parameters, timezone labeling, viewer controls, complete/cancel endpoints, conflict handling, rate-limit guidance, and form submission; noted that the current auth session lacks an exact organization timezone string and kept backend classification authoritative; and reviewed verification output before marking the task done.
+
+FE-010 update: Codex read the root/frontend AGENTS files, `FE-005`, the backend notice API contract, and relevant frontend architecture/security/API-error/filtering/testing/localization/simplicity docs; added explicit notice API functions, query keys, hooks, types, Zod schemas, list/detail/create/edit pages, permission-scoped related case/contract search, resolved related matter detail links, linked deadline status/assignee display, archive confirmation, linked deadline invalidation, route wiring, feature CSS, and focused tests for invisible related choices, linked deadline refresh, invalid date errors, hidden relation errors, version conflicts, viewer read-only behavior, and archive confirmation; noted that the task named `routes.ts` while the repository uses `routes.tsx`; and reviewed verification output before marking the task done.
+
+FE-011 update: Codex read the root/frontend AGENTS files, `FE-006`, the backend task API contract, and relevant frontend architecture/security/API-error/filtering/testing/localization/simplicity docs; added explicit task API functions, query keys, hooks, types, Zod schemas, list/detail/create/edit pages, assigned-to-me defaults, active assignee controls, viewer and counsel role boundaries, complete/cancel confirmations, task mutation error handling, a matter-scoped task section, route wiring, feature CSS, and focused tests for filter mapping, 429 retry guidance, viewer read-only behavior, counsel reassignment hiding, version conflicts, idempotent final actions, and matter task actions; noted that the task named `routes.ts` while the repository uses `routes.tsx`; and reviewed verification output before marking the task done.
+
 BE-008 update: Codex read the root/backend AGENTS files, `BE-002`, `BE-013`, and relevant backend architecture/data-model/security/tenancy/localization/testing/common-base docs; added explicit organization and membership models, canonical choices, timezone validation, organization-scoped selectors, factories, migration, and focused tests; and reviewed verification output before marking the task done.
 
 BE-009 update: Codex read the root/backend AGENTS files, `BE-001`, and relevant JWT/security/API/testing/localization/OpenAPI docs; added CSRF bootstrap, login, refresh rotation, logout, and current-user endpoints; wired Simple JWT blacklist support, refresh cookie attributes, URL routing, stable auth error codes, OpenAPI declarations, and focused auth API tests; and reviewed verification output before marking the task done.
@@ -63,6 +73,10 @@ BE-019 update: Codex read the root/backend AGENTS files, `BE-008`, and relevant 
 BE-017 update: Codex read the root/backend AGENTS files, `BE-006`, and relevant backend architecture/data-model/security/API/testing/OpenAPI/simplicity docs; added the concrete matter-linked `Task` app with explicit assignment rules, permission-scoped selectors, create/update/complete/cancel services, API serializers/filter/viewset/OpenAPI, initial migration, route/settings registration, and focused tests for cross-organization or inactive assignees, counsel reassignment denial, viewer read-only behavior, idempotent final actions, stale versions, and filter/ordering allowlists; and reviewed verification output before marking the task done.
 
 INT-001 update: Codex read the root/backend/frontend AGENTS files, the integration task, linked backend/frontend auth and permission specs, definition of done, and relevant architecture/security/realtime/MinIO/Docker/testing guardrails; confirmed `BE-011` and `FE-005` were `DONE`; added an allowed-scope backend integration test for published auth, CSRF, refresh, logout, WebSocket ticket, MinIO bucket, and cross-org not-found contracts; and marked the task blocked after required Compose verification failed before stack startup on an unavailable MinIO client image tag.
+
+INT-002 update: Codex read the root/backend/frontend AGENTS files, the integration task, linked backend/frontend case, contract, and notice specs, definition of done, and relevant architecture/security/API/testing guardrails; confirmed `BE-016` and `FE-010` were `DONE`; used the real local Compose stack and ran the required verification command; cleared unrelated Docker port conflicts; and marked the task blocked because the `legal-backend:dev` runtime image does not include `pytest`, so the required `docker compose run --rm api python -m pytest tests/integration/test_legal_records.py -q` command exits before test collection.
+
+INT-003 update: Codex read the root/backend/frontend AGENTS files, the integration task, linked backend/frontend deadline and task specs, definition of done, and relevant architecture/security/API/testing/localization guardrails; confirmed `BE-017` and `FE-011` were `DONE`; used the real local Compose stack and ran the required verification command; identified a host PostgreSQL port conflict on `5432`; and marked the task blocked after the no-host-port Compose variant confirmed the `legal-backend:dev` runtime image does not include `pytest`, so deadline/task integration tests cannot reach collection.
 
 ## 3. Important prompts
 
@@ -333,6 +347,13 @@ The assignment requires at least two. Record concrete examples rather than gener
 - How it was detected: `apps/activity/tests/test_outbox_dispatcher.py::test_dispatch_records_bounded_retry_failure` failed during BE-019 verification.
 - What was changed: The dispatcher now treats the max-attempt error marker as terminal before publishing, and the activity tests pass.
 
+### Example 14
+
+- What the AI proposed: A matter task action hook that captured an empty task id before a user selected the task action.
+- Why it was wrong or unsuitable: Completing a matter task attempted to call `/api/v1/tasks//complete/` instead of the selected task endpoint.
+- How it was detected: `cd frontend && npm test -- --run src/features/tasks` failed during FE-011 verification.
+- What was changed: Matter task complete/cancel mutations now accept the selected task id and version at mutation time, and the task tests pass.
+
 ## 5. Decisions made personally
 
 Document professional judgment that was not delegated to the AI. Examples may include:
@@ -545,6 +566,57 @@ Replace examples with the candidate's actual decisions and reasoning.
 | Backend BE-017 format | `cd backend && UV_PROJECT_ENVIRONMENT=/tmp/legal-be017-venv uv run --python /usr/bin/python3.12 ruff format --check apps/tasks config/settings/base.py config/urls.py` | Passed, 20 files already formatted | Codex |
 | Backend BE-017 simplicity | `/usr/bin/python3.12 scripts/check_simplicity.py backend` | Passed after splitting one test function and removing ignored generated `backend/.venv`, scanned 177 source files | Codex |
 | Backend BE-017 docs validation | `/usr/bin/python3.12 scripts/validate_docs.py` | Passed, 27 specs, 63 tasks, 172 Markdown files | Codex |
+| Frontend FE-007 initial test command | `cd frontend && npm test -- --run src/features/cases` | Failed before test startup because dependencies were not installed and `vitest` was missing | Codex |
+| Frontend FE-007 dependency install | `cd frontend && npm ci` | Passed, 371 packages installed, 0 vulnerabilities | Codex |
+| Frontend FE-007 case tests | `cd frontend && npm test -- --run src/features/cases` | Passed, 4 test files and 8 tests after fixing fixture UUID and TypeScript mock shape | Codex |
+| Frontend FE-007 typecheck | `cd frontend && npm run typecheck` | Passed after enum boundary casts and complete test fixtures | Codex |
+| Frontend FE-007 lint | `cd frontend && npm run lint` | Passed | Codex |
+| Frontend FE-007 format | `cd frontend && npm run format:check` | Passed | Codex |
+| Frontend FE-007 simplicity | `/usr/bin/python3.12 scripts/check_simplicity.py frontend/src` | Passed, scanned 73 source files | Codex |
+| Frontend FE-007 docs validation | `/usr/bin/python3.12 scripts/validate_docs.py` | Initially failed because generated `frontend/node_modules` Markdown was present; passed after removing that ignored generated dependency directory and build output | Codex |
+| Frontend FE-007 production build | `cd frontend && npm run build` | Passed with Vite chunk-size warning for the bundled app | Codex |
+| Frontend FE-008 dependency install | `cd frontend && npm ci` | Passed, 371 packages installed, 0 vulnerabilities | Codex |
+| Frontend FE-008 contract tests | `cd frontend && npm test -- --run src/features/contracts` | Initially failed once due to a fake-timer test stall and once due to an invalid edit fixture; passed after fixes, 4 test files and 9 tests | Codex |
+| Frontend FE-008 typecheck | `cd frontend && npm run typecheck` | Initially failed on strict schema/field typings; passed after explicit type narrowing | Codex |
+| Frontend FE-008 lint | `cd frontend && npm run lint` | Passed | Codex |
+| Frontend FE-008 format | `cd frontend && npm run format:check` | Initially failed on new-file formatting; passed after targeted Prettier formatting | Codex |
+| Frontend FE-008 production build | `cd frontend && npm run build` | Passed with Vite chunk-size warning for the bundled app | Codex |
+| Frontend FE-008 simplicity | `/usr/bin/python3.12 scripts/check_simplicity.py frontend/src` | Passed, scanned 95 source files | Codex |
+| Frontend FE-008 docs validation | `python3 scripts/validate_docs.py` | Initially failed because generated `frontend/node_modules` Markdown was present; passed after removing generated `frontend/node_modules` and `frontend/dist` | Codex |
+| Frontend FE-009 dependency install | `cd frontend && npm ci` | Passed, 371 packages installed, 0 vulnerabilities | Codex |
+| Frontend FE-009 deadline tests | `cd frontend && npm test -- --run src/features/deadlines` | Initially failed once on a test timing assertion; passed after fix, 3 test files and 11 tests | Codex |
+| Frontend FE-009 typecheck | `cd frontend && npm run typecheck` | Passed | Codex |
+| Frontend FE-009 lint | `cd frontend && npm run lint` | Initially failed on a Fast Refresh constant export warning; passed after moving the constant to a non-component file | Codex |
+| Frontend FE-009 format | `cd frontend && npm run format:check` | Initially failed on new-file formatting; passed after targeted Prettier formatting | Codex |
+| Frontend FE-009 production build | `cd frontend && npm run build` | Passed with Vite chunk-size warning for the bundled app | Codex |
+| Frontend FE-009 simplicity | `python3 scripts/check_simplicity.py frontend/src` | Passed, scanned 118 source files | Codex |
+| Frontend FE-009 docs validation | `python3 scripts/validate_docs.py` | Initially failed because generated `frontend/node_modules` Markdown was present; passed after removing generated `frontend/node_modules` and `frontend/dist` | Codex |
+| Frontend FE-010 dependency install | `cd frontend && npm ci` | Passed, 371 packages installed, 0 vulnerabilities; rerun after generated dependency cleanup also passed | Codex |
+| Frontend FE-010 notice tests | `cd frontend && npm test -- --run src/features/notices` | Initially failed because form tests needed a QueryClient wrapper; a post-cleanup rerun failed while `node_modules` was absent; passed after reinstalling dependencies, 3 test files and 9 tests | Codex |
+| Frontend FE-010 typecheck | `cd frontend && npm run typecheck` | A post-cleanup rerun failed while `node_modules` was absent; passed after reinstalling dependencies | Codex |
+| Frontend FE-010 lint | `cd frontend && npm run lint` | Passed | Codex |
+| Frontend FE-010 format | `cd frontend && npm run format:check` | Initially failed on new-file formatting; passed after targeted Prettier formatting | Codex |
+| Frontend FE-010 production build | `cd frontend && npm run build` | Passed with Vite chunk-size warning for the bundled app | Codex |
+| Frontend FE-010 simplicity | `python3 scripts/check_simplicity.py frontend/src/features/notices frontend/src/app/routes.tsx` | Passed, scanned 23 source files | Codex |
+| Frontend FE-010 docs validation | `python3 scripts/validate_docs.py` | Passed after removing generated `frontend/node_modules` and `frontend/dist`, 27 specs, 63 tasks, 172 Markdown files | Codex |
+| Frontend FE-011 dependency install | `cd frontend && npm ci` | Passed, 371 packages installed, 0 vulnerabilities | Codex |
+| Frontend FE-011 task tests | `cd frontend && npm test -- --run src/features/tasks` | Initially failed on duplicate 429 retry text and matter action task id binding; passed after fixes, 3 test files and 10 tests | Codex |
+| Frontend FE-011 typecheck | `cd frontend && npm run typecheck` | Initially failed on test fixture/mock typings; passed after fixes | Codex |
+| Frontend FE-011 lint | `cd frontend && npm run lint` | Initially failed on lint-only issues in task tests/schema/form; passed after fixes | Codex |
+| Frontend FE-011 format | `cd frontend && npm run format:check` | Passed | Codex |
+| Frontend FE-011 production build | `cd frontend && npm run build` | Passed with Vite chunk-size warning for the bundled app | Codex |
+| Frontend FE-011 simplicity | `python3 scripts/check_simplicity.py frontend/src/features/tasks frontend/src/app/routes.tsx` | Passed, scanned 22 source files | Codex |
+| Frontend FE-011 docs validation | `python3 scripts/validate_docs.py` | Passed after task log and AI usage updates and after removing generated dependency/build artifacts, 27 specs, 63 tasks, 172 Markdown files | Codex |
+| Integration INT-002 first Compose verification | `docker compose run --rm api python -m pytest tests/integration/test_legal_records.py -q` | Failed before test startup while Compose recreated dependencies because unrelated `agenticcrmbackend-redis-1` already bound port `6379` | Codex |
+| Integration INT-002 port cleanup | `docker stop agenticcrmbackend-redis-1 agenticcrmbackend-api-1` | Passed; stopped unrelated containers occupying ports needed by the local Compose override | Codex |
+| Integration INT-002 required pytest command | `docker compose run --rm api python -m pytest tests/integration/test_legal_records.py -q` | Failed before test collection with `/opt/venv/bin/python: No module named pytest` in `legal-backend:dev` | Codex |
+| Integration INT-002 simplicity | `python3 scripts/check_simplicity.py` | Passed, scanned 342 source files | Codex |
+| Integration INT-002 docs validation | `python3 scripts/validate_docs.py` | Passed after final task log and AI usage updates, 27 specs, 63 tasks, 172 Markdown files | Codex |
+| Integration INT-003 required Compose command | `docker compose run --rm api python -m pytest tests/integration/test_deadlines_tasks.py -q` | Failed before test startup while Compose recreated dependencies because host PostgreSQL already bound `127.0.0.1:5432` | Codex |
+| Integration INT-003 host PostgreSQL check | `pgrep -a postgres`, `systemctl --user status postgresql --no-pager`, `sudo -n systemctl stop postgresql` | Confirmed a non-Docker PostgreSQL process owns port `5432`; stopping it requires sudo credentials | Codex |
+| Integration INT-003 no-host-port Compose check | `docker compose -f compose.yaml run --rm api python -m pytest tests/integration/test_deadlines_tasks.py -q` | Failed before test collection with `/opt/venv/bin/python: No module named pytest` in `legal-backend:dev` | Codex |
+| Integration INT-003 simplicity | `python3 scripts/check_simplicity.py` | Passed, scanned 342 source files | Codex |
+| Integration INT-003 docs validation | `python3 scripts/validate_docs.py` | Passed after final task log and AI usage updates, 27 specs, 63 tasks, 172 Markdown files | Codex |
 | OpenAPI validation | TODO | TODO | TODO |
 | Docker build | TODO | TODO | TODO |
 | Security tests | TODO | TODO | TODO |

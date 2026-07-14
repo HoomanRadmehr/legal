@@ -1,0 +1,133 @@
+.deadline-tabs,
+.deadline-filters,
+.deadline-form {
+  display: grid;
+  gap: 16px;
+  margin-top: 24px;
+}
+
+.deadline-tabs {
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+}
+
+.deadline-tabs button,
+.deadline-form button,
+.deadline-filters button,
+.page-header__actions a,
+.page-header__actions button,
+.deadline-detail-grid a {
+  min-height: 40px;
+  box-sizing: border-box;
+  border: 1px solid #98a2b3;
+  border-radius: 8px;
+  padding: 8px 12px;
+  background: #ffffff;
+  color: #101828;
+  cursor: pointer;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.deadline-tabs__active {
+  border-color: #175cd3;
+  background: #eff8ff;
+  color: #175cd3;
+}
+
+.deadline-filters {
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  align-items: end;
+}
+
+.deadline-filters label,
+.deadline-form label {
+  display: grid;
+  gap: 6px;
+  color: #344054;
+  font-weight: 700;
+}
+
+.deadline-filters input,
+.deadline-filters select,
+.deadline-form input,
+.deadline-form select,
+.deadline-form textarea {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 40px;
+  border: 1px solid #d0d5dd;
+  border-radius: 8px;
+  padding: 8px 10px;
+  color: #101828;
+  font: inherit;
+}
+
+.deadline-form fieldset {
+  display: grid;
+  gap: 16px;
+  border: 1px solid #d0d5dd;
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.deadline-form legend {
+  color: #101828;
+  font-weight: 800;
+}
+
+.deadline-checkbox {
+  grid-template-columns: auto 1fr;
+  align-items: center;
+}
+
+.deadline-checkbox input {
+  width: auto;
+}
+
+.deadline-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 24px;
+  margin-top: 24px;
+}
+
+.deadline-detail-grid section {
+  min-width: 0;
+}
+
+.deadline-definition-list {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+}
+
+.deadline-definition-list div {
+  display: grid;
+  gap: 4px;
+}
+
+.deadline-definition-list dt {
+  color: #667085;
+  font-size: 0.875rem;
+  font-weight: 700;
+}
+
+.deadline-definition-list dd {
+  margin: 0;
+  color: #101828;
+  overflow-wrap: anywhere;
+}
+
+.deadline-timezone,
+.deadline-alert {
+  border: 1px solid #fedf89;
+  border-radius: 8px;
+  padding: 12px;
+  background: #fffcf5;
+  color: #93370d;
+}
+
+.deadline-form__actions {
+  display: flex;
+  justify-content: flex-end;
+}

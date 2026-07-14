@@ -16,6 +16,7 @@ DEBUG = False
 ALLOWED_HOSTS = env.csv("DJANGO_ALLOWED_HOSTS", default=("localhost", "127.0.0.1"))
 CSRF_TRUSTED_ORIGINS = env.csv("DJANGO_CSRF_TRUSTED_ORIGINS")
 CORS_ALLOWED_ORIGINS = env.csv("DJANGO_CORS_ALLOWED_ORIGINS")
+CORS_ALLOW_CREDENTIALS = True
 
 INSTALLED_APPS = [
     "apps.accounts.apps.AccountsConfig",
@@ -28,6 +29,7 @@ INSTALLED_APPS = [
     "apps.notices.apps.NoticesConfig",
     "apps.tasks.apps.TasksConfig",
     "channels",
+    "corsheaders",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -42,6 +44,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.locale.LocaleMiddleware",
     "django.middleware.common.CommonMiddleware",
