@@ -1,0 +1,167 @@
+import { createNetworkError, parseApiErrorResponse } from "./errors";
+
+export type AccessTokenProvider = () => string | null | undefined;
+
+export type QueryValue = boolean | number | string | null | undefined;
+
+export type ApiRequestOptions = {
+  body?: unknown;
+  credentials?: RequestCredentials;
+  headers?: HeadersInit;
+  method?: string;
+  query?: Record<string, QueryValue | QueryValue[]>;
+  signal?: AbortSignal;
+};
+
+export type ApiClient = {
+  request: <TResponse>(
+    path: string,
+    options?: ApiRequestOptions,
+  ) => Promise<TResponse>;
+};
+
+export type ApiClientConfig = {
+  baseUrl?: string;
+  fetchImpl?: typeof fetch;
+  getAccessToken?: AccessTokenProvider;
+};
+
+const DEFAULT_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8000/api/v1";
+
+export function createApiClient(config: ApiClientConfig = {}): ApiClient {
+  const baseUrl = config.baseUrl ?? DEFAULT_BASE_URL;
+  const fetchImpl = config.fetchImpl ?? fetch;
+  const getAccessToken = config.getAccessToken;
+
+  return {
+    request: (path, options = {}) =>
+      apiRequest(path, options, { baseUrl, fetchImpl, getAccessToken }),
+  };
+}
+
+export const apiClient = createApiClient();
+
+async function apiRequest<TResponse>(
+  path: string,
+  options: ApiRequestOptions,
+  config: Required<Pick<ApiClientConfig, "baseUrl" | "fetchImpl">> &
+    Pick<ApiClientConfig, "getAccessToken">,
+): Promise<TResponse> {
+  const response = await sendRequest(path, options, config);
+  const payload = await readResponseBody(response);
+
+  if (!response.ok) {
+    throw parseApiErrorResponse(response, payload);
+  }
+
+  return payload as TResponse;
+}
+
+async function sendRequest(
+  path: string,
+  options: ApiRequestOptions,
+  config: Required<Pick<ApiClientConfig, "baseUrl" | "fetchImpl">> &
+    Pick<ApiClientConfig, "getAccessToken">,
+): Promise<Response> {
+  try {
+    return await config.fetchImpl(
+      buildUrl(config.baseUrl, path, options.query),
+      {
+        body: serializeBody(options.body),
+        credentials: options.credentials ?? "include",
+        headers: buildHeaders(
+          options.headers,
+          options.body,
+          config.getAccessToken?.(),
+        ),
+        method: options.method ?? "GET",
+        signal: options.signal,
+      },
+    );
+  } catch {
+    throw createNetworkError();
+  }
+}
+
+function buildHeaders(
+  baseHeaders: HeadersInit | undefined,
+  body: unknown,
+  token: string | null | undefined,
+) {
+  const headers = new Headers(baseHeaders);
+  headers.set("Accept", "application/json");
+
+  if (
+    body !== undefined &&
+    !(body instanceof FormData) &&
+    !headers.has("Content-Type")
+  ) {
+    headers.set("Content-Type", "application/json");
+  }
+  if (token && !headers.has("Authorization")) {
+    headers.set("Authorization", `Bearer ${token}`);
+  }
+
+  return headers;
+}
+
+function serializeBody(body: unknown): BodyInit | undefined {
+  if (body === undefined) {
+    return undefined;
+  }
+  if (body instanceof FormData || typeof body === "string") {
+    return body;
+  }
+  return JSON.stringify(body);
+}
+
+async function readResponseBody(response: Response): Promise<unknown> {
+  if (response.status === 204) {
+    return undefined;
+  }
+
+  const contentType = response.headers.get("Content-Type") ?? "";
+  if (contentType.includes("application/json")) {
+    return response.json();
+  }
+
+  return response.text();
+}
+
+function buildUrl(
+  baseUrl: string,
+  path: string,
+  query?: Record<string, QueryValue | QueryValue[]>,
+): string {
+  const normalizedBase = baseUrl.replace(/\/+$/, "");
+  const normalizedPath = path.startsWith("/") ? path : `/${path}`;
+  const urlBase = normalizedBase.startsWith("http")
+    ? normalizedBase
+    : `http://local.test${normalizedBase}`;
+  const url = new URL(`${urlBase}${normalizedPath}`);
+
+  appendQuery(url, query);
+  if (normalizedBase.startsWith("http")) {
+    return url.toString();
+  }
+  return `${url.pathname}${url.search}`;
+}
+
+function appendQuery(
+  url: URL,
+  query?: Record<string, QueryValue | QueryValue[]>,
+): void {
+  if (!query) {
+    return;
+  }
+
+  for (const [key, value] of Object.entries(query)) {
+    const values = Array.isArray(value) ? value : [value];
+    for (const item of values) {
+      if (item !== undefined && item !== null) {
+        url.searchParams.append(key, String(item));
+      }
+    }
+  }
+}

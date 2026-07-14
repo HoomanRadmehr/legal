@@ -1,0 +1,41 @@
+services:
+  api:
+    volumes:
+      - ./backend:/app/backend
+    ports:
+      - "127.0.0.1:8000:8000"
+
+  worker:
+    volumes:
+      - ./backend:/app/backend
+
+  beat:
+    volumes:
+      - ./backend:/app/backend
+
+  migration:
+    volumes:
+      - ./backend:/app/backend
+
+  postgres:
+    ports:
+      - "127.0.0.1:5432:5432"
+
+  redis:
+    ports:
+      - "127.0.0.1:6379:6379"
+
+  rabbitmq:
+    ports:
+      - "127.0.0.1:5672:5672"
+      - "127.0.0.1:15672:15672"
+
+  minio:
+    ports:
+      - "127.0.0.1:9000:9000"
+      - "127.0.0.1:9001:9001"
+
+  mailpit:
+    ports:
+      - "127.0.0.1:1025:1025"
+      - "127.0.0.1:8025:8025"

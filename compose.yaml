@@ -1,0 +1,189 @@
+name: legal-management
+
+x-backend-build: &backend-build
+  context: .
+  dockerfile: docker/backend/Dockerfile
+
+x-backend-environment: &backend-environment
+  DJANGO_SETTINGS_MODULE: ${DJANGO_SETTINGS_MODULE:-config.settings.development}
+  DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY:-development-only-secret-key-change-me}
+  DJANGO_ALLOWED_HOSTS: ${DJANGO_ALLOWED_HOSTS:-localhost,127.0.0.1,api}
+  DJANGO_CORS_ALLOWED_ORIGINS: ${DJANGO_CORS_ALLOWED_ORIGINS:-http://localhost:5173}
+  DJANGO_CSRF_TRUSTED_ORIGINS: ${DJANGO_CSRF_TRUSTED_ORIGINS:-http://localhost:5173}
+  DJANGO_LANGUAGE_CODE: ${DJANGO_LANGUAGE_CODE:-en}
+  DJANGO_TIME_ZONE: ${DJANGO_TIME_ZONE:-UTC}
+  DATABASE_URL: postgresql://${POSTGRES_USER:-legal_management}:${POSTGRES_PASSWORD:-legal_management_dev_password}@postgres:5432/${POSTGRES_DB:-legal_management}
+  REDIS_URL: ${REDIS_URL:-redis://redis:6379/0}
+  CHANNEL_LAYER_REDIS_URL: ${CHANNEL_LAYER_REDIS_URL:-redis://redis:6379/1}
+  CELERY_BROKER_URL: amqp://${RABBITMQ_DEFAULT_USER:-legal_management}:${RABBITMQ_DEFAULT_PASS:-legal_management_dev_password}@rabbitmq:5672//
+  CELERY_RESULT_BACKEND: ${CELERY_RESULT_BACKEND:-redis://redis:6379/2}
+  MINIO_ENDPOINT: ${MINIO_ENDPOINT:-minio:9000}
+  MINIO_PUBLIC_ENDPOINT: ${MINIO_PUBLIC_ENDPOINT:-http://localhost:9000}
+  MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY:-legal_management}
+  MINIO_SECRET_KEY: ${MINIO_SECRET_KEY:-legal_management_dev_password}
+  MINIO_BUCKET_DOCUMENTS: ${MINIO_BUCKET_DOCUMENTS:-legal-documents}
+  MINIO_USE_SSL: ${MINIO_USE_SSL:-false}
+  MINIO_PRESIGNED_UPLOAD_TTL_SECONDS: ${MINIO_PRESIGNED_UPLOAD_TTL_SECONDS:-900}
+  MINIO_PRESIGNED_DOWNLOAD_TTL_SECONDS: ${MINIO_PRESIGNED_DOWNLOAD_TTL_SECONDS:-300}
+  MAX_UPLOAD_SIZE_BYTES: ${MAX_UPLOAD_SIZE_BYTES:-26214400}
+  JWT_ACCESS_MINUTES: ${JWT_ACCESS_MINUTES:-10}
+  JWT_REFRESH_DAYS: ${JWT_REFRESH_DAYS:-7}
+  JWT_REFRESH_COOKIE_NAME: ${JWT_REFRESH_COOKIE_NAME:-legal_refresh}
+  JWT_COOKIE_DOMAIN: ${JWT_COOKIE_DOMAIN:-}
+  EMAIL_HOST: ${EMAIL_HOST:-mailpit}
+  EMAIL_PORT: ${EMAIL_PORT:-1025}
+  EMAIL_HOST_USER: ${EMAIL_HOST_USER:-}
+  EMAIL_HOST_PASSWORD: ${EMAIL_HOST_PASSWORD:-}
+  EMAIL_USE_TLS: ${EMAIL_USE_TLS:-false}
+  DEFAULT_FROM_EMAIL: ${DEFAULT_FROM_EMAIL:-legal-management@example.test}
+
+x-backend-service: &backend-service
+  build: *backend-build
+  image: legal-backend:dev
+  environment: *backend-environment
+  networks:
+    - backend
+  depends_on:
+    postgres:
+      condition: service_healthy
+    redis:
+      condition: service_healthy
+    rabbitmq:
+      condition: service_healthy
+    minio-init:
+      condition: service_completed_successfully
+  restart: unless-stopped
+
+services:
+  api:
+    <<: *backend-service
+    command: ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health/live/', timeout=3).read()",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  worker:
+    <<: *backend-service
+    command: ["celery", "-A", "config.celery:app", "worker", "--loglevel=INFO", "--concurrency=2"]
+    stop_grace_period: 30s
+
+  beat:
+    <<: *backend-service
+    command:
+      [
+        "celery",
+        "-A",
+        "config.celery:app",
+        "beat",
+        "--loglevel=INFO",
+        "--schedule=/tmp/celerybeat-schedule",
+      ]
+    stop_grace_period: 30s
+
+  migration:
+    <<: *backend-service
+    command: ["python", "manage.py", "migrate", "--noinput"]
+    profiles: ["tools"]
+    restart: "no"
+
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-legal_management}
+      POSTGRES_USER: ${POSTGRES_USER:-legal_management}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-legal_management_dev_password}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - backend
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U \"$${POSTGRES_USER}\" -d \"$${POSTGRES_DB}\""]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7.4-alpine
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redis-data:/data
+    networks:
+      - backend
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  rabbitmq:
+    image: rabbitmq:3.13-management-alpine
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER:-legal_management}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS:-legal_management_dev_password}
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+    networks:
+      - backend
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  minio:
+    image: minio/minio:RELEASE.2024-07-16T23-46-41Z
+    command: ["server", "/data", "--console-address", ":9001"]
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ACCESS_KEY:-legal_management}
+      MINIO_ROOT_PASSWORD: ${MINIO_SECRET_KEY:-legal_management_dev_password}
+    volumes:
+      - minio-data:/data
+    networks:
+      - backend
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:9000/minio/health/live >/dev/null"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  minio-init:
+    image: minio/mc:RELEASE.2024-07-15T19-02-30Z
+    environment:
+      MINIO_ENDPOINT: ${MINIO_ENDPOINT:-minio:9000}
+      MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY:-legal_management}
+      MINIO_SECRET_KEY: ${MINIO_SECRET_KEY:-legal_management_dev_password}
+      MINIO_BUCKET_DOCUMENTS: ${MINIO_BUCKET_DOCUMENTS:-legal-documents}
+    volumes:
+      - ./infra/minio/create-private-bucket.sh:/scripts/create-private-bucket.sh:ro
+      - ./infra/minio/cors-dev.json:/etc/minio/cors-dev.json:ro
+    networks:
+      - backend
+    depends_on:
+      minio:
+        condition: service_healthy
+    entrypoint: ["/bin/sh", "/scripts/create-private-bucket.sh"]
+    restart: "no"
+
+  mailpit:
+    image: axllent/mailpit:v1.21.8
+    networks:
+      - backend
+
+volumes:
+  postgres-data:
+  redis-data:
+  rabbitmq-data:
+  minio-data:
+
+networks:
+  backend:
+    driver: bridge

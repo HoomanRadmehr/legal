@@ -1,0 +1,902 @@
+{
+  "name": "legal-management-codex-starter",
+  "format_version": 1,
+  "file_count_excluding_manifest_json": 179,
+  "files": [
+    {
+      "path": ".codex/README.md",
+      "size_bytes": 215,
+      "sha256": "bbe0b67ebd6246b196c12d9be894e0b56e16e08811438d715611b382be8f608c"
+    },
+    {
+      "path": ".codex/prompts/implement-task.md",
+      "size_bytes": 697,
+      "sha256": "638f67720e94bce2559ffef3750a82f6ec1f26e6243fae8f72bbc7e4e1547f3b"
+    },
+    {
+      "path": ".codex/prompts/review-task.md",
+      "size_bytes": 540,
+      "sha256": "1799c5d81959db3ed0041dd91122b254a5b6676e48b84853790e76cd1bb59276"
+    },
+    {
+      "path": ".codex/prompts/security-review.md",
+      "size_bytes": 540,
+      "sha256": "4fcff128df5db05befcb463c3307200935175274e0f49d17822889fc3dfd5f94"
+    },
+    {
+      "path": ".codex/prompts/test-task.md",
+      "size_bytes": 476,
+      "sha256": "2e77fbebd757f0ed94bdf2ff9a7eb68ccac1df86a95e55d5d238b6794e370343"
+    },
+    {
+      "path": ".editorconfig",
+      "size_bytes": 243,
+      "sha256": "9749819ccdab74251bb7dc07520f50a8b775765b09d23003c7190eacd1308199"
+    },
+    {
+      "path": ".env.example",
+      "size_bytes": 1797,
+      "sha256": "d7226581a657ab10eab5deb636c1472d54a2c89526a138fa25352084cd826079"
+    },
+    {
+      "path": ".gitattributes",
+      "size_bytes": 109,
+      "sha256": "62cba8a0dd8277fd8f8705ac934ccf940fdb84c9f95589ee25e9ca3845c7065b"
+    },
+    {
+      "path": ".gitignore",
+      "size_bytes": 508,
+      "sha256": "68617a7a9c1e00fdd0b11918364ad9a8fd0af1504ba52c8136b4968a4deaeaee"
+    },
+    {
+      "path": "AGENTS.md",
+      "size_bytes": 6821,
+      "sha256": "d4b61216107b306bec81ebac67026d432954dfb56fe204809be775173b3caf74"
+    },
+    {
+      "path": "AI_USAGE.md",
+      "size_bytes": 2183,
+      "sha256": "d989010c40735543c54e39d7bbf22b42455d0feaa0ed568a343d67e75c4aa6f4"
+    },
+    {
+      "path": "CODEX_START_HERE.md",
+      "size_bytes": 3632,
+      "sha256": "4f50a946925ff9c12c33e386ed1bc14abf16c163af8a0862a023e4fd483229f6"
+    },
+    {
+      "path": "MANIFEST.md",
+      "size_bytes": 1414,
+      "sha256": "5687f773702029ebe4e25ff523a38a18812883ac2bf7258357d085e13cdd67a0"
+    },
+    {
+      "path": "Makefile",
+      "size_bytes": 208,
+      "sha256": "2eced7d11cea195fce408d0b94c5e9dc1c9c1af9da860f4a6ceac93cdc7f8f71"
+    },
+    {
+      "path": "README.md",
+      "size_bytes": 4811,
+      "sha256": "a6ed6bd4464717daa627033ecea8a7ab7bff3e67a98b00849ca77720f431c9b3"
+    },
+    {
+      "path": "agent.md",
+      "size_bytes": 238,
+      "sha256": "52cd9a21402614adfa5c66c31a6874146e9b05373d624ed82e868eb1cd40e004"
+    },
+    {
+      "path": "backend/AGENTS.md",
+      "size_bytes": 4142,
+      "sha256": "012b8e58e58569d0581a024ef31344378a58d5089317ac6d8621cc31fc21e429"
+    },
+    {
+      "path": "backend/README.md",
+      "size_bytes": 688,
+      "sha256": "825dc5cad9ed992479fa656a80ce3d93daa119d875535ebfe479f202df44d624"
+    },
+    {
+      "path": "backend/src/README.md",
+      "size_bytes": 200,
+      "sha256": "0c2a0dd8a311c5c020e042e3563c858569ee9cbdf407ccb57f97a356d6bbfeb6"
+    },
+    {
+      "path": "docs/README.md",
+      "size_bytes": 903,
+      "sha256": "0429e1e478c5c67d09eadeec82fa640649014d611afdabbb73415d1626d2e994"
+    },
+    {
+      "path": "docs/business/00-assignment-summary.md",
+      "size_bytes": 1346,
+      "sha256": "f6ca8cf88eca3546ad464ce3e070f62ebf0de2d65e051d4020431d4d922685c8"
+    },
+    {
+      "path": "docs/business/01-product-brief.md",
+      "size_bytes": 2033,
+      "sha256": "aca9359e10e3333b5286a6c6e7cada082b31bd1012cbfd078539250365e6354c"
+    },
+    {
+      "path": "docs/business/02-glossary.md",
+      "size_bytes": 1667,
+      "sha256": "5cb2719ddf6384f5d8e30aba18cacf129bba04e7e420153ee35006e24ca5aabb"
+    },
+    {
+      "path": "docs/business/03-roles-and-permissions.md",
+      "size_bytes": 2716,
+      "sha256": "1efb8fbc1fa007ab35e7781a8c487e99f841c65a5c972f8f243f8f6c4cd06520"
+    },
+    {
+      "path": "docs/business/04-core-workflows.md",
+      "size_bytes": 3294,
+      "sha256": "6b9bbdb7b176c011509b3cfd1cd45ca940d24b35969640ea1359b7d4f1dec432"
+    },
+    {
+      "path": "docs/business/05-domain-rules.md",
+      "size_bytes": 3842,
+      "sha256": "b03c342a1835f25edd248a739dc69df4b8662e488706be8ef208a561aa64efb7"
+    },
+    {
+      "path": "docs/business/06-mvp-scope.md",
+      "size_bytes": 1915,
+      "sha256": "94b528d7d7fa9e14a6c80a10d424ea88650954f74fde0894d7c09a93e21be3f9"
+    },
+    {
+      "path": "docs/business/07-demo-script.md",
+      "size_bytes": 1928,
+      "sha256": "0bbf114b75a717f5db574a65c26a66032ba0245ee50ae5e11313b11f8c48d95a"
+    },
+    {
+      "path": "docs/decisions/ADR-001-modular-monolith.md",
+      "size_bytes": 461,
+      "sha256": "30c41040b01481a554002648d8dc2a9cf96cc52277d3493585342fa3acf5cb46"
+    },
+    {
+      "path": "docs/decisions/ADR-002-composition-no-polymorphism.md",
+      "size_bytes": 735,
+      "sha256": "8af1064c516ec22c493ade2271fc2746ffdc85bfc0232df782ceaabca6bd8d52"
+    },
+    {
+      "path": "docs/decisions/ADR-003-functions-services-selectors.md",
+      "size_bytes": 535,
+      "sha256": "d4793c37903faceaf44d223e5dfd0eee75ca12ee3f0c3c4741fefcee79c38bfe"
+    },
+    {
+      "path": "docs/decisions/ADR-004-jwt-cookie-memory.md",
+      "size_bytes": 675,
+      "sha256": "2d8e17411bf1509b73d1278ffa32de9bf9f989c6d4f6d825ed4c83cc4ab74c48"
+    },
+    {
+      "path": "docs/decisions/ADR-005-presigned-upload-realtime.md",
+      "size_bytes": 692,
+      "sha256": "d0b2eedc63646c66187bee685e5970c115386b4e766627dfd8559d2549babd8d"
+    },
+    {
+      "path": "docs/decisions/ADR-006-celery-outbox.md",
+      "size_bytes": 553,
+      "sha256": "e85cde3c656d52753c85f05108419d5c5bb908f0c4dc3c8548eccbe79b97b59e"
+    },
+    {
+      "path": "docs/decisions/ADR-007-settings-environments.md",
+      "size_bytes": 639,
+      "sha256": "eff2e11000225607e020bfd5b68d2af4434514e04b1f6eeb5a09e2cf116ff788"
+    },
+    {
+      "path": "docs/decisions/ADR-008-no-hard-delete.md",
+      "size_bytes": 600,
+      "sha256": "15025ae98c6122be5ac8fde66e0eb6b2ce820ca0f68a89e19e72f78874b1fc56"
+    },
+    {
+      "path": "docs/decisions/pending.md",
+      "size_bytes": 300,
+      "sha256": "716af6ddd9acdfcfd492629cdeca12b61406ef852fa777ecee5729d3aab71a1e"
+    },
+    {
+      "path": "docs/guardrails/01-simplicity-and-reviewability.md",
+      "size_bytes": 3088,
+      "sha256": "915d37bed818a1426f74e3766016355bd4cb1cd78f416bf2044b27b783bd4e11"
+    },
+    {
+      "path": "docs/guardrails/02-security.md",
+      "size_bytes": 4593,
+      "sha256": "5547fa6b21541ecbaee5304d7dd7d8f9a8e7f8dcc6bab194713a7d1b9c1fcef0"
+    },
+    {
+      "path": "docs/guardrails/03-data-tenancy-and-transactions.md",
+      "size_bytes": 2461,
+      "sha256": "61dfe48edb4cbd00cd4a7c4942b05ec66ef43683436195105bb3e00149524c26"
+    },
+    {
+      "path": "docs/guardrails/04-api-errors-filtering.md",
+      "size_bytes": 2217,
+      "sha256": "8584faaa303c7dd2dc9ed7db87c550ccdce2db9e4eb97d5b97f18e6ba9f84ecd"
+    },
+    {
+      "path": "docs/guardrails/05-testing.md",
+      "size_bytes": 2000,
+      "sha256": "5cdaab9466f63f9d39995849b713393b089476683a5c768b01840fb786a85652"
+    },
+    {
+      "path": "docs/guardrails/06-realtime-and-upload.md",
+      "size_bytes": 2459,
+      "sha256": "f50fe4e31d3bb2b9ff00556fb120cbc5dff979ff619b8a602e448f40ae46d687"
+    },
+    {
+      "path": "docs/guardrails/07-localization.md",
+      "size_bytes": 1469,
+      "sha256": "e63e2973829ef0aa3c6320d101528a86d2574c3a25206d71ea3a5c0ef61a8f4b"
+    },
+    {
+      "path": "docs/guardrails/08-ai-agent-working-rules.md",
+      "size_bytes": 1511,
+      "sha256": "758666f51cf5a9dd311b47a2f952a1a3117851926d93aabdb1054636caa0a831"
+    },
+    {
+      "path": "docs/guardrails/09-dependency-policy.md",
+      "size_bytes": 1240,
+      "sha256": "6a2533a257080481af0ae4f3ae32525ce75aeed837c6890d1e2ceac01860a420"
+    },
+    {
+      "path": "docs/guardrails/10-spec-driven-workflow.md",
+      "size_bytes": 1807,
+      "sha256": "3e87df9e4f288abf28f1f02739e75eb7cbf7af44423c4ae457ac9d6cf102702e"
+    },
+    {
+      "path": "docs/presentation/interview-outline.md",
+      "size_bytes": 1788,
+      "sha256": "8ef98295a72e57187a94eb95b486074d4bc6b3eb3552e241f2d39a1fce340ced"
+    },
+    {
+      "path": "docs/tech/01-architecture.md",
+      "size_bytes": 2583,
+      "sha256": "a41e7b236e1511d1141cd7ee1838fecb37647b6672116cd5f672dbafc8c0b89d"
+    },
+    {
+      "path": "docs/tech/02-backend.md",
+      "size_bytes": 3508,
+      "sha256": "4ba4315f1019942228751d0432d572f3319dfb40c5ad2e5f418e54d6317acc84"
+    },
+    {
+      "path": "docs/tech/03-frontend.md",
+      "size_bytes": 2234,
+      "sha256": "8512469d7d527df70b9dccccc833d14dfaf9c252afbd4b600dcab1ad212246fd"
+    },
+    {
+      "path": "docs/tech/04-data-model.md",
+      "size_bytes": 4967,
+      "sha256": "4db669245df1b168eb473a65b1c139de6948387d01dac0682ee90f8e6b3c0b3d"
+    },
+    {
+      "path": "docs/tech/05-auth-jwt.md",
+      "size_bytes": 2526,
+      "sha256": "4cad3b1b5c8c57d2c7fa22546f44c094a6ae04718a815fbf432ebe1aad92908d"
+    },
+    {
+      "path": "docs/tech/06-minio-upload.md",
+      "size_bytes": 2469,
+      "sha256": "7f516186d79c4cb6e819efc89840cae2e0b973cdc0aeda66cf67543f1e235979"
+    },
+    {
+      "path": "docs/tech/07-realtime.md",
+      "size_bytes": 1544,
+      "sha256": "8bf35679a059a086af625a29898701df5ea9ee86be8f681edbe2ae9953f79ceb"
+    },
+    {
+      "path": "docs/tech/08-background-jobs.md",
+      "size_bytes": 1376,
+      "sha256": "d5e7307d54fa984c738c29d7c87447c5306cd4f7bcec3212a5f909535a24abef"
+    },
+    {
+      "path": "docs/tech/09-notifications.md",
+      "size_bytes": 1843,
+      "sha256": "8e09dbe828550f022dd53590ef57afa4581e9cd63449845103d8e20d1c6ca757"
+    },
+    {
+      "path": "docs/tech/10-openapi.md",
+      "size_bytes": 1185,
+      "sha256": "5c7c29d366ffa1338a651ca6bdc8605c79897f20c97f63081da08b4e936b8ced"
+    },
+    {
+      "path": "docs/tech/11-environments-settings.md",
+      "size_bytes": 1652,
+      "sha256": "dec42c2632b480c2f22857564a1a8bc67b3c8625ddd64973ea0afe85b1b5cc49"
+    },
+    {
+      "path": "docs/tech/12-docker.md",
+      "size_bytes": 1864,
+      "sha256": "aae29f96358de3e354aee4661bf42a21ded24d4d1232cca195f196052dff8924"
+    },
+    {
+      "path": "docs/tech/13-observability.md",
+      "size_bytes": 1255,
+      "sha256": "e0ccac3c9b2814a6f4990202167563ff4e1e9d74f34665f06c44b8a9088ab7e6"
+    },
+    {
+      "path": "docs/tech/14-testing-tooling.md",
+      "size_bytes": 1074,
+      "sha256": "85fb9703aafb45f12b8f5552ae02e0e1d0c549add4111f191bbf5a1b2b7515c7"
+    },
+    {
+      "path": "docs/tech/15-api-endpoint-map.md",
+      "size_bytes": 4759,
+      "sha256": "ab1bf46f92dc4a85588986054490502dcadcf7efc5ec10647758a20fd8474dc9"
+    },
+    {
+      "path": "docs/tech/16-enum-catalog.md",
+      "size_bytes": 2095,
+      "sha256": "fe865516b100401a62c7d81ff249e8b7c7420cb5caa46eeca0592606ba8ad663"
+    },
+    {
+      "path": "docs/tech/17-rate-limiting.md",
+      "size_bytes": 3426,
+      "sha256": "1baa04e89ae521fe8ae0b415b10cbfa11b6fb03be10b8fd8ce30a4b89497ecbb"
+    },
+    {
+      "path": "docs/tech/18-common-base-classes.md",
+      "size_bytes": 3501,
+      "sha256": "55f0977b50bf7787c8b41a14f039645ce1fc20adf7ba652cc3ea5cb2619c1b9d"
+    },
+    {
+      "path": "docs/tech/asyncapi.yaml",
+      "size_bytes": 2717,
+      "sha256": "b6dac770de8f23eff4cc8273eaba62c636354737b20679d6588114c92f34a191"
+    },
+    {
+      "path": "docs/templates/ADR_TEMPLATE.md",
+      "size_bytes": 543,
+      "sha256": "4993f5655bf529e572acab77fd0c3ab2e89a33799a833152fb52485671bdee22"
+    },
+    {
+      "path": "docs/templates/CODE_REVIEW_CHECKLIST.md",
+      "size_bytes": 1584,
+      "sha256": "2a380784e2632e386fbf71b90a187f76e98c2559f5ea92daddeb29636f611bd6"
+    },
+    {
+      "path": "docs/templates/SERVICE_SELECTOR_EXAMPLE.md",
+      "size_bytes": 1961,
+      "sha256": "cd38aa2c0b200b9731a8edede187351f7b82afc339f4fb80d916585df719ffc8"
+    },
+    {
+      "path": "docs/templates/SPEC_TEMPLATE.md",
+      "size_bytes": 1186,
+      "sha256": "968b72b9231a79656664d7560bdd0a857ddabe1a9f4dbe8979da19c6818348c5"
+    },
+    {
+      "path": "docs/templates/TASK_TEMPLATE.md",
+      "size_bytes": 759,
+      "sha256": "c4e6b77bea98f3e62116c173ac1e8c793606c8a09f32f1d14d17c0303f2d1ac1"
+    },
+    {
+      "path": "docs/traceability/definition-of-done.md",
+      "size_bytes": 1248,
+      "sha256": "4aafbe6d603469b520f5f1df6e2cda724900eeff38a38a2bfd28da7769c1afad"
+    },
+    {
+      "path": "docs/traceability/matrix.md",
+      "size_bytes": 1075,
+      "sha256": "0a90284cf1eb4d7b4263c1e016f3f71b5f350179d396acc9b098315371b1307d"
+    },
+    {
+      "path": "docs/traceability/requirements.md",
+      "size_bytes": 2021,
+      "sha256": "f6a05e96ebf3ce754ad4a8a17ecaf5b64cb26fb5dd519a1c08b7975aeb5c2134"
+    },
+    {
+      "path": "frontend/AGENTS.md",
+      "size_bytes": 2753,
+      "sha256": "f3d392c0b20f41c286a5e519958031ea3e21d09ba667397d5a29cfb7f5c22eaa"
+    },
+    {
+      "path": "frontend/README.md",
+      "size_bytes": 523,
+      "sha256": "45f746ace2965ac05d2abc712023a1d4244f6b15360ec523e5d8d256022bb079"
+    },
+    {
+      "path": "frontend/src/README.md",
+      "size_bytes": 135,
+      "sha256": "685fb031b3105d12837192197300922a0867717565c9f48e862cc6936f8056ec"
+    },
+    {
+      "path": "infra/AGENTS.md",
+      "size_bytes": 869,
+      "sha256": "e55a59edf99d21c56b65eeb4afa0e8fe73090a373a1520a0454a90d25365f415"
+    },
+    {
+      "path": "infra/README.md",
+      "size_bytes": 545,
+      "sha256": "43c0765e702da586e7f4e2e0b7ba2246a4aa7156659e3e6fd946156fe8793d43"
+    },
+    {
+      "path": "scripts/check_simplicity.py",
+      "size_bytes": 5331,
+      "sha256": "605a48443189e3c0756d8a636f46c67225b806e38a93afd9fd22a4ae8e695537"
+    },
+    {
+      "path": "scripts/list_tasks.py",
+      "size_bytes": 589,
+      "sha256": "0ef182b538641139286e33820d62d9e844afdfa8a0c022fc90df5ad4fec80b62"
+    },
+    {
+      "path": "scripts/start_next_task.py",
+      "size_bytes": 802,
+      "sha256": "7a9a7e5b487eaa2658b92a31d2cb12a66feb2b7fbd9474abc3ab8f3bdda38142"
+    },
+    {
+      "path": "scripts/validate_docs.py",
+      "size_bytes": 5984,
+      "sha256": "d1631897581f3961d2f341fad9df83fb3303f91fff298712e938ca6b4c17be3b"
+    },
+    {
+      "path": "specs/README.md",
+      "size_bytes": 595,
+      "sha256": "5a8cb1cb5deda14a17c03b2bda73b7a6eb1c148268a41cfa49d5a32e09f6fda6"
+    },
+    {
+      "path": "specs/backend/BE-000-foundation.md",
+      "size_bytes": 3705,
+      "sha256": "5dbe4d691e14e1101167a4970f93d7340bf57e30632d100f9ef12795142ff7c2"
+    },
+    {
+      "path": "specs/backend/BE-001-authentication.md",
+      "size_bytes": 3608,
+      "sha256": "9b5d015ceebe01e0432b4127e67890b563a28068b4673bf59872fe4307444d37"
+    },
+    {
+      "path": "specs/backend/BE-002-organizations-permissions.md",
+      "size_bytes": 2970,
+      "sha256": "dacdbc5e3fb111145eec6d581c26e8e743470b4e589f8b7e6670b63c1fb45b04"
+    },
+    {
+      "path": "specs/backend/BE-003-cases.md",
+      "size_bytes": 3067,
+      "sha256": "f2c07b595832eb4b9367e1cd39dd1660b026a8a03b6856b0195373ddef46a76b"
+    },
+    {
+      "path": "specs/backend/BE-004-contracts.md",
+      "size_bytes": 2415,
+      "sha256": "e08a949097122cf9a2f96d59eafc6e44dc57242e9dafc5fb2dada89edd887932"
+    },
+    {
+      "path": "specs/backend/BE-005-notices.md",
+      "size_bytes": 2317,
+      "sha256": "b38c9cd9c72b8e4a1574fef24436494361f59a19fcd0f4874f205f45bf486a63"
+    },
+    {
+      "path": "specs/backend/BE-006-deadlines-tasks.md",
+      "size_bytes": 3256,
+      "sha256": "d1d84dd71676469aa3b73152801ca0c039f032be017b24421aae61b22ddbcc5e"
+    },
+    {
+      "path": "specs/backend/BE-007-documents-uploads.md",
+      "size_bytes": 3393,
+      "sha256": "ff23af4f80fb472d6678af6757babfbaa244a4e59bc4cc1550cb9b78a3844e7c"
+    },
+    {
+      "path": "specs/backend/BE-008-activity-outbox.md",
+      "size_bytes": 2784,
+      "sha256": "c895b27db40d77ce49088a690dd9cb12969f28d881bd1fe3b6fa4c2cf91e5570"
+    },
+    {
+      "path": "specs/backend/BE-009-notifications-realtime.md",
+      "size_bytes": 2995,
+      "sha256": "8da3928e04e0b03e16c097f12e09a129061a5a1cdde5bdc40bef63c5b8eaa1d0"
+    },
+    {
+      "path": "specs/backend/BE-010-dashboard.md",
+      "size_bytes": 1988,
+      "sha256": "7a2be14d6b2c782c4d2f18fb3ea2bafa7650552fd98790993bdb1f1849688517"
+    },
+    {
+      "path": "specs/backend/BE-011-offboarding.md",
+      "size_bytes": 2584,
+      "sha256": "92f77fb9204d09eb83fd624ce12c461ea44204d20967312c370bcf0dfeec1a3e"
+    },
+    {
+      "path": "specs/backend/BE-012-api-localization.md",
+      "size_bytes": 2337,
+      "sha256": "f63321195c429102ccf6349e9208a63583f2f05666649a5a9dd89205623957fb"
+    },
+    {
+      "path": "specs/backend/BE-013-security-deployment.md",
+      "size_bytes": 2491,
+      "sha256": "17c039daf2f4b451a104833bacc22517fef6bee8b5aa7755182c679e8ce44955"
+    },
+    {
+      "path": "specs/frontend/FE-000-foundation.md",
+      "size_bytes": 2371,
+      "sha256": "e98320391352502ae4646a99d8c97ab3068fd982bc4035b35106e76389ec3bd3"
+    },
+    {
+      "path": "specs/frontend/FE-001-authentication.md",
+      "size_bytes": 2297,
+      "sha256": "b9ac8b879b20d49b4a6b729a42d3bf8236c99bc8e131c787805c6b01c4518319"
+    },
+    {
+      "path": "specs/frontend/FE-002-app-shell-permissions.md",
+      "size_bytes": 1942,
+      "sha256": "7f9e150a633227031186930622e3ca2d478a30ccb724f87b079c8789169ee89c"
+    },
+    {
+      "path": "specs/frontend/FE-003-cases.md",
+      "size_bytes": 1906,
+      "sha256": "cecd36f641d030e5d5e66c1ec220c9736d053f20d3339f56713b3b3ba7fcbd83"
+    },
+    {
+      "path": "specs/frontend/FE-004-contracts.md",
+      "size_bytes": 1631,
+      "sha256": "4827ae2696ded870fc4e24d6dacbdae90c4bed21ae75b4b0f97c92e16c77512a"
+    },
+    {
+      "path": "specs/frontend/FE-005-notices.md",
+      "size_bytes": 1523,
+      "sha256": "317c4ca4fca9fa7336832eb35e8eebe68db87c1d8decdc8373a816693ece045b"
+    },
+    {
+      "path": "specs/frontend/FE-006-deadlines-tasks.md",
+      "size_bytes": 1865,
+      "sha256": "a67b2cedbdf0b263e54825fab81f479c19c8b47141ec783665ac575d3839948f"
+    },
+    {
+      "path": "specs/frontend/FE-007-documents-upload.md",
+      "size_bytes": 2719,
+      "sha256": "10fdd75e7a4a31f558740c37b673475e0bf648b4790b3cf4d141663ee3b5d9d2"
+    },
+    {
+      "path": "specs/frontend/FE-008-dashboard.md",
+      "size_bytes": 1211,
+      "sha256": "c6ad9f978086323b3fbfece79fb7c5fd9a2464c26e8b539a68ecb3619b5faec8"
+    },
+    {
+      "path": "specs/frontend/FE-009-notifications-activity-realtime.md",
+      "size_bytes": 2086,
+      "sha256": "cfa329a21bdedf7fdaaec86ad9a8ed558ddd150f0027ed7b4b843f1da9d949bd"
+    },
+    {
+      "path": "specs/frontend/FE-010-offboarding.md",
+      "size_bytes": 1866,
+      "sha256": "a1c2b9804710a9deacb12a1ed6da543e2aed71198aa1ecf9de1c217d3a146006"
+    },
+    {
+      "path": "specs/frontend/FE-011-localization-accessibility.md",
+      "size_bytes": 2209,
+      "sha256": "e7cb2ee0aabd6b46484d5542715ec886eff5e175a9291a8a219277bf7af1dc74"
+    },
+    {
+      "path": "specs/frontend/FE-012-testing-delivery.md",
+      "size_bytes": 1787,
+      "sha256": "47479d8293666c8137837c7f42a04fd26e3d0a22bb2260ca709827e9bb4578dc"
+    },
+    {
+      "path": "tasks/INDEX.md",
+      "size_bytes": 10354,
+      "sha256": "4ca006fbd40db885de81c1911c44e117e2e89405425eb2ed6016eadc2e9a38e7"
+    },
+    {
+      "path": "tasks/ORDER.md",
+      "size_bytes": 1616,
+      "sha256": "6b061a345fc9345e92dfe52803bf3ff79552bdc044b9fb23d81c5899746ac092"
+    },
+    {
+      "path": "tasks/README.md",
+      "size_bytes": 648,
+      "sha256": "2d8e93f66cb38af116bb376f778159e8afc8948c1eab857550bfc93065773434"
+    },
+    {
+      "path": "tasks/TIMEBOX.md",
+      "size_bytes": 2409,
+      "sha256": "a73791a084ed725d930b0c5d2f8d1ae392d18c1b206bc710cb61c01e8bedae8a"
+    },
+    {
+      "path": "tasks/backend/BE-001-scaffold-django-project-and-lock-dependencies.md",
+      "size_bytes": 1519,
+      "sha256": "80e7e4cd582f2a25e742f833c76b2111aac125a3399f4c563e7123c1575170c4"
+    },
+    {
+      "path": "tasks/backend/BE-002-implement-settings-modules-and-environment-validation.md",
+      "size_bytes": 1688,
+      "sha256": "a981253be0a6268e51dfdd6ee61ce9fe745edfe806b718a7a8e85097ab7519fe"
+    },
+    {
+      "path": "tasks/backend/BE-003-add-common-model-api-base-classes-and-error-envelope.md",
+      "size_bytes": 1686,
+      "sha256": "cc6e94e20a8ad080ced721c4878757acbd9634ff526053db0956103d70f3b675"
+    },
+    {
+      "path": "tasks/backend/BE-004-configure-drf-filters-openapi-health-and-structured-logging.md",
+      "size_bytes": 1563,
+      "sha256": "e29ab23f61cb2a49624bbd867de651fc53b3e2b8d25416b41bdf2dca7f31f777"
+    },
+    {
+      "path": "tasks/backend/BE-005-create-development-docker-compose-infrastructure.md",
+      "size_bytes": 1633,
+      "sha256": "6ea70de36857b7a06dab8c0ceb3f5b08fe96bca5aba0b1a446649ddd3b4d8c95"
+    },
+    {
+      "path": "tasks/backend/BE-006-add-backend-ci-and-documentation-guard-checks.md",
+      "size_bytes": 1328,
+      "sha256": "6f1013fd5f2e1b0519d2669adc08bb150f780efc336fe51b8f440ea1504c74d5"
+    },
+    {
+      "path": "tasks/backend/BE-007-implement-custom-user-model-and-initial-migration.md",
+      "size_bytes": 1449,
+      "sha256": "7b1933e0f2c7573357ecc1a0add01f82f34c77662129669113cc4ebfd5448e50"
+    },
+    {
+      "path": "tasks/backend/BE-008-implement-organization-and-membership-models.md",
+      "size_bytes": 1506,
+      "sha256": "4290877af0805e96432db965fd4e80a89ab6d19808092bec08fb0bc35b9b8195"
+    },
+    {
+      "path": "tasks/backend/BE-009-implement-jwt-login-refresh-logout-and-me.md",
+      "size_bytes": 1766,
+      "sha256": "8e357bc6db5004b4c7f4d3b99592421610591f9024ea48f7d7174190e3e93357"
+    },
+    {
+      "path": "tasks/backend/BE-010-add-authentication-throttles-and-one-time-websocket-tickets.md",
+      "size_bytes": 1583,
+      "sha256": "21829d7ba5307f4b0312ade247d484a17b111384fe358d4b208ff1c04313c6b4"
+    },
+    {
+      "path": "tasks/backend/BE-011-implement-explicit-role-and-matter-permission-functions.md",
+      "size_bytes": 1567,
+      "sha256": "e71375047980edb0580c52670861d36b9410cfc20dc43cc54c98fb23bf9ed56f"
+    },
+    {
+      "path": "tasks/backend/BE-012-implement-matter-matteraccess-and-matterrelation.md",
+      "size_bytes": 1720,
+      "sha256": "29c32c668fb8c49445cb6b13c8076a3cbb90ba3309656c5ee25f87da8d5d07f0"
+    },
+    {
+      "path": "tasks/backend/BE-013-implement-legal-case-api-and-services.md",
+      "size_bytes": 1532,
+      "sha256": "41c97d24692d21002812ee0ddf4893f867271ecabd4ff2e55cf162fba57d0a8f"
+    },
+    {
+      "path": "tasks/backend/BE-014-implement-contract-api-and-date-rules.md",
+      "size_bytes": 1438,
+      "sha256": "82b07659a607c447d88ad4e6ad12afd5d6db48f38d1b450251597e6b432a181f"
+    },
+    {
+      "path": "tasks/backend/BE-015-implement-deadline-model-views-and-mutations.md",
+      "size_bytes": 1510,
+      "sha256": "a12eef99f82f6a9d1b1c447543098e8ebd2aa35b5aaa12db54ec6c4b42c8ddf1"
+    },
+    {
+      "path": "tasks/backend/BE-016-implement-legal-notice-api-with-linked-response-deadline.md",
+      "size_bytes": 1484,
+      "sha256": "1ad5ec7dc8ad1e149038a37975f65e28e56f08e5b3f6359cb90eaa87774a2f58"
+    },
+    {
+      "path": "tasks/backend/BE-017-implement-task-api-and-assignment-rules.md",
+      "size_bytes": 1328,
+      "sha256": "167f80c9041a8b6c4bcd0c3a2eb69188a22a4059ecada9ac2ceed87e681c8a8a"
+    },
+    {
+      "path": "tasks/backend/BE-018-implement-version-conflict-and-idempotency-primitives.md",
+      "size_bytes": 1625,
+      "sha256": "42d1eb2121c066e71bd225fe52f3562e44088ecfaff25199519a842ed83403e8"
+    },
+    {
+      "path": "tasks/backend/BE-019-implement-activitylog-and-transactional-outbox.md",
+      "size_bytes": 1443,
+      "sha256": "a23f01b700cc11e06d62903abfa7880965ad4a58e7b237b8b199bf220e0a6bda"
+    },
+    {
+      "path": "tasks/backend/BE-020-implement-minio-client-and-upload-initiation.md",
+      "size_bytes": 1597,
+      "sha256": "e75d1db69b266fa704638ba93c5f410512287233fd0cb9d333831f9e83c8f444"
+    },
+    {
+      "path": "tasks/backend/BE-021-implement-upload-completion-processing-document-list-download.md",
+      "size_bytes": 1522,
+      "sha256": "01399f63ee93c1078ccbc736149c1ed6de46077550c4420e82d4e6fa81006a57"
+    },
+    {
+      "path": "tasks/backend/BE-022-implement-channels-user-event-stream-and-publishing.md",
+      "size_bytes": 1673,
+      "sha256": "4d7e85b343e3af23b041bc1c1655c82eb70677d34f43ebabc0d71c3ca9270b69"
+    },
+    {
+      "path": "tasks/backend/BE-023-implement-notification-preferences-and-delivery-functions.md",
+      "size_bytes": 1627,
+      "sha256": "860264ea10fd1a506caf1eb6f2f9a67237913610a3794a9847e30ac1403262bf"
+    },
+    {
+      "path": "tasks/backend/BE-024-implement-deadline-reminder-scheduling.md",
+      "size_bytes": 1483,
+      "sha256": "a3d999d23bbfc701f11777fb03848e3a20b35dea784752d2066436a0e94c397e"
+    },
+    {
+      "path": "tasks/backend/BE-025-implement-permission-aware-dashboard-selectors-and-api.md",
+      "size_bytes": 1327,
+      "sha256": "81c70e7a7bf1283c8414a07ee19ace8484b67b6617a0223b74c4434503eaa2e8"
+    },
+    {
+      "path": "tasks/backend/BE-026-implement-activity-list-and-matter-timeline-apis.md",
+      "size_bytes": 1305,
+      "sha256": "f98a4fc5d89667c83b10c78f10456a4de0cd7b61e9a047bf4f9d98918009291d"
+    },
+    {
+      "path": "tasks/backend/BE-027-implement-offboarding-preview-and-atomic-execute.md",
+      "size_bytes": 1513,
+      "sha256": "1709950547b31ab510e37b890e9f3c215191f40743fa20c1184655fb6b349381"
+    },
+    {
+      "path": "tasks/backend/BE-028-complete-localization-and-per-domain-openapi.md",
+      "size_bytes": 1579,
+      "sha256": "47d82f9326f1399ca8d54065a15082f3ff7eb3d22b654f0613af395803a72353"
+    },
+    {
+      "path": "tasks/backend/BE-029-review-filters-indexes-and-query-efficiency.md",
+      "size_bytes": 1694,
+      "sha256": "5fc33891e75fec9b072b30264164855f4995aca367d72265254f4aad4ef8f2ce"
+    },
+    {
+      "path": "tasks/backend/BE-030-run-focused-backend-security-test-suite.md",
+      "size_bytes": 1478,
+      "sha256": "8c0996edff66a5a0b64fc66d1bcf52241195c12caac7f0df2965adc67fce6615"
+    },
+    {
+      "path": "tasks/backend/BE-031-create-production-docker-and-compose-overlay.md",
+      "size_bytes": 1564,
+      "sha256": "cfbfe2a332a9e1b6a2f630933096cea793cfb91af69a1aab720fc6a9ec499c36"
+    },
+    {
+      "path": "tasks/backend/BE-032-create-idempotent-seed-data-command.md",
+      "size_bytes": 1533,
+      "sha256": "61d69cb12343b64bd56e47da7f5e66fc28f771c295d87050743ef3fc63e5de36"
+    },
+    {
+      "path": "tasks/backend/BE-033-complete-backend-readme-and-ai-evidence.md",
+      "size_bytes": 1426,
+      "sha256": "5ee967b13b18a41cdd132556c4893ff1376b077f8068e10d84ef2fd9bf31170c"
+    },
+    {
+      "path": "tasks/backend/BE-034-final-backend-acceptance-verification.md",
+      "size_bytes": 1654,
+      "sha256": "7952777503913c822aba9df0e296a60b7d75b71cfd2b5efd7559217e0682b108"
+    },
+    {
+      "path": "tasks/frontend/FE-001-scaffold-react-typescript-application.md",
+      "size_bytes": 1377,
+      "sha256": "961105eeacf4410702de34d1e933787d52126293f699b7805caa00d11e5925e6"
+    },
+    {
+      "path": "tasks/frontend/FE-002-implement-typed-api-client-and-error-contract.md",
+      "size_bytes": 1393,
+      "sha256": "81ed97a44434f7af977005a91d40a2b1d8ff36f4d50331285043d1476e4e5001"
+    },
+    {
+      "path": "tasks/frontend/FE-003-create-app-providers-router-and-standard-states.md",
+      "size_bytes": 1304,
+      "sha256": "860beddebe417d25541db8c089935fc9ca856b1d56114403e6ac48f9bea5616a"
+    },
+    {
+      "path": "tasks/frontend/FE-004-implement-login-session-restore-refresh-and-logout.md",
+      "size_bytes": 1511,
+      "sha256": "2aa1741bfcbb874ec7eaacbc1b33acc338792d99073367bc73ac08feb9536b53"
+    },
+    {
+      "path": "tasks/frontend/FE-005-implement-app-shell-and-explicit-permission-helpers.md",
+      "size_bytes": 1340,
+      "sha256": "d0850be724e01b04df9ca999755033ebdfbadba91dac2893a9d8791ae58444cf"
+    },
+    {
+      "path": "tasks/frontend/FE-006-add-localization-foundation-and-common-form-table-components.md",
+      "size_bytes": 1422,
+      "sha256": "6161aa960970f13e818074161aca401f932e2971a9283c299e28314b21d8c48f"
+    },
+    {
+      "path": "tasks/frontend/FE-007-implement-case-list-detail-form-and-timeline.md",
+      "size_bytes": 1363,
+      "sha256": "ae496cf361dbd3d44f6cf8e2f5761bfede5ad725a4e981f9353796181b9a9c16"
+    },
+    {
+      "path": "tasks/frontend/FE-008-implement-contract-screens-and-date-validation.md",
+      "size_bytes": 1283,
+      "sha256": "37ad7641d7e31eee9a54e05b684a5e042b81a3916a0e6aabc2caa6351dbb86c1"
+    },
+    {
+      "path": "tasks/frontend/FE-009-implement-deadline-views-and-mutations.md",
+      "size_bytes": 1327,
+      "sha256": "d14f99b08ce53073932c222ee7f1833fec384fd8ae1a0fbaa12c80e240e03caa"
+    },
+    {
+      "path": "tasks/frontend/FE-010-implement-legal-notice-screens-and-linked-deadline-refresh.md",
+      "size_bytes": 1369,
+      "sha256": "65f87fe8f355d666fe1eedfaf6202fa10388bac7b9ef2e91df8226d9a7e19fd2"
+    },
+    {
+      "path": "tasks/frontend/FE-011-implement-task-list-and-matter-task-sections.md",
+      "size_bytes": 1208,
+      "sha256": "7488c46886f04c7693ed9ddb430a86e37ef472d7b10610b0457f433c4eba8111"
+    },
+    {
+      "path": "tasks/frontend/FE-012-implement-document-upload-initiation-and-direct-transfer.md",
+      "size_bytes": 1450,
+      "sha256": "3430f595a465acc20e653d7ae847d7e8e2ae59a71c79c10da1b94f7e940ca250"
+    },
+    {
+      "path": "tasks/frontend/FE-013-implement-upload-completion-realtime-recovery-document-list-download.md",
+      "size_bytes": 1609,
+      "sha256": "902b3f8f12ed1abeb1456c3bb78151cf10e65bd30a97f637bbf58a9e41253741"
+    },
+    {
+      "path": "tasks/frontend/FE-014-implement-dashboard.md",
+      "size_bytes": 1199,
+      "sha256": "c23bed32b2d7ad06e1082942c35aa98f7234eebdee1fbee7329092a4555f329b"
+    },
+    {
+      "path": "tasks/frontend/FE-015-implement-notification-center-and-preferences.md",
+      "size_bytes": 1359,
+      "sha256": "8b78a91c5e17527286aa79989531e4e533f128f277f55f42a4bb74e8e7c05a90"
+    },
+    {
+      "path": "tasks/frontend/FE-016-implement-activity-list-and-matter-timeline-presentation.md",
+      "size_bytes": 1316,
+      "sha256": "ac4683b539eb93968bd4bdffe41368ee13aa31f161ae12b833ab764dd9c91add"
+    },
+    {
+      "path": "tasks/frontend/FE-017-implement-admin-offboarding-workflow.md",
+      "size_bytes": 1396,
+      "sha256": "a54a364282cb78d80f8e3d62297c224a675d2f82ceffdc9611346537f66b6839"
+    },
+    {
+      "path": "tasks/frontend/FE-018-complete-persian-rtl-and-jalali-date-behavior.md",
+      "size_bytes": 1404,
+      "sha256": "a49828d61469fdc7529b44a365356e65ddabb3ee07e96445a1b8188f4d4344ba"
+    },
+    {
+      "path": "tasks/frontend/FE-019-run-frontend-security-and-accessibility-verification.md",
+      "size_bytes": 1417,
+      "sha256": "6bec2f86a2b7ff02bcee20cf9cb6bdab3317635fb0687049c3432c8489c99caa"
+    },
+    {
+      "path": "tasks/frontend/FE-020-create-production-frontend-image-and-proxy-integration.md",
+      "size_bytes": 1476,
+      "sha256": "ca29947d1ccfb4a983d5dc96a6b5d5acd191d7e75721ffb72c5e7a2485b3ea45"
+    },
+    {
+      "path": "tasks/frontend/FE-021-complete-frontend-readme-and-final-acceptance.md",
+      "size_bytes": 1401,
+      "sha256": "6649dc3e23fe5384b07f6afad5ddcabc0a14c2ff81c8a1ff71a971ae0c34e172"
+    },
+    {
+      "path": "tasks/integration/INT-001-verify-authentication-and-role-contract.md",
+      "size_bytes": 1535,
+      "sha256": "5a1f7b893b1256f3b451f7a61c470559c698efad256436e1713fd996f6cd4cc8"
+    },
+    {
+      "path": "tasks/integration/INT-002-verify-cases-contracts-and-notices.md",
+      "size_bytes": 1515,
+      "sha256": "962266864adf165c642cc7b9727f9b5fbc1d847d88d9fbf89a0c02ffd68eed5f"
+    },
+    {
+      "path": "tasks/integration/INT-003-verify-deadline-and-task-critical-path.md",
+      "size_bytes": 1289,
+      "sha256": "55987ba1824d720e69ed968af028fccfcfc60e35d0142bacc085c60cc21c72e3"
+    },
+    {
+      "path": "tasks/integration/INT-004-verify-document-upload-and-realtime-recovery.md",
+      "size_bytes": 1555,
+      "sha256": "820b2c6aeff5457d287fdbc2660cddec5776c5e4213ee52d8fc00ae02a66b0ea"
+    },
+    {
+      "path": "tasks/integration/INT-005-verify-notifications-activity-and-dashboard.md",
+      "size_bytes": 1491,
+      "sha256": "9fa07b7f08f44aafc1306e1fb82b0b285efb030c32a3471281f31a37bdff9aff"
+    },
+    {
+      "path": "tasks/integration/INT-006-verify-offboarding-atomicity-end-to-end.md",
+      "size_bytes": 1294,
+      "sha256": "35c0d5c32b4ceaf0f5db0bed1e5521447f1ba4eba5970be6a0670ec2aaae57c2"
+    },
+    {
+      "path": "tasks/integration/INT-007-verify-persian-locale-rtl-and-jalali-dates.md",
+      "size_bytes": 1298,
+      "sha256": "36fd33cddf391cf8b1b765648b02de4fd9363ec968c8a9a8b821e3c274dbd089"
+    },
+    {
+      "path": "tasks/integration/INT-008-final-assignment-delivery-and-presentation-rehearsal.md",
+      "size_bytes": 1730,
+      "sha256": "eeafd78649d9665aeb5b2ea9490d97a8d0c0bfee16c26b94bc69c955d1c20b69"
+    }
+  ]
+}

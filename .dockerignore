@@ -1,0 +1,46 @@
+# Secrets and local environment
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Version control and local tooling
+.git
+.codex
+.idea
+.vscode
+.DS_Store
+Thumbs.db
+
+# Python caches and environments
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+.venv/
+venv/
+build/
+dist/
+*.egg-info/
+
+# Runtime data
+backend/staticfiles/
+backend/media/
+backend/db.sqlite3
+volumes/
+.local/
+*.log
+
+# Frontend dependencies and builds
+frontend/node_modules/
+frontend/dist/
+frontend/coverage/
+frontend/.vite/
+
+# Generated contracts
+openapi.generated.yaml
+frontend/src/api/generated/

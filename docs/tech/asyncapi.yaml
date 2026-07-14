@@ -1,0 +1,96 @@
+asyncapi: 2.6.0
+info:
+  title: Legal Management User Events
+  version: 1.0.0
+  description: Minimal contract for server-to-client user events. PostgreSQL/REST remain authoritative.
+servers:
+  production:
+    url: wss://{host}/ws/v1/events/
+    protocol: wss
+    variables:
+      host:
+        default: example.invalid
+channels:
+  userEvents:
+    subscribe:
+      message:
+        oneOf:
+          - $ref: '#/components/messages/UploadStatusChanged'
+          - $ref: '#/components/messages/NotificationCreated'
+          - $ref: '#/components/messages/OffboardingStatusChanged'
+components:
+  schemas:
+    EventBase:
+      type: object
+      required: [event_id, event_type, version, occurred_at, data]
+      properties:
+        event_id:
+          type: string
+          format: uuid
+        event_type:
+          type: string
+        version:
+          type: integer
+          minimum: 1
+        occurred_at:
+          type: string
+          format: date-time
+        data:
+          type: object
+  messages:
+    UploadStatusChanged:
+      name: document.upload.status.changed
+      payload:
+        allOf:
+          - $ref: '#/components/schemas/EventBase'
+          - type: object
+            properties:
+              event_type:
+                const: document.upload.status_changed
+              data:
+                type: object
+                required: [upload_id, status]
+                properties:
+                  upload_id:
+                    type: string
+                    format: uuid
+                  status:
+                    type: string
+                  progress:
+                    type: integer
+                    minimum: 0
+                    maximum: 100
+    NotificationCreated:
+      name: notification.created
+      payload:
+        allOf:
+          - $ref: '#/components/schemas/EventBase'
+          - type: object
+            properties:
+              event_type:
+                const: notification.created
+              data:
+                type: object
+                required: [notification_id]
+                properties:
+                  notification_id:
+                    type: string
+                    format: uuid
+    OffboardingStatusChanged:
+      name: offboarding.status.changed
+      payload:
+        allOf:
+          - $ref: '#/components/schemas/EventBase'
+          - type: object
+            properties:
+              event_type:
+                const: offboarding.status_changed
+              data:
+                type: object
+                required: [run_id, status]
+                properties:
+                  run_id:
+                    type: string
+                    format: uuid
+                  status:
+                    type: string
