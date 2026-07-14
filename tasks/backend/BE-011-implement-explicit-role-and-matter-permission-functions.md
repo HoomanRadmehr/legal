@@ -1,6 +1,6 @@
 # BE-011: Implement explicit role and matter permission functions
 
-Status: TODO
+Status: DONE
 Priority: P0
 Area: Backend
 Related specs: BE-002
@@ -35,11 +35,11 @@ Create readable permission functions and one common permission base without a po
 
 ## Acceptance criteria
 
-- [ ] Every function is small and explicit.
-- [ ] Inactive membership denies access.
-- [ ] Cross-organization access is denied before object retrieval.
-- [ ] No bitwise permission expression or registry is used.
-- [ ] Role matrix matches business document.
+- [x] Every function is small and explicit.
+- [x] Inactive membership denies access.
+- [x] Cross-organization access is denied before object retrieval.
+- [x] No bitwise permission expression or registry is used.
+- [x] Role matrix matches business document.
 
 ## Verification commands
 
@@ -53,9 +53,25 @@ cd backend && python -m pytest apps/organizations/tests apps/matters/tests -q
 
 ## Codex execution log
 
-- Started:
-- Completed:
+- Started: 2026-07-14
+- Completed: 2026-07-14 18:07:31 +0330
 - Files changed:
+  - `backend/common/permissions.py`
+  - `backend/apps/organizations/permissions.py`
+  - `backend/apps/organizations/tests/test_permissions.py`
+  - `backend/apps/matters/__init__.py`
+  - `backend/apps/matters/permissions.py`
+  - `backend/apps/matters/tests/__init__.py`
+  - `backend/apps/matters/tests/test_permissions.py`
+  - `AI_USAGE.md`
+  - `tasks/backend/BE-011-implement-explicit-role-and-matter-permission-functions.md`
 - Commands run:
-- Result:
-- Deviations/questions:
+  - `cd backend && python -m pytest apps/organizations/tests apps/matters/tests -q` (failed before pytest: local pyenv points to missing Python 3.12)
+  - `cd backend && UV_PROJECT_ENVIRONMENT=/tmp/legal-be011-venv uv run --python /usr/bin/python3.12 python -m pytest apps/organizations/tests apps/matters/tests -q`
+  - `cd backend && UV_PROJECT_ENVIRONMENT=/tmp/legal-be011-venv uv run --python /usr/bin/python3.12 ruff check common/permissions.py apps/organizations/permissions.py apps/matters/permissions.py apps/organizations/tests/test_permissions.py apps/matters/tests/test_permissions.py`
+  - `cd backend && UV_PROJECT_ENVIRONMENT=/tmp/legal-be011-venv uv run --python /usr/bin/python3.12 ruff format --check common/permissions.py apps/organizations/permissions.py apps/matters/permissions.py apps/organizations/tests/test_permissions.py apps/matters/tests/test_permissions.py`
+  - `cd backend && UV_PROJECT_ENVIRONMENT=/tmp/legal-be011-venv uv run --python /usr/bin/python3.12 python manage.py makemigrations --check --dry-run` (passed with Django warning because local PostgreSQL role `legal_management` does not exist)
+  - `/usr/bin/python3.12 scripts/check_simplicity.py backend`
+  - `/usr/bin/python3.12 scripts/validate_docs.py`
+- Result: Implemented one small common permission base, explicit organization role helpers, an active membership resolver wrapper, matter visibility/edit functions, and a matter permission class that raises not-visible `404` behavior for hidden matters. Added role matrix tests with two organizations, inactive membership denial, active/revoked grants, viewer edit denial, and organization-scoped matter filtering checks.
+- Deviations/questions: The allowed scope omitted `backend/apps/matters/tests/`, but the required verification command includes `apps/matters/tests`; a minimal matter test package was added so the required command has a real test target. Matter models and grant writes remain out of scope. Viewer edit grants are denied because the business acceptance criteria say viewers cannot mutate matters.

@@ -7,7 +7,7 @@ Do not claim that a tool verified code unless its output was reviewed.
 
 | Tool | Purpose | Where used |
 |---|---|---|
-| Codex | Read task/spec guardrails, scaffolded backend and frontend foundations, generated lock files, implemented settings validation, common API primitives, health endpoints, OpenAPI components, logging redaction, Docker Compose infrastructure, backend CI, guard checks, the custom user model, organization tenancy models, JWT auth endpoints, authentication throttles, one-time WebSocket tickets, the typed frontend API client, the frontend app shell providers/router/states, and the localization/component foundation, and reviewed verification output | BE-001 through BE-010 backend foundation; FE-001 through FE-003 and FE-006 frontend foundation |
+| Codex | Read task/spec guardrails, scaffolded backend and frontend foundations, generated lock files, implemented settings validation, common API primitives, health endpoints, OpenAPI components, logging redaction, Docker Compose infrastructure, backend CI, guard checks, the custom user model, organization tenancy models, explicit role and matter permission functions, JWT auth endpoints, authentication throttles, one-time WebSocket tickets, the typed frontend API client, the frontend app shell providers/router/states, and the localization/component foundation, and reviewed verification output | BE-001 through BE-011 backend foundation; FE-001 through FE-003 and FE-006 frontend foundation |
 | ChatGPT | Requirements and architecture planning | Initial specification starter |
 | Other | TODO | TODO |
 
@@ -49,6 +49,8 @@ BE-008 update: Codex read the root/backend AGENTS files, `BE-002`, `BE-013`, and
 BE-009 update: Codex read the root/backend AGENTS files, `BE-001`, and relevant JWT/security/API/testing/localization/OpenAPI docs; added CSRF bootstrap, login, refresh rotation, logout, and current-user endpoints; wired Simple JWT blacklist support, refresh cookie attributes, URL routing, stable auth error codes, OpenAPI declarations, and focused auth API tests; and reviewed verification output before marking the task done.
 
 BE-010 update: Codex read the root/backend AGENTS files, `BE-001`, `BE-009`, and relevant JWT/realtime/rate-limiting/security/API/testing/localization docs; added explicit login, refresh, and WebSocket ticket throttles; added short-lived one-time WebSocket ticket helpers; documented 429 responses and `Retry-After`; added focused auth tests for throttle envelopes, hashed login identifiers, ticket entropy/TTL, one-time consumption, and JWT exclusion from ticket URLs; and reviewed verification output before marking the task done.
+
+BE-011 update: Codex read the root/backend AGENTS files, `BE-002`, and relevant backend architecture/data-model/security/API-error/testing/localization/common-base docs; added a small common permission base, explicit organization role helpers, an active membership resolver wrapper, matter visibility/edit permission functions, a matter permission class that returns not-visible behavior for hidden matters, and role matrix tests with two organizations; and reviewed verification output before marking the task done.
 
 ## 3. Important prompts
 
@@ -210,7 +212,7 @@ Do not start another task.
 ### Prompt 10
 
 ```text
-Implement only [BE-010-add-authentication-throttles-and-one-time-websocket-tickets.md](tasks/backend/BE-010-add-authentication-throttles-and-one-time-websocket-tickets.md) 
+Implement only [BE-011-implement-explicit-role-and-matter-permission-functions.md](tasks/backend/BE-011-implement-explicit-role-and-matter-permission-functions.md) 
 First read the root and nearest nested AGENTS.md, the task file, every linked spec,
 and the relevant guardrails. Before editing, provide a concise implementation plan and
 list the files you expect to change. Keep the implementation explicit and standard:
@@ -220,7 +222,7 @@ listed in the task's verification section. Update the task execution note and AI
 Do not start another task.
 ```
 
-**Result used:** Added BE-010 authentication throttles and one-time WebSocket tickets only, with focused tests and OpenAPI declarations.
+**Result used:** Added BE-011 explicit role and matter permission functions only, with focused role matrix and not-visible behavior tests.
 
 **Human review or correction:** None during implementation; Codex recorded the local missing-pyenv Python issue and used the locked `/usr/bin/python3.12` path for meaningful verification.
 
@@ -297,6 +299,13 @@ The assignment requires at least two. Record concrete examples rather than gener
 - Why it was wrong or unsuitable: Ruff rejected the bare expression, and the TTL check could fail by a millisecond because the ticket is created after request dispatch begins.
 - How it was detected: The first tightened BE-010 verification pass failed Ruff and two focused account tests.
 - What was changed: The request parsing became a real assertion, the synthetic request was given a JSON parser, and the TTL assertion now compares expiry against response completion.
+
+### Example 11
+
+- What the AI proposed: A single BE-011 role matrix test that covered both matter view and edit outcomes.
+- Why it was wrong or unsuitable: The test was readable but crossed the repository's hard 40-line function limit by one line.
+- How it was detected: `/usr/bin/python3.12 scripts/check_simplicity.py backend` failed during BE-011 verification.
+- What was changed: The matrix was split into separate view and edit tests with a small setup helper, and the simplicity check passed.
 
 ## 5. Decisions made personally
 
@@ -410,6 +419,13 @@ Replace examples with the candidate's actual decisions and reasoning.
 | Backend BE-010 format | `cd backend && UV_PROJECT_ENVIRONMENT=/tmp/legal-be010-venv uv run --python /usr/bin/python3.12 ruff format common/api/throttles.py common/auth/tickets.py apps/accounts/api/v1 apps/accounts/tests/test_auth_api.py` | Passed, 8 files left unchanged | Codex |
 | Backend BE-010 simplicity | `/usr/bin/python3.12 scripts/check_simplicity.py backend` | Passed, scanned 68 source files | Codex |
 | Backend BE-010 docs validation | `/usr/bin/python3.12 scripts/validate_docs.py` | Passed, 27 specs, 63 tasks, 170 Markdown files | Codex |
+| Backend BE-011 literal pytest command | `cd backend && python -m pytest apps/organizations/tests apps/matters/tests -q` | Failed before test startup because local pyenv points to uninstalled Python 3.12 | Codex |
+| Backend BE-011 permission tests | `cd backend && UV_PROJECT_ENVIRONMENT=/tmp/legal-be011-venv uv run --python /usr/bin/python3.12 python -m pytest apps/organizations/tests apps/matters/tests -q` | Passed, `24 passed` | Codex |
+| Backend BE-011 migration drift | `cd backend && UV_PROJECT_ENVIRONMENT=/tmp/legal-be011-venv uv run --python /usr/bin/python3.12 python manage.py makemigrations --check --dry-run` | Passed, no changes detected; local PostgreSQL role warning reviewed | Codex |
+| Backend BE-011 lint | `cd backend && UV_PROJECT_ENVIRONMENT=/tmp/legal-be011-venv uv run --python /usr/bin/python3.12 ruff check common/permissions.py apps/organizations/permissions.py apps/matters/permissions.py apps/organizations/tests/test_permissions.py apps/matters/tests/test_permissions.py` | Passed | Codex |
+| Backend BE-011 format | `cd backend && UV_PROJECT_ENVIRONMENT=/tmp/legal-be011-venv uv run --python /usr/bin/python3.12 ruff format --check common/permissions.py apps/organizations/permissions.py apps/matters/permissions.py apps/organizations/tests/test_permissions.py apps/matters/tests/test_permissions.py` | Passed, 5 files already formatted | Codex |
+| Backend BE-011 simplicity | `/usr/bin/python3.12 scripts/check_simplicity.py backend` | Passed, scanned 75 source files | Codex |
+| Backend BE-011 docs validation | `/usr/bin/python3.12 scripts/validate_docs.py` | Passed, 27 specs, 63 tasks, 170 Markdown files | Codex |
 | OpenAPI validation | TODO | TODO | TODO |
 | Docker build | TODO | TODO | TODO |
 | Security tests | TODO | TODO | TODO |
