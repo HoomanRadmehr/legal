@@ -7,16 +7,23 @@ servers:
   production:
     url: wss://{host}/ws/v1/events/
     protocol: wss
+    description: Connect with a one-time ticket query parameter issued by authenticated REST.
     variables:
       host:
         default: example.invalid
 channels:
-  userEvents:
+  /ws/v1/events/:
+    parameters:
+      ticket:
+        description: One-time Redis-backed WebSocket ticket. Do not log this value.
+        schema:
+          type: string
     subscribe:
       message:
         oneOf:
           - $ref: '#/components/messages/UploadStatusChanged'
           - $ref: '#/components/messages/NotificationCreated'
+          - $ref: '#/components/messages/DeadlineReminderCreated'
           - $ref: '#/components/messages/OffboardingStatusChanged'
 components:
   schemas:
@@ -39,7 +46,7 @@ components:
           type: object
   messages:
     UploadStatusChanged:
-      name: document.upload.status.changed
+      name: document.upload.status_changed
       payload:
         allOf:
           - $ref: '#/components/schemas/EventBase'
@@ -76,8 +83,24 @@ components:
                   notification_id:
                     type: string
                     format: uuid
+    DeadlineReminderCreated:
+      name: deadline.reminder.created
+      payload:
+        allOf:
+          - $ref: '#/components/schemas/EventBase'
+          - type: object
+            properties:
+              event_type:
+                const: deadline.reminder.created
+              data:
+                type: object
+                required: [deadline_id]
+                properties:
+                  deadline_id:
+                    type: string
+                    format: uuid
     OffboardingStatusChanged:
-      name: offboarding.status.changed
+      name: offboarding.status_changed
       payload:
         allOf:
           - $ref: '#/components/schemas/EventBase'

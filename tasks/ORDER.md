@@ -34,9 +34,9 @@ Integration checkpoint: INT-004
 
 ## Phase 4 - dashboard, activity, offboarding
 
-Backend: BE-025 -> BE-026 -> BE-027
+Backend: BE-025 -> BE-026 -> BE-027 -> BE-026.5 -> BE-026.75
 
-Frontend: FE-014 -> FE-016 -> FE-017
+Frontend: FE-014 -> FE-016 -> FE-017 -> FE-013.5 -> FE-013.75
 
 Integration checkpoints: INT-005, INT-006
 

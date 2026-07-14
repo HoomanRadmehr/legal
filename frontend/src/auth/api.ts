@@ -24,6 +24,12 @@ export type LoginInput = {
   username: string;
 };
 
+export type WebSocketTicket = {
+  expires_at: string;
+  ticket: string;
+  websocket_url: string;
+};
+
 export async function ensureCsrfCookie(): Promise<void> {
   await apiClient.request<void>("/auth/csrf/", {
     method: "GET",
@@ -57,6 +63,13 @@ export async function logoutSession(): Promise<void> {
 
   await apiClient.request<void>("/auth/logout/", {
     headers: buildCsrfHeaders(),
+    method: "POST",
+    replayOnUnauthorized: false,
+  });
+}
+
+export async function requestWebSocketTicket(): Promise<WebSocketTicket> {
+  return apiClient.request<WebSocketTicket>("/auth/ws-ticket/", {
     method: "POST",
     replayOnUnauthorized: false,
   });

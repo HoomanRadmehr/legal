@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from datetime import timedelta
+
 from django.db import transaction
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -11,6 +13,7 @@ from apps.accounts.selectors import get_current_membership
 from apps.deadlines.models import STATUS_CANCELLED, STATUS_COMPLETED, STATUS_OPEN, Deadline
 from apps.matters.permissions import require_matter_edit
 from apps.matters.selectors import matter_get
+from apps.notifications.services import create_notification
 from apps.organizations.models import STATUS_ACTIVE as MEMBERSHIP_STATUS_ACTIVE
 from apps.organizations.models import Membership
 from apps.organizations.permissions import is_admin_or_manager
@@ -23,6 +26,10 @@ ACTION_DEADLINE_CREATED = "deadline.created"
 ACTION_DEADLINE_UPDATED = "deadline.updated"
 ACTION_DEADLINE_COMPLETED = "deadline.completed"
 ACTION_DEADLINE_CANCELLED = "deadline.cancelled"
+EVENT_DEADLINE_REMINDER_CREATED = "deadline.reminder.created"
+REMINDER_OFFSETS_MINUTES = (1440, 60)
+REMINDER_SCAN_WINDOW_MINUTES = 5
+REMINDER_SCAN_LIMIT = 100
 
 DEADLINE_UPDATE_FIELDS = {
     "title",
@@ -115,6 +122,69 @@ def deadline_cancel(*, actor, deadline: Deadline, expected_version: int) -> Dead
         )
         mark_deadline_cancelled(deadline=locked, actor_membership=actor_membership)
         return locked
+
+
+def scan_deadline_reminders(*, now=None, limit: int = REMINDER_SCAN_LIMIT) -> int:
+    current_time = now or timezone.now()
+    created_count = 0
+    for offset_minutes in REMINDER_OFFSETS_MINUTES:
+        for deadline in reminder_deadlines(
+            now=current_time,
+            offset_minutes=offset_minutes,
+            limit=limit,
+        ):
+            if create_deadline_reminder(deadline=deadline, offset_minutes=offset_minutes):
+                created_count += 1
+            if created_count >= limit:
+                return created_count
+    return created_count
+
+
+def reminder_deadlines(*, now, offset_minutes: int, limit: int):
+    window_start = now + timedelta(minutes=offset_minutes)
+    window_end = window_start + timedelta(minutes=REMINDER_SCAN_WINDOW_MINUTES)
+    return (
+        Deadline.objects.select_related("organization", "matter", "assignee", "assignee__user")
+        .filter(
+            status=STATUS_OPEN,
+            reminder_enabled=True,
+            due_at__gte=window_start,
+            due_at__lt=window_end,
+            assignee__status=MEMBERSHIP_STATUS_ACTIVE,
+            assignee__user__is_active=True,
+        )
+        .order_by("due_at", "id")[:limit]
+    )
+
+
+def create_deadline_reminder(*, deadline: Deadline, offset_minutes: int) -> bool:
+    try:
+        create_notification(
+            recipient=deadline.assignee,
+            event_type=EVENT_DEADLINE_REMINDER_CREATED,
+            title=deadline_reminder_title(deadline=deadline),
+            body=deadline_reminder_body(deadline=deadline, offset_minutes=offset_minutes),
+            data={"deadline_id": deadline.id, "matter_id": deadline.matter_id},
+            dedupe_key=deadline_reminder_dedupe_key(deadline=deadline),
+            reminder_offset_minutes=offset_minutes,
+        )
+    except ConflictError:
+        return False
+    return True
+
+
+def deadline_reminder_dedupe_key(*, deadline: Deadline) -> str:
+    return f"deadline:{deadline.id}"
+
+
+def deadline_reminder_title(*, deadline: Deadline) -> str:
+    return _("Deadline reminder: %(title)s") % {"title": deadline.title}
+
+
+def deadline_reminder_body(*, deadline: Deadline, offset_minutes: int) -> str:
+    if offset_minutes >= 1440:
+        return _("A deadline is due in %(days)s day(s).") % {"days": offset_minutes // 1440}
+    return _("A deadline is due in %(minutes)s minute(s).") % {"minutes": offset_minutes}
 
 
 def require_deadline_actor(*, actor):

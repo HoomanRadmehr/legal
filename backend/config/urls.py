@@ -13,6 +13,8 @@ urlpatterns = [
     path("api/v1/", include("apps.deadlines.api.v1.urls")),
     path("api/v1/", include("apps.notices.api.v1.urls")),
     path("api/v1/", include("apps.tasks.api.v1.urls")),
+    path("api/v1/", include("apps.documents.api.v1.urls")),
+    path("api/v1/", include("apps.notifications.api.v1.urls")),
     path("health/live/", health_views.live, name="health-live"),
     path("health/ready/", health_views.ready, name="health-ready"),
 ]

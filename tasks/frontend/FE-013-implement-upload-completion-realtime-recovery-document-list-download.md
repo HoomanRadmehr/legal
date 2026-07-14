@@ -1,6 +1,6 @@
 # FE-013: Implement upload completion, realtime recovery, document list/download
 
-Status: TODO
+Status: DONE
 Priority: P0
 Area: Frontend
 Related specs: FE-007, FE-009
@@ -34,11 +34,11 @@ Complete uploads idempotently, follow authoritative status over WebSocket/pollin
 
 ## Acceptance criteria
 
-- [ ] Ticket/token/URL is not persisted.
-- [ ] Duplicate event cannot regress final state.
-- [ ] Polling reaches same final state.
-- [ ] Download asks backend each time.
-- [ ] Unknown event version is safe.
+- [x] Ticket/token/URL is not persisted.
+- [x] Duplicate event cannot regress final state.
+- [x] Polling reaches same final state.
+- [x] Download asks backend each time.
+- [x] Unknown event version is safe.
 
 ## Verification commands
 
@@ -53,9 +53,9 @@ cd frontend && npm run typecheck
 
 ## Codex execution log
 
-- Started:
-- Completed:
-- Files changed:
-- Commands run:
-- Result:
-- Deviations/questions:
+- Started: 2026-07-14 21:54 +0330
+- Completed: 2026-07-14 22:04 +0330
+- Files changed: `frontend/src/auth/api.ts`; `frontend/src/realtime/client.ts`; `frontend/src/realtime/events.ts`; `frontend/src/realtime/index.ts`; `frontend/src/realtime/client.test.ts`; `frontend/src/features/documents/api.ts`; `frontend/src/features/documents/hooks.ts`; `frontend/src/features/documents/queryKeys.ts`; `frontend/src/features/documents/types.ts`; `frontend/src/features/documents/index.ts`; `frontend/src/features/documents/components/DocumentUploadPanel.tsx`; `frontend/src/features/documents/components/DocumentList.tsx`; `frontend/src/features/documents/components/DocumentSection.tsx`; `frontend/src/features/documents/components/documents.css`; `frontend/src/features/documents/tests/api.test.ts`; `frontend/src/features/documents/tests/DocumentUploadPanel.test.tsx`; `frontend/src/features/documents/tests/DocumentList.test.tsx`; `frontend/src/features/documents/tests/recovery.test.ts`; `tasks/frontend/FE-013-implement-upload-completion-realtime-recovery-document-list-download.md`; `AI_USAGE.md`.
+- Commands run: `cd frontend && npm ci` (restored missing locked dependencies); `cd frontend && npm test -- --run src/features/documents src/realtime` (failed before install; passed after implementation, 5 files/16 tests); `cd frontend && npm run typecheck` (passed); `python3 scripts/check_simplicity.py frontend/src` (passed); `cd frontend && npx prettier --write src/auth/api.ts src/realtime src/features/documents` (targeted formatting); `python3 scripts/validate_docs.py` (failed on unrelated task-doc issues after generated dependency cleanup).
+- Result: Implemented upload completion with idempotency, one-time WebSocket ticket connection/reconnect, safe event validation, upload polling/reconnect recovery, document list/download/revoke UI, and focused state/security tests.
+- Deviations/questions: The existing FE-012 client expected a nested upload initiation response while the backend publishes a flattened response. The FE-013 API adapter now normalizes both shapes so prior frontend fixtures and real backend responses are supported. Docs validation remains blocked outside this task by task-doc issues including `tasks/frontend/FE-013.07-implement-user-invitation-acceptance-page.md` being empty; an earlier validator run also reported invalid decimal-ID headings in unrelated BE-026.5, BE-026.75, and FE-013.5 task files.

@@ -1,0 +1,72 @@
+.notification-page {
+  display: grid;
+  gap: 1.25rem;
+  padding: 1.5rem;
+}
+
+.notification-toolbar {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.notification-badge {
+  border: 1px solid #fedf89;
+  border-radius: 999px;
+  color: #b54708;
+  font-weight: 700;
+  margin: 0;
+  padding: 0.25rem 0.75rem;
+}
+
+.notification-realtime,
+.notification-provider-note,
+.notification-message small,
+.notification-preferences small {
+  color: #667085;
+}
+
+.notification-message {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.notification-message p {
+  margin: 0;
+}
+
+.notification-preferences {
+  display: grid;
+  gap: 1rem;
+}
+
+.notification-preferences__group {
+  border: 1px solid #d0d5dd;
+  border-radius: 8px;
+  display: grid;
+  gap: 0.75rem;
+  margin: 0;
+  padding: 1rem;
+}
+
+.notification-preferences__group legend {
+  font-weight: 700;
+  padding: 0 0.25rem;
+}
+
+.notification-preferences__option {
+  align-items: flex-start;
+  display: flex;
+  gap: 0.625rem;
+}
+
+.notification-preferences__option span {
+  display: grid;
+  gap: 0.125rem;
+}
+
+.notification-alert {
+  color: #b42318;
+  margin: 0;
+}

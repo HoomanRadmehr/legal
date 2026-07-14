@@ -1,5 +1,7 @@
-"""Channels routing placeholder for later realtime tasks."""
+"""ASGI WebSocket routes."""
 
 from __future__ import annotations
 
-websocket_urlpatterns = []
+from common.realtime.routing import websocket_urlpatterns
+
+__all__ = ["websocket_urlpatterns"]

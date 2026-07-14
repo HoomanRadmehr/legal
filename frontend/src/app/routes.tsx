@@ -33,6 +33,10 @@ import {
   NoticeListPage,
 } from "../features/notices/pages";
 import {
+  NotificationCenterPage,
+  NotificationPreferencesPage,
+} from "../features/notifications";
+import {
   TaskCreatePage,
   TaskDetailPage,
   TaskEditPage,
@@ -64,6 +68,11 @@ export const appRoutes: RouteObject[] = [
       { path: "notices/new", element: <NoticeCreatePage /> },
       { path: "notices/:noticeId", element: <NoticeDetailPage /> },
       { path: "notices/:noticeId/edit", element: <NoticeEditPage /> },
+      { path: "notifications", element: <NotificationCenterPage /> },
+      {
+        path: "settings/notifications",
+        element: <NotificationPreferencesPage />,
+      },
       { path: "tasks", element: <TaskListPage /> },
       { path: "tasks/new", element: <TaskCreatePage /> },
       { path: "tasks/:taskId", element: <TaskDetailPage /> },

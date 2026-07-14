@@ -28,6 +28,8 @@ INSTALLED_APPS = [
     "apps.deadlines.apps.DeadlinesConfig",
     "apps.notices.apps.NoticesConfig",
     "apps.tasks.apps.TasksConfig",
+    "apps.documents.apps.DocumentsConfig",
+    "apps.notifications.apps.NotificationsConfig",
     "channels",
     "corsheaders",
     "django.contrib.admin",

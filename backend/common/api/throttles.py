@@ -6,6 +6,8 @@ import hashlib
 
 from rest_framework.throttling import SimpleRateThrottle
 
+from apps.accounts.selectors import get_current_membership
+
 
 class LoginThrottle(SimpleRateThrottle):
     scope = "login"
@@ -34,6 +36,21 @@ class WebSocketTicketThrottle(SimpleRateThrottle):
         if not request.user or not request.user.is_authenticated:
             return None
         return build_throttle_key(scope=self.scope, parts=(str(request.user.id),))
+
+
+class UploadInitiateThrottle(SimpleRateThrottle):
+    scope = "upload_initiate"
+    rate = "20/hour"
+
+    def get_cache_key(self, request, view) -> str | None:
+        if not request.user or not request.user.is_authenticated:
+            return None
+        membership = get_current_membership(user=request.user)
+        organization_id = getattr(membership, "organization_id", "no-organization")
+        return build_throttle_key(
+            scope=self.scope,
+            parts=(str(request.user.id), str(organization_id)),
+        )
 
 
 def normalized_login_identifier(request) -> str:
