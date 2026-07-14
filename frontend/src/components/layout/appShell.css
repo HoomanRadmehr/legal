@@ -1,0 +1,133 @@
+.layout-shell {
+  display: grid;
+  min-height: 100vh;
+  grid-template-columns: 260px minmax(0, 1fr);
+  background: #f8fafc;
+}
+
+.layout-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  border-inline-end: 1px solid #d0d5dd;
+  padding: 24px;
+  background: #ffffff;
+}
+
+.layout-main {
+  min-width: 0;
+}
+
+.layout-header {
+  display: flex;
+  min-height: 72px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  border-bottom: 1px solid #d0d5dd;
+  padding: 16px 24px;
+  background: #ffffff;
+}
+
+.layout-header__actions,
+.layout-locale,
+.layout-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.layout-content {
+  padding: 32px 24px;
+}
+
+.layout-kicker {
+  margin: 0 0 4px;
+  color: #667085;
+  font-size: 0.8125rem;
+  font-weight: 700;
+}
+
+.layout-organization,
+.layout-user {
+  margin: 0;
+  color: #101828;
+  font-weight: 800;
+}
+
+.layout-nav {
+  display: grid;
+  gap: 6px;
+}
+
+.layout-nav__link {
+  min-height: 40px;
+  box-sizing: border-box;
+  border-radius: 8px;
+  padding: 10px 12px;
+  color: #344054;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.layout-nav__link--active {
+  background: #eff8ff;
+  color: #175cd3;
+}
+
+.layout-button,
+.layout-actions button,
+.layout-action-link {
+  min-height: 36px;
+  box-sizing: border-box;
+  border: 1px solid #98a2b3;
+  border-radius: 8px;
+  padding: 7px 12px;
+  background: #ffffff;
+  color: #101828;
+  cursor: pointer;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.layout-action-link {
+  display: inline-flex;
+  align-items: center;
+}
+
+.layout-notification {
+  display: inline-grid;
+  width: 32px;
+  height: 32px;
+  place-items: center;
+  border: 1px solid #d0d5dd;
+  border-radius: 999px;
+  color: #344054;
+  font-weight: 800;
+}
+
+.layout-actions {
+  margin-top: 24px;
+}
+
+.layout-readonly {
+  margin: 0;
+  color: #475467;
+}
+
+@media (max-width: 760px) {
+  .layout-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .layout-sidebar {
+    border-inline-end: 0;
+    border-bottom: 1px solid #d0d5dd;
+  }
+
+  .layout-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}

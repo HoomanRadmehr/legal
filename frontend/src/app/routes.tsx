@@ -1,14 +1,28 @@
 import type { RouteObject } from "react-router-dom";
 
+import { ProtectedRoute } from "../auth";
 import { NotFoundState } from "../components/standardStates";
-import { ProtectedAppShellPage, PublicLoginPage } from "./pages";
+import {
+  AdminOffboardingPage,
+  ConfidentialRecordNotFoundPage,
+  ProtectedAppShellPage,
+  PublicLoginPage,
+} from "./pages";
 import { RouteErrorState } from "./routeError";
 
 export const appRoutes: RouteObject[] = [
   {
     path: "/",
-    element: <ProtectedAppShellPage />,
+    element: <ProtectedRoute />,
     errorElement: <RouteErrorState />,
+    children: [
+      { index: true, element: <ProtectedAppShellPage /> },
+      { path: "admin/offboarding", element: <AdminOffboardingPage /> },
+      {
+        path: "matters/not-visible",
+        element: <ConfidentialRecordNotFoundPage />,
+      },
+    ],
   },
   {
     path: "/login",

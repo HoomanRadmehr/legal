@@ -1,6 +1,6 @@
 # BE-012: Implement Matter, MatterAccess, and MatterRelation
 
-Status: TODO
+Status: DONE
 Priority: P0
 Area: Backend
 Related specs: BE-002, BE-003
@@ -32,11 +32,11 @@ Create the concrete shared Matter boundary and explicit access/relation models w
 
 ## Acceptance criteria
 
-- [ ] Matter uses `CommonModel` as its only direct base.
-- [ ] Case/contract/notice details will compose with Matter rather than inherit.
-- [ ] Organization+reference is unique.
-- [ ] Self and cross-organization relations are rejected.
-- [ ] Visibility selectors pass role matrix tests.
+- [x] Matter uses `CommonModel` as its only direct base.
+- [x] Case/contract/notice details will compose with Matter rather than inherit.
+- [x] Organization+reference is unique.
+- [x] Self and cross-organization relations are rejected.
+- [x] Visibility selectors pass role matrix tests.
 
 ## Verification commands
 
@@ -52,9 +52,34 @@ python scripts/check_simplicity.py backend
 
 ## Codex execution log
 
-- Started:
-- Completed:
+- Started: 2026-07-14
+- Completed: 2026-07-14 18:16:56 +0330
 - Files changed:
+  - `backend/config/settings/base.py`
+  - `backend/apps/matters/apps.py`
+  - `backend/apps/matters/models.py`
+  - `backend/apps/matters/permissions.py`
+  - `backend/apps/matters/selectors.py`
+  - `backend/apps/matters/services.py`
+  - `backend/apps/matters/migrations/__init__.py`
+  - `backend/apps/matters/migrations/0001_initial.py`
+  - `backend/apps/matters/tests/factories.py`
+  - `backend/apps/matters/tests/test_models.py`
+  - `backend/apps/matters/tests/test_permissions.py`
+  - `backend/apps/matters/tests/test_selectors.py`
+  - `backend/apps/matters/tests/test_services.py`
+  - `AI_USAGE.md`
+  - `tasks/backend/BE-012-implement-matter-matteraccess-and-matterrelation.md`
 - Commands run:
-- Result:
-- Deviations/questions:
+  - `cd backend && python -m pytest apps/matters/tests -q` (failed before pytest: local pyenv points to missing Python 3.12)
+  - `cd backend && python manage.py makemigrations --check --dry-run` (failed before Django startup for the same local pyenv reason)
+  - `python scripts/check_simplicity.py backend` (failed before script startup for the same local pyenv reason)
+  - `cd backend && UV_PROJECT_ENVIRONMENT=/tmp/legal-be012-venv uv run --python /usr/bin/python3.12 python manage.py makemigrations matters`
+  - `cd backend && UV_PROJECT_ENVIRONMENT=/tmp/legal-be012-venv uv run --python /usr/bin/python3.12 python -m pytest apps/matters/tests -q`
+  - `cd backend && UV_PROJECT_ENVIRONMENT=/tmp/legal-be012-venv uv run --python /usr/bin/python3.12 python manage.py makemigrations --check --dry-run` (passed with Django warning because local PostgreSQL role `legal_management` does not exist)
+  - `cd backend && UV_PROJECT_ENVIRONMENT=/tmp/legal-be012-venv uv run --python /usr/bin/python3.12 ruff check config/settings/base.py apps/matters apps/matters/tests`
+  - `cd backend && UV_PROJECT_ENVIRONMENT=/tmp/legal-be012-venv uv run --python /usr/bin/python3.12 ruff format --check config/settings/base.py apps/matters apps/matters/tests`
+  - `/usr/bin/python3.12 scripts/check_simplicity.py backend`
+  - `/usr/bin/python3.12 scripts/validate_docs.py`
+- Result: Implemented the concrete `Matter`, `MatterAccess`, and `MatterRelation` boundary models with explicit foreign keys, indexes, constraints, and initial migration; added permission-scoped `matter_list`/`matter_get` selectors; added minimal grant/revoke/owner-transfer services; and expanded tests for inheritance, uniqueness, same-organization validation, relation validation, visibility selectors, and service tenant checks.
+- Deviations/questions: Registering `apps.matters` in `backend/config/settings/base.py` was required for Django to discover models and migrations, although the allowed scope listed only `backend/apps/matters/`. Grant/revoke and owner-transfer services intentionally omit activity/outbox writes because audit models are not in this task scope.

@@ -73,7 +73,15 @@ services:
 
   worker:
     <<: *backend-service
-    command: ["celery", "-A", "config.celery:app", "worker", "--loglevel=INFO", "--concurrency=2"]
+    command:
+      [
+        "celery",
+        "-A",
+        "config.celery:app",
+        "worker",
+        "--loglevel=INFO",
+        "--concurrency=2",
+      ]
     stop_grace_period: 30s
 
   beat:
@@ -106,7 +114,8 @@ services:
     networks:
       - backend
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U \"$${POSTGRES_USER}\" -d \"$${POSTGRES_DB}\""]
+      test:
+        ["CMD-SHELL", 'pg_isready -U "$${POSTGRES_USER}" -d "$${POSTGRES_DB}"']
       interval: 10s
       timeout: 5s
       retries: 5
@@ -140,23 +149,28 @@ services:
       retries: 5
 
   minio:
-    image: minio/minio:RELEASE.2024-07-16T23-46-41Z
+    image: minio/minio:RELEASE.2024-07-15T19-02-30Z
     command: ["server", "/data", "--console-address", ":9001"]
     environment:
       MINIO_ROOT_USER: ${MINIO_ACCESS_KEY:-legal_management}
       MINIO_ROOT_PASSWORD: ${MINIO_SECRET_KEY:-legal_management_dev_password}
+      MINIO_API_CORS_ALLOW_ORIGIN: ${MINIO_API_CORS_ALLOW_ORIGIN:-http://localhost:5173}
     volumes:
       - minio-data:/data
     networks:
       - backend
     healthcheck:
-      test: ["CMD-SHELL", "curl -fsS http://localhost:9000/minio/health/live >/dev/null"]
+      test:
+        [
+          "CMD-SHELL",
+          "curl -fsS http://localhost:9000/minio/health/live >/dev/null",
+        ]
       interval: 10s
       timeout: 5s
       retries: 5
 
   minio-init:
-    image: minio/mc:RELEASE.2024-07-15T19-02-30Z
+    image: minio/mc:RELEASE.2024-07-15T17-46-06Z-cpuv1
     environment:
       MINIO_ENDPOINT: ${MINIO_ENDPOINT:-minio:9000}
       MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY:-legal_management}

@@ -6,6 +6,7 @@ from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
 from rest_framework.exceptions import PermissionDenied
 
+from apps.matters.models import ACCESS_LEVEL_EDIT, ACCESS_LEVEL_VIEW
 from apps.organizations.permissions import (
     is_active_membership,
     is_admin_or_manager,
@@ -15,8 +16,6 @@ from apps.organizations.permissions import (
 )
 from common.permissions import CommonPermission
 
-ACCESS_LEVEL_VIEW = "view"
-ACCESS_LEVEL_EDIT = "edit"
 VISIBLE_ACCESS_LEVELS = (ACCESS_LEVEL_VIEW, ACCESS_LEVEL_EDIT)
 EDIT_ACCESS_LEVELS = (ACCESS_LEVEL_EDIT,)
 WRITE_ACTIONS = {"create", "update", "partial_update", "archive"}

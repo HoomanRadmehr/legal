@@ -1,0 +1,78 @@
+.login-panel {
+  width: min(100%, 420px);
+}
+
+.login-panel h1 {
+  margin: 0;
+  color: #101828;
+  font-size: 2.5rem;
+  line-height: 1.1;
+}
+
+.login-form {
+  display: grid;
+  gap: 18px;
+  margin-top: 28px;
+}
+
+.login-field {
+  display: grid;
+  gap: 8px;
+  color: #344054;
+  font-weight: 700;
+}
+
+.login-field input {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid #98a2b3;
+  border-radius: 8px;
+  padding: 11px 12px;
+  background: #ffffff;
+  color: #101828;
+}
+
+.login-field input:focus {
+  border-color: #175cd3;
+  outline: 3px solid #d1e9ff;
+}
+
+.login-error {
+  margin: 0;
+  border: 1px solid #fecdca;
+  border-radius: 8px;
+  padding: 12px;
+  background: #fffafa;
+  color: #b42318;
+  line-height: 1.4;
+}
+
+.login-submit {
+  min-height: 44px;
+  border: 0;
+  border-radius: 8px;
+  background: #175cd3;
+  color: #ffffff;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.login-submit:disabled {
+  cursor: wait;
+  opacity: 0.72;
+}
+
+.workspace-actions {
+  margin-top: 24px;
+}
+
+.workspace-logout {
+  min-height: 40px;
+  border: 1px solid #98a2b3;
+  border-radius: 8px;
+  padding: 0 14px;
+  background: #ffffff;
+  color: #101828;
+  cursor: pointer;
+  font-weight: 700;
+}

@@ -1,37 +1,75 @@
-import { EmptyState, LoadingState } from "../components/standardStates";
+import { useAuth } from "../auth";
+import { canRunOffboarding } from "../auth/permissions";
+import { ForbiddenState, NotFoundState } from "../components/standardStates";
+import { AppShell, RoleActionBar } from "../components/layout/AppShell";
+import { LoginPage } from "../features/auth/LoginPage";
 
 export function PublicLoginPage() {
-  return (
-    <main className="app-shell app-shell--public">
-      <section className="app-panel" aria-labelledby="login-title">
-        <p className="app-kicker">Public route</p>
-        <h1 id="login-title">Sign in</h1>
-        <p className="app-muted">
-          Authentication workflow will be implemented in its dedicated task.
-        </p>
-      </section>
-    </main>
-  );
+  return <LoginPage />;
 }
 
 export function ProtectedAppShellPage() {
+  const { logout, session } = useAuth();
+
+  if (!session) {
+    return null;
+  }
+
   return (
-    <main className="app-shell" aria-labelledby="workspace-title">
-      <section className="app-panel">
-        <p className="app-kicker">Protected route</p>
-        <h1 id="workspace-title">Legal workspace</h1>
+    <AppShell onLogout={logout} session={session}>
+      <section aria-labelledby="dashboard-title">
+        <p className="app-kicker">Legal workspace</p>
+        <h1 id="dashboard-title">Dashboard</h1>
         <p className="app-muted">
-          Authenticated case, contract, notice, deadline, and document pages
-          will mount here.
+          Signed in as {session.user.display_name}. Work queues and matter
+          summaries will appear here as feature screens are added.
         </p>
-        <div className="app-state-row" aria-label="Standard states preview">
-          <LoadingState label="Loading workspace" />
-          <EmptyState
-            title="No records yet"
-            message="Create flows will appear in their feature tasks."
-          />
-        </div>
+        <RoleActionBar role={session.membership.role} />
       </section>
-    </main>
+    </AppShell>
+  );
+}
+
+export function AdminOffboardingPage() {
+  const { logout, session } = useAuth();
+
+  if (!session) {
+    return null;
+  }
+
+  return (
+    <AppShell onLogout={logout} session={session}>
+      {canRunOffboarding(session.membership.role) ? (
+        <section aria-labelledby="offboarding-title">
+          <p className="app-kicker">Administration</p>
+          <h1 id="offboarding-title">Offboarding</h1>
+          <p className="app-muted">
+            Offboarding preview and execution controls will mount here.
+          </p>
+        </section>
+      ) : (
+        <ForbiddenState
+          title="Access denied"
+          message="This administrative page is not available for your role."
+        />
+      )}
+    </AppShell>
+  );
+}
+
+export function ConfidentialRecordNotFoundPage() {
+  const { logout, session } = useAuth();
+
+  if (!session) {
+    return null;
+  }
+
+  return (
+    <AppShell onLogout={logout} session={session}>
+      <NotFoundState
+        title="Record not found"
+        message="The record could not be found."
+      />
+    </AppShell>
   );
 }

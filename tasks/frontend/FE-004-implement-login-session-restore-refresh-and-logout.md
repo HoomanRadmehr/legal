@@ -1,6 +1,6 @@
 # FE-004: Implement login, session restore, refresh, and logout
 
-Status: TODO
+Status: DONE
 Priority: P0
 Area: Frontend
 Related specs: FE-001
@@ -35,11 +35,11 @@ Implement in-memory access token lifecycle with HttpOnly refresh cookie and sing
 
 ## Acceptance criteria
 
-- [ ] No token is stored in local/session storage.
-- [ ] Parallel 401s create one refresh.
-- [ ] No infinite retry.
-- [ ] Logout clears state even if server session is already gone.
-- [ ] CSRF bootstrap is used and CSRF is not disabled.
+- [x] No token is stored in local/session storage.
+- [x] Parallel 401s create one refresh.
+- [x] No infinite retry.
+- [x] Logout clears state even if server session is already gone.
+- [x] CSRF bootstrap is used and CSRF is not disabled.
 
 ## Verification commands
 
@@ -54,9 +54,9 @@ cd frontend && npm run typecheck
 
 ## Codex execution log
 
-- Started:
-- Completed:
-- Files changed:
-- Commands run:
-- Result:
-- Deviations/questions:
+- Started: 2026-07-14 18:32 +0330
+- Completed: 2026-07-14 18:35 +0330
+- Files changed: `frontend/src/api/client.ts`, `frontend/src/app/App.test.tsx`, `frontend/src/app/pages.tsx`, `frontend/src/app/providers.tsx`, `frontend/src/app/routes.tsx`, `frontend/src/auth/AuthProvider.tsx`, `frontend/src/auth/ProtectedRoute.tsx`, `frontend/src/auth/api.ts`, `frontend/src/auth/context.ts`, `frontend/src/auth/csrf.ts`, `frontend/src/auth/index.ts`, `frontend/src/auth/session.ts`, `frontend/src/auth/testUtils.ts`, `frontend/src/auth/useAuth.ts`, `frontend/src/auth/csrf.test.ts`, `frontend/src/auth/session.test.ts`, `frontend/src/features/auth/LoginPage.tsx`, `frontend/src/features/auth/authFlow.test.tsx`, `frontend/src/features/auth/login.css`, `AI_USAGE.md`.
+- Commands run: `cd frontend && npm test -- --run src/auth src/features/auth` initially failed because `vitest` was unavailable before dependencies were installed; `cd frontend && npm ci`; `cd frontend && npm test -- --run src/auth src/features/auth`; `cd frontend && npm run typecheck`; `cd frontend && npm test -- --run src/app src/api`; `cd frontend && npm run lint`; `cd frontend && npm run format:check`; `cd frontend && npx prettier --write ...` for touched frontend files after `format:check` identified formatting changes; final reruns of auth tests, typecheck, app/API tests, lint, and format all passed.
+- Result: Implemented in-memory auth session lifecycle, CSRF-backed login/refresh/logout API calls, protected route restoration, single-flight refresh replay, and focused tests. Required verification commands passed after the locked dependency install.
+- Deviations/questions: No unresolved questions. `frontend/src/app/*` was updated to wire the protected route and provider even though the task's allowed scope list was narrower; this was required to make FE-004 behavior reachable in the application shell.

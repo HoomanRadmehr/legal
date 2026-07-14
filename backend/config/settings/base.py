@@ -20,6 +20,8 @@ CORS_ALLOWED_ORIGINS = env.csv("DJANGO_CORS_ALLOWED_ORIGINS")
 INSTALLED_APPS = [
     "apps.accounts.apps.AccountsConfig",
     "apps.organizations.apps.OrganizationsConfig",
+    "apps.matters.apps.MattersConfig",
+    "apps.activity.apps.ActivityConfig",
     "channels",
     "django.contrib.admin",
     "django.contrib.auth",
