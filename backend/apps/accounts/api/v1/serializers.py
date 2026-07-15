@@ -8,6 +8,7 @@ from rest_framework import serializers
 
 from apps.accounts.models import User
 from apps.organizations.models import Membership
+from common.api.serializers import CommonModelSerializer
 
 
 class LoginInputSerializer(serializers.Serializer):
@@ -69,3 +70,25 @@ class WebSocketTicketSerializer(serializers.Serializer):
     ticket = serializers.CharField()
     expires_at = serializers.DateTimeField()
     websocket_url = serializers.CharField()
+
+
+class UserChoiceSerializer(CommonModelSerializer):
+    id = serializers.UUIDField(source="user_id", read_only=True)
+    label = serializers.SerializerMethodField()
+    secondary_label = serializers.EmailField(source="user.email", read_only=True)
+    role = serializers.CharField(read_only=True)
+
+    class Meta:
+        model = Membership
+        fields = ("id", "label", "secondary_label", "role")
+        read_only_fields = fields
+
+    def get_label(self, membership: Membership) -> str:
+        full_name = membership.user.get_full_name().strip()
+        return full_name or membership.user.email or membership.user.username
+
+
+class UserChoicePageSerializer(serializers.Serializer):
+    next_cursor = serializers.CharField(allow_null=True)
+    has_more = serializers.BooleanField()
+    results = UserChoiceSerializer(many=True)

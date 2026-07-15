@@ -10,14 +10,19 @@ from rest_framework.response import Response
 from apps.accounts.selectors import get_current_membership
 from apps.organizations.api.v1.openapi import membership_schema
 from apps.organizations.api.v1.serializers import (
+    MembershipChoiceFilter,
+    MembershipChoiceSerializer,
     MembershipInvitationCreateSerializer,
     MembershipInvitationSerializer,
     MembershipRoleChangeSerializer,
     MembershipSerializer,
 )
 from apps.organizations.models import Membership
-from apps.organizations.selectors import membership_list_for_admin
+from apps.organizations.selectors import membership_choices, membership_list_for_admin
 from apps.organizations.services import change_membership_role, create_membership_invitation
+from common.api.errors import InvalidInputError
+from common.api.pagination import ChoiceCursorPagination
+from common.api.throttles import MembershipChoicesThrottle
 from common.api.viewsets import CommonModelViewSet
 
 
@@ -26,6 +31,7 @@ class MembershipViewSet(CommonModelViewSet):
     http_method_names = ("get", "post", "head", "options")
     permission_classes = (IsAuthenticated,)
     queryset = Membership.objects.none()
+    pagination_class = ChoiceCursorPagination
 
     def get_queryset(self):
         if self.action == "list":
@@ -33,6 +39,8 @@ class MembershipViewSet(CommonModelViewSet):
         return Membership.objects.none()
 
     def get_serializer_class(self):
+        if self.action == "choices":
+            return MembershipChoiceSerializer
         if self.action == "create":
             return MembershipInvitationCreateSerializer
         if self.action == "change_role":
@@ -43,6 +51,24 @@ class MembershipViewSet(CommonModelViewSet):
 
     def retrieve(self, request, *args, **kwargs):
         raise MethodNotAllowed("GET")
+
+    def get_throttles(self):
+        if self.action == "choices":
+            return [MembershipChoicesThrottle()]
+        return super().get_throttles()
+
+    @action(detail=False, methods=["get"], url_path="choices")
+    def choices(self, request):
+        filters = validated_membership_choice_filters(data=request.query_params)
+        queryset = membership_choices(
+            actor=request.user,
+            exclude_membership_id=filters.get("exclude_membership_id"),
+            purpose=filters["purpose"],
+            query=filters["q"],
+        )
+        page = self.paginate_queryset(queryset)
+        serializer = MembershipChoiceSerializer(page, many=True)
+        return self.get_paginated_response(serializer.data)
 
     @action(detail=True, methods=["post"], url_path="role")
     def change_role(self, request, *args, **kwargs):
@@ -90,3 +116,10 @@ def idempotency_key_from_request(*, request) -> str:
     if not key:
         raise ValidationError({"Idempotency-Key": ["This header is required."]})
     return key
+
+
+def validated_membership_choice_filters(*, data):
+    serializer = MembershipChoiceFilter(data=data)
+    if not serializer.is_valid():
+        raise InvalidInputError(serializer.errors)
+    return serializer.validated_data

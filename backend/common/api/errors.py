@@ -16,3 +16,9 @@ class DomainRuleError(APIException):
     status_code = 422
     default_detail = _("The request violates a domain rule.")
     default_code = "domain_rule_violation"
+
+
+class InvalidInputError(APIException):
+    status_code = 400
+    default_detail = _("Invalid request.")
+    default_code = "invalid_input"

@@ -1,4 +1,4 @@
-"""Account authentication API views."""
+"""Account authentication views and user choice ViewSets."""
 
 from __future__ import annotations
 
@@ -9,16 +9,18 @@ from django.middleware.csrf import get_token
 from django.utils.translation import gettext_lazy as _
 from rest_framework.authentication import CSRFCheck
 from rest_framework.decorators import (
+    action,
     api_view,
     authentication_classes,
     permission_classes,
     throttle_classes,
 )
-from rest_framework.exceptions import PermissionDenied
+from rest_framework.exceptions import MethodNotAllowed, PermissionDenied
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
+from apps.accounts.api.v1.filters import UserChoiceFilter
 from apps.accounts.api.v1.openapi import (
     csrf_schema,
     invitation_accept_schema,
@@ -26,6 +28,7 @@ from apps.accounts.api.v1.openapi import (
     logout_schema,
     me_schema,
     refresh_schema,
+    user_schema,
     ws_ticket_schema,
 )
 from apps.accounts.api.v1.serializers import (
@@ -34,17 +37,23 @@ from apps.accounts.api.v1.serializers import (
     InvitationAcceptSerializer,
     LoginInputSerializer,
     MeSerializer,
+    UserChoiceSerializer,
     WebSocketTicketSerializer,
 )
-from apps.accounts.selectors import get_current_membership
+from apps.accounts.models import User
+from apps.accounts.selectors import get_current_membership, user_choices
 from apps.accounts.services import AuthError, login_user, logout_refresh_token, refresh_session
 from apps.organizations.services import accept_user_invitation
+from common.api.errors import InvalidInputError
+from common.api.pagination import ChoiceCursorPagination
 from common.api.throttles import (
     InvitationAcceptThrottle,
     LoginThrottle,
     RefreshThrottle,
+    UserChoicesThrottle,
     WebSocketTicketThrottle,
 )
+from common.api.viewsets import CommonModelViewSet
 from common.auth.tickets import create_websocket_ticket
 
 
@@ -152,6 +161,46 @@ def ws_ticket(request):
             }
         ).data
     )
+
+
+@user_schema
+class UserViewSet(CommonModelViewSet):
+    http_method_names = ("get", "head", "options")
+    permission_classes = (IsAuthenticated,)
+    pagination_class = ChoiceCursorPagination
+    serializer_class = UserChoiceSerializer
+    queryset = User.objects.none()
+
+    def list(self, request, *args, **kwargs):
+        raise MethodNotAllowed("GET")
+
+    def retrieve(self, request, *args, **kwargs):
+        raise MethodNotAllowed("GET")
+
+    def get_throttles(self):
+        if self.action == "choices":
+            return [UserChoicesThrottle()]
+        return []
+
+    @action(detail=False, methods=["get"], url_path="choices")
+    def choices(self, request):
+        filters = validated_user_choice_filters(data=request.query_params)
+        queryset = user_choices(
+            actor=request.user,
+            purpose=filters["purpose"],
+            query=filters["q"],
+            exclude_user_id=filters.get("exclude_user_id"),
+        )
+        page = self.paginate_queryset(queryset)
+        serializer = UserChoiceSerializer(page, many=True)
+        return self.get_paginated_response(serializer.data)
+
+
+def validated_user_choice_filters(*, data):
+    serializer = UserChoiceFilter(data=data)
+    if not serializer.is_valid():
+        raise InvalidInputError(serializer.errors)
+    return serializer.validated_data
 
 
 def enforce_csrf(request) -> None:

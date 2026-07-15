@@ -49,7 +49,8 @@ def test_generated_schema_has_stable_operation_ids_and_synthetic_examples() -> N
     assert operation_ids(operations=operations)
     assert all(operation["operationId"] for operation in operations)
     assert "offboarding_execute" in operation_ids(operations=operations)
-    assert "documents_uploads_complete" in operation_ids(operations=operations)
+    assert "documents_presign" in operation_ids(operations=operations)
+    assert "documents_complete" in operation_ids(operations=operations)
     assert schema_example_text(schema=schema).find("@gmail.com") == -1
 
 

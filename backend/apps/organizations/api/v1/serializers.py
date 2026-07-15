@@ -10,6 +10,13 @@ from apps.organizations.models import MEMBERSHIP_ROLE_CHOICES, Membership
 from common.api.serializers import CommonModelSerializer
 
 FORBIDDEN_INVITATION_FIELDS = {"organization_id", "organization", "password"}
+FORBIDDEN_MEMBERSHIP_CHOICE_FIELDS = {"organization", "organization_id", "role", "status"}
+MEMBERSHIP_CHOICE_PURPOSES = (
+    "owner",
+    "assignee",
+    "participant",
+    "offboarding_replacement",
+)
 
 
 class MembershipInvitationCreateSerializer(serializers.Serializer):
@@ -73,6 +80,44 @@ class MembershipSerializer(CommonModelSerializer):
     def get_display_name(self, obj) -> str:
         full_name = obj.user.get_full_name().strip()
         return full_name or obj.user.username
+
+
+class MembershipChoiceFilter(serializers.Serializer):
+    q = serializers.CharField(max_length=80, required=False, allow_blank=True, trim_whitespace=True)
+    purpose = serializers.ChoiceField(choices=MEMBERSHIP_CHOICE_PURPOSES)
+    cursor = serializers.CharField(required=False, allow_blank=True)
+    page_size = serializers.IntegerField(required=False, min_value=1)
+    exclude_membership_id = serializers.UUIDField(required=False)
+
+    def validate(self, attrs):
+        forbidden = FORBIDDEN_MEMBERSHIP_CHOICE_FIELDS.intersection(self.initial_data)
+        if forbidden:
+            raise serializers.ValidationError(
+                {field: [_("This field is not accepted.")] for field in sorted(forbidden)}
+            )
+        attrs["q"] = attrs.get("q", "")
+        return attrs
+
+
+class MembershipChoiceSerializer(CommonModelSerializer):
+    label = serializers.SerializerMethodField()
+    secondary_label = serializers.EmailField(source="user.email", read_only=True)
+    user_id = serializers.UUIDField(read_only=True)
+
+    class Meta:
+        model = Membership
+        fields = ("id", "user_id", "label", "secondary_label", "role")
+        read_only_fields = fields
+
+    def get_label(self, membership: Membership) -> str:
+        full_name = membership.user.get_full_name().strip()
+        return full_name or membership.user.email or membership.user.username
+
+
+class MembershipChoicePageSerializer(serializers.Serializer):
+    next_cursor = serializers.CharField(allow_null=True)
+    has_more = serializers.BooleanField()
+    results = MembershipChoiceSerializer(many=True)
 
 
 class MembershipRoleChangeSerializer(serializers.Serializer):

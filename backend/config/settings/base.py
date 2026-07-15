@@ -5,6 +5,7 @@ from __future__ import annotations
 from datetime import timedelta
 from pathlib import Path
 
+from corsheaders.defaults import default_headers
 from django.utils.translation import gettext_lazy as _
 
 from config import env
@@ -17,6 +18,7 @@ ALLOWED_HOSTS = env.csv("DJANGO_ALLOWED_HOSTS", default=("localhost", "127.0.0.1
 CSRF_TRUSTED_ORIGINS = env.csv("DJANGO_CSRF_TRUSTED_ORIGINS")
 CORS_ALLOWED_ORIGINS = env.csv("DJANGO_CORS_ALLOWED_ORIGINS")
 CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOW_HEADERS = (*default_headers, "idempotency-key")
 
 INSTALLED_APPS = [
     "apps.accounts.apps.AccountsConfig",
@@ -127,6 +129,11 @@ REST_FRAMEWORK = {
     ],
     "EXCEPTION_HANDLER": "common.api.exception_handler.exception_handler",
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+    "DEFAULT_THROTTLE_RATES": {
+        "membership_choices": env.value("MEMBERSHIP_CHOICES_THROTTLE_RATE", default="120/min"),
+        "user_choices": env.value("USER_CHOICES_THROTTLE_RATE", default="120/min"),
+        "matter_choices": env.value("MATTER_CHOICES_THROTTLE_RATE", default="120/min"),
+    },
 }
 
 SPECTACULAR_SETTINGS = {
@@ -157,12 +164,18 @@ SPECTACULAR_SETTINGS = {
     },
 }
 
-MINIO_ENDPOINT = env.value("MINIO_ENDPOINT", default="localhost:9000")
+MINIO_SECURE = env.boolean("MINIO_SECURE", default=False)
+MINIO_INTERNAL_ENDPOINT = env.value(
+    "MINIO_INTERNAL_ENDPOINT",
+    default=env.value("MINIO_ENDPOINT", default="localhost:9000"),
+)
+MINIO_ENDPOINT = MINIO_INTERNAL_ENDPOINT
 MINIO_PUBLIC_ENDPOINT = env.value("MINIO_PUBLIC_ENDPOINT", default="http://localhost:9000")
 MINIO_ACCESS_KEY = env.value("MINIO_ACCESS_KEY", default="minioadmin")
 MINIO_SECRET_KEY = env.value("MINIO_SECRET_KEY", default="minioadmin")
 MINIO_BUCKET_DOCUMENTS = env.value("MINIO_BUCKET_DOCUMENTS", default="legal-documents")
-MINIO_USE_SSL = env.boolean("MINIO_USE_SSL", default=False)
+MINIO_REGION = env.value("MINIO_REGION", default="us-east-1")
+MINIO_USE_SSL = env.boolean("MINIO_USE_SSL", default=MINIO_SECURE)
 MINIO_PRESIGNED_UPLOAD_TTL_SECONDS = env.integer(
     "MINIO_PRESIGNED_UPLOAD_TTL_SECONDS",
     default=900,

@@ -2,7 +2,13 @@
 
 from __future__ import annotations
 
-from drf_spectacular.utils import OpenApiExample, OpenApiResponse, extend_schema
+from drf_spectacular.utils import (
+    OpenApiExample,
+    OpenApiParameter,
+    OpenApiResponse,
+    extend_schema,
+    extend_schema_view,
+)
 
 from apps.accounts.api.v1.serializers import (
     AuthSessionSerializer,
@@ -10,6 +16,7 @@ from apps.accounts.api.v1.serializers import (
     InvitationAcceptSerializer,
     LoginInputSerializer,
     MeSerializer,
+    UserChoicePageSerializer,
     WebSocketTicketSerializer,
 )
 from common.api.openapi import COMMON_ERROR_RESPONSES, RETRY_AFTER_HEADER
@@ -106,4 +113,66 @@ ws_ticket_schema = extend_schema(
         401: COMMON_ERROR_RESPONSES[401],
         429: COMMON_ERROR_RESPONSES[429],
     },
+)
+
+USER_CHOICE_PURPOSE_PARAMETER = OpenApiParameter(
+    name="purpose",
+    type=str,
+    location=OpenApiParameter.QUERY,
+    required=True,
+    enum=["owner", "assignee", "participant", "offboarding_replacement"],
+    description="Form purpose that selects explicit role rules.",
+)
+USER_CHOICE_QUERY_PARAMETER = OpenApiParameter(
+    name="q",
+    type=str,
+    location=OpenApiParameter.QUERY,
+    description="Optional search across first name, last name, and email.",
+)
+USER_CHOICE_CURSOR_PARAMETER = OpenApiParameter(
+    name="cursor",
+    type=str,
+    location=OpenApiParameter.QUERY,
+    description="Opaque cursor from the previous response.",
+)
+USER_CHOICE_PAGE_SIZE_PARAMETER = OpenApiParameter(
+    name="page_size",
+    type=int,
+    location=OpenApiParameter.QUERY,
+    description="Page size from 1 to 50. Defaults to 20.",
+)
+USER_CHOICE_EXCLUDE_USER_PARAMETER = OpenApiParameter(
+    name="exclude_user_id",
+    type=str,
+    location=OpenApiParameter.QUERY,
+    description="User UUID to exclude, used by offboarding replacement choices.",
+)
+
+user_schema = extend_schema_view(
+    list=extend_schema(exclude=True),
+    retrieve=extend_schema(exclude=True),
+    choices=extend_schema(
+        operation_id="users_choices",
+        summary="List permission-scoped user choices",
+        description=(
+            "Returns active same-organization users permitted for the requested form purpose. "
+            "The response uses opaque cursor pagination and exposes only user ID, label, "
+            "email, and role."
+        ),
+        parameters=[
+            USER_CHOICE_PURPOSE_PARAMETER,
+            USER_CHOICE_QUERY_PARAMETER,
+            USER_CHOICE_CURSOR_PARAMETER,
+            USER_CHOICE_PAGE_SIZE_PARAMETER,
+            USER_CHOICE_EXCLUDE_USER_PARAMETER,
+            RETRY_AFTER_HEADER,
+        ],
+        responses={
+            200: UserChoicePageSerializer,
+            400: COMMON_ERROR_RESPONSES[400],
+            401: COMMON_ERROR_RESPONSES[401],
+            403: COMMON_ERROR_RESPONSES[403],
+            429: COMMON_ERROR_RESPONSES[429],
+        },
+    ),
 )

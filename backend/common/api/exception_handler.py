@@ -18,6 +18,8 @@ from rest_framework.exceptions import (
 )
 from rest_framework.views import exception_handler as drf_exception_handler
 
+from common.api.errors import InvalidInputError
+
 
 def exception_handler(exc, context):
     response = drf_exception_handler(exc, context)
@@ -35,6 +37,8 @@ def exception_handler(exc, context):
 
 
 def error_code(exc) -> str:
+    if isinstance(exc, InvalidInputError):
+        return "invalid_input"
     if isinstance(exc, ValidationError):
         return "validation_error"
     if isinstance(exc, Throttled):
@@ -61,6 +65,8 @@ def error_code(exc) -> str:
 
 
 def error_message(exc, response_data) -> str:
+    if isinstance(exc, InvalidInputError):
+        return str(_("Invalid request."))
     if isinstance(exc, ValidationError):
         return str(_("Invalid request."))
     if isinstance(exc, Throttled):
@@ -71,6 +77,8 @@ def error_message(exc, response_data) -> str:
 
 
 def error_details(exc, response_data):
+    if isinstance(exc, InvalidInputError):
+        return normalize_detail(response_data)
     if isinstance(exc, ValidationError):
         return normalize_detail(response_data)
     if isinstance(exc, Throttled) and exc.wait is not None:
