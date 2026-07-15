@@ -1,15 +1,30 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { test, expect } from "vitest";
+import { afterEach, test, expect } from "vitest";
 
 import {
   I18nProvider,
   createI18nInstance,
   getAcceptLanguageHeader,
+  localeStorageKey,
+  resolveInitialLocale,
   getTextDirection,
   useI18n,
 } from ".";
+import {
+  formatDate,
+  inputToIsoDate,
+  inputToLocalDateTime,
+  isoDateToInput,
+  localDateTimeToInput,
+} from "./date";
 import { commonResources } from "./resources";
+
+afterEach(() => {
+  localStorage.clear();
+  document.documentElement.lang = "";
+  document.documentElement.dir = "";
+});
 
 test("translates common namespace keys in English and Persian", () => {
   const english = createI18nInstance("en");
@@ -52,10 +67,45 @@ test("provider switches document language and direction", async () => {
   expect(screen.getByText("rtl")).toBeInTheDocument();
 });
 
+test("provider defaults new sessions to Persian RTL", () => {
+  render(
+    <I18nProvider>
+      <LocaleProbe />
+    </I18nProvider>,
+  );
+
+  expect(document.documentElement.lang).toBe("fa");
+  expect(document.documentElement.dir).toBe("rtl");
+  expect(screen.getByText("rtl")).toBeInTheDocument();
+});
+
+test("locale resolution uses saved frontend locale then Persian fallback", () => {
+  localStorage.setItem(localeStorageKey, "en");
+  expect(resolveInitialLocale()).toBe("en");
+
+  localStorage.setItem(localeStorageKey, "unsupported");
+  expect(resolveInitialLocale()).toBe("fa");
+});
+
 test("accept language helper follows the selected locale", () => {
   expect(getAcceptLanguageHeader("en")).toContain("en-US");
   expect(getAcceptLanguageHeader("fa")).toContain("fa-IR");
   expect(getTextDirection("fa")).toBe("rtl");
+});
+
+test("Jalali date conversion round-trips date-only values without shifting", () => {
+  expect(isoDateToInput("2027-03-21", "fa")).toBe("1406-01-01");
+  expect(inputToIsoDate("1406-01-01", "fa")).toBe("2027-03-21");
+  expect(formatDate("2027-03-21", "fa")).toContain("1406");
+});
+
+test("Jalali local datetime conversion preserves local clock time", () => {
+  expect(localDateTimeToInput("2027-03-21T09:30", "fa")).toBe(
+    "1406-01-01 09:30",
+  );
+  expect(inputToLocalDateTime("1406-01-01 09:30", "fa")).toBe(
+    "2027-03-21T09:30",
+  );
 });
 
 function LocaleProbe() {

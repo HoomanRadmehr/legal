@@ -12,17 +12,20 @@ const requestTicketMock = vi.mocked(requestWebSocketTicket);
 
 afterEach(() => {
   vi.clearAllMocks();
+  vi.restoreAllMocks();
 });
 
 describe("realtime client", () => {
   test("requests a fresh one-time ticket before reconnecting", async () => {
     const sockets: FakeSocket[] = [];
+    const statuses: string[] = [];
     requestTicketMock
       .mockResolvedValueOnce(ticket("ticket-one"))
       .mockResolvedValueOnce(ticket("ticket-two"));
 
     connectUserEvents({
       onEvent: vi.fn(),
+      onStatusChange: (status) => statuses.push(status),
       setTimer: (callback: () => void) => {
         callback();
         return 0;
@@ -34,6 +37,7 @@ describe("realtime client", () => {
       },
     });
     await flushPromises();
+    sockets[0]?.onopen?.();
     sockets[0]?.onclose?.();
     await flushPromises();
 
@@ -41,6 +45,12 @@ describe("realtime client", () => {
     expect(sockets.map((socket) => socket.url)).toEqual([
       "ws://localhost:3000/ws/v1/events/?ticket=ticket-one",
       "ws://localhost:3000/ws/v1/events/?ticket=ticket-two",
+    ]);
+    expect(statuses).toEqual([
+      "connecting",
+      "connected",
+      "disconnected",
+      "connecting",
     ]);
   });
 
@@ -69,6 +79,33 @@ describe("realtime client", () => {
     });
 
     expect(onEvent).not.toHaveBeenCalled();
+  });
+
+  test("ignores malformed messages without console output", async () => {
+    const onEvent = vi.fn();
+    const consoleError = vi
+      .spyOn(console, "error")
+      .mockImplementation(() => undefined);
+    const consoleWarn = vi
+      .spyOn(console, "warn")
+      .mockImplementation(() => undefined);
+    const sockets: FakeSocket[] = [];
+    requestTicketMock.mockResolvedValueOnce(ticket("ticket-one"));
+
+    connectUserEvents({
+      onEvent,
+      socketFactory: (url) => {
+        const socket = new FakeSocket(url);
+        sockets.push(socket);
+        return socket;
+      },
+    });
+    await flushPromises();
+    sockets[0]?.onmessage?.({ data: "ticket=secret-ticket" });
+
+    expect(onEvent).not.toHaveBeenCalled();
+    expect(consoleError).not.toHaveBeenCalled();
+    expect(consoleWarn).not.toHaveBeenCalled();
   });
 
   test("builds websocket URL from published relative path", () => {

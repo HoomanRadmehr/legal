@@ -95,6 +95,45 @@ describe("auth session memory", () => {
     expect(refreshCalls).toBe(1);
     expect(fetchImpl).toHaveBeenCalledTimes(2);
   });
+
+  test("does not persist or log token values when refresh fails", async () => {
+    localStorage.clear();
+    sessionStorage.clear();
+    const consoleError = vi
+      .spyOn(console, "error")
+      .mockImplementation(() => undefined);
+    const storageSet = vi.spyOn(Storage.prototype, "setItem");
+    let refreshCalls = 0;
+    setAuthSession(buildSession("stale-secret-token"));
+    configureSessionRefresh(async () => {
+      refreshCalls += 1;
+      throw new Error("fresh-secret-token");
+    });
+
+    const fetchImpl = vi.fn(async () => unauthorizedResponse());
+    const client = createApiClient({
+      baseUrl: "/api/v1",
+      fetchImpl,
+      getAccessToken,
+      refreshAccessToken: async () => {
+        const session = await refreshSessionOnce();
+        return session?.access ?? null;
+      },
+    });
+
+    await expect(client.request("/documents/")).rejects.toMatchObject({
+      status: 401,
+    });
+    const consoleText = consoleError.mock.calls.flat().join(" ");
+
+    expect(refreshCalls).toBe(1);
+    expect(fetchImpl).toHaveBeenCalledTimes(1);
+    expect(storageSet).not.toHaveBeenCalled();
+    expect(localStorage.length).toBe(0);
+    expect(sessionStorage.length).toBe(0);
+    expect(consoleText).not.toContain("stale-secret-token");
+    expect(consoleText).not.toContain("fresh-secret-token");
+  });
 });
 
 function buildSession(access: string): AuthSession {

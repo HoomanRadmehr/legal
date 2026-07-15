@@ -6,6 +6,24 @@ export const commonResources = {
         close: "Close",
         confirm: "Confirm",
       },
+      auth: {
+        login: {
+          eyebrow: "Legal workspace",
+          title: "Sign in",
+          username: "Email or username",
+          password: "Password",
+          submit: "Sign in",
+          submitting: "Signing in",
+          errors: {
+            invalidCredentials: "The username or password is incorrect.",
+            network:
+              "Unable to reach the server. Check your connection and try again.",
+            rateLimited: "Too many sign-in attempts. Try again later.",
+            rateLimitedWithSeconds:
+              "Too many sign-in attempts. Try again in {{seconds}} seconds.",
+          },
+        },
+      },
       components: {
         formErrorSummary: {
           title: "Please fix the following fields",
@@ -14,10 +32,68 @@ export const commonResources = {
           empty: "No records to show.",
           pageStatus: "Page {{page}} of {{pageCount}}",
         },
+        standardStates: {
+          accessDenied: "Access denied",
+          forbiddenMessage: "You do not have permission to view this page.",
+          loading: "Loading",
+          notFoundMessage: "The page could not be found.",
+          pageNotFound: "Page not found",
+          requestFailed: "Request failed",
+          requestFailedMessage: "The request could not be completed.",
+          requestId: "Request ID {{requestId}}.",
+          retryAfter: "Retry after {{seconds}} seconds.",
+          requestIdWithRetry:
+            "Request ID {{requestId}}. Retry after {{seconds}} seconds.",
+        },
       },
       locale: {
         en: "English",
-        fa: "Persian",
+        fa: "فارسی",
+      },
+      routes: {
+        confidentialRecord: {
+          message: "The record could not be found.",
+          title: "Record not found",
+        },
+        error: {
+          message: "Refresh the page or try again shortly.",
+          title: "Something went wrong",
+        },
+      },
+      layout: {
+        actions: {
+          createMatter: "Create matter",
+          editMatter: "Edit matter",
+          runOffboarding: "Run offboarding",
+          transferOwner: "Transfer owner",
+          uploadDocument: "Upload document",
+        },
+        availableActions: "Available actions",
+        localeSwitcher: "Locale switcher",
+        mainNavigation: "Main navigation",
+        navigation: {
+          activity: "Activity",
+          admin: "Admin",
+          cases: "Cases",
+          contracts: "Contracts",
+          dashboard: "Dashboard",
+          deadlines: "Deadlines",
+          documents: "Documents",
+          inviteUser: "Invite user",
+          notices: "Notices",
+          notifications: "Notifications",
+          offboarding: "Offboarding",
+          tasks: "Tasks",
+        },
+        notifications: "Notifications",
+        organization: "Organization",
+        readonly: {
+          viewer: "Viewer access is read-only.",
+        },
+        signedInAs: "Signed in as",
+        signedInAsName: "Signed in as {{name}}",
+        signOut: "Sign out",
+        workspace: "Workspace",
       },
       features: {
         adminUsers: {
@@ -130,6 +206,24 @@ export const commonResources = {
         close: "بستن",
         confirm: "تایید",
       },
+      auth: {
+        login: {
+          eyebrow: "فضای کاری حقوقی",
+          title: "ورود",
+          username: "ایمیل یا نام کاربری",
+          password: "گذرواژه",
+          submit: "ورود",
+          submitting: "در حال ورود",
+          errors: {
+            invalidCredentials: "نام کاربری یا گذرواژه نادرست است.",
+            network: "ارتباط با سرور برقرار نشد. اتصال خود را بررسی کنید.",
+            rateLimited:
+              "تعداد تلاش‌های ورود بیش از حد مجاز است. بعدا تلاش کنید.",
+            rateLimitedWithSeconds:
+              "تعداد تلاش‌های ورود بیش از حد مجاز است. {{seconds}} ثانیه دیگر تلاش کنید.",
+          },
+        },
+      },
       components: {
         formErrorSummary: {
           title: "لطفا این فیلدها را اصلاح کنید",
@@ -138,10 +232,68 @@ export const commonResources = {
           empty: "رکوردی برای نمایش وجود ندارد.",
           pageStatus: "صفحه {{page}} از {{pageCount}}",
         },
+        standardStates: {
+          accessDenied: "دسترسی رد شد",
+          forbiddenMessage: "شما مجوز مشاهده این صفحه را ندارید.",
+          loading: "در حال بارگذاری",
+          notFoundMessage: "صفحه پیدا نشد.",
+          pageNotFound: "صفحه پیدا نشد",
+          requestFailed: "درخواست ناموفق بود",
+          requestFailedMessage: "درخواست کامل نشد.",
+          requestId: "شناسه درخواست {{requestId}}.",
+          retryAfter: "{{seconds}} ثانیه دیگر تلاش کنید.",
+          requestIdWithRetry:
+            "شناسه درخواست {{requestId}}. {{seconds}} ثانیه دیگر تلاش کنید.",
+        },
       },
       locale: {
-        en: "انگلیسی",
+        en: "English",
         fa: "فارسی",
+      },
+      routes: {
+        confidentialRecord: {
+          message: "رکورد پیدا نشد.",
+          title: "رکورد پیدا نشد",
+        },
+        error: {
+          message: "صفحه را تازه‌سازی کنید یا کمی بعد دوباره تلاش کنید.",
+          title: "خطایی رخ داد",
+        },
+      },
+      layout: {
+        actions: {
+          createMatter: "ایجاد پرونده",
+          editMatter: "ویرایش پرونده",
+          runOffboarding: "اجرای خروج کاربر",
+          transferOwner: "انتقال مالک",
+          uploadDocument: "بارگذاری سند",
+        },
+        availableActions: "اقدام‌های در دسترس",
+        localeSwitcher: "تغییر زبان",
+        mainNavigation: "ناوبری اصلی",
+        navigation: {
+          activity: "فعالیت‌ها",
+          admin: "مدیریت",
+          cases: "پرونده‌ها",
+          contracts: "قراردادها",
+          dashboard: "داشبورد",
+          deadlines: "مهلت‌ها",
+          documents: "اسناد",
+          inviteUser: "دعوت کاربر",
+          notices: "ابلاغ‌ها",
+          notifications: "اعلان‌ها",
+          offboarding: "خروج کاربر",
+          tasks: "کارها",
+        },
+        notifications: "اعلان‌ها",
+        organization: "سازمان",
+        readonly: {
+          viewer: "دسترسی مشاهده‌گر فقط خواندنی است.",
+        },
+        signedInAs: "وارد شده با",
+        signedInAsName: "وارد شده با {{name}}",
+        signOut: "خروج",
+        workspace: "محیط کار",
       },
       features: {
         adminUsers: {

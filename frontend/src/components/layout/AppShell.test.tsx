@@ -17,6 +17,7 @@ import {
 } from "../../auth/permissions";
 import { AppProviders } from "../../app/providers";
 import { appRoutes } from "../../app/routes";
+import { I18nProvider, type SupportedLocale } from "../../i18n";
 import { AppShell, RoleActionBar } from "./AppShell";
 
 afterEach(() => {
@@ -123,11 +124,42 @@ describe("app shell permissions", () => {
     expect(screen.getByText("Viewer access is read-only.")).toBeInTheDocument();
   });
 
+  test("renders Persian sidebar labels and RTL shell placement", () => {
+    renderShell(ROLE_LEGAL_ADMIN, "fa");
+
+    const workspace = screen.getByLabelText("محیط کار");
+    expect(workspace.closest(".layout-shell")).toHaveClass("layout-shell--rtl");
+    expect(
+      screen.getByRole("navigation", { name: "ناوبری اصلی" }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "داشبورد" })).toHaveAttribute(
+      "href",
+      "/",
+    );
+    expect(screen.getByRole("link", { name: "اسناد" })).toHaveAttribute(
+      "href",
+      "/documents",
+    );
+    expect(screen.getByRole("link", { name: "دعوت کاربر" })).toHaveAttribute(
+      "href",
+      "/admin/users/new",
+    );
+    expect(
+      screen.getByRole("button", { name: "بارگذاری سند" }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "خروج" })).toBeInTheDocument();
+    expect(
+      screen.queryByRole("link", { name: "Dashboard" }),
+    ).not.toBeInTheDocument();
+  });
+
   test("handles direct admin-route denial without hidden details", async () => {
     stubFetchWithSession(ROLE_VIEWER);
     renderRoute("/admin/offboarding");
 
-    expect(await screen.findByRole("alert")).toHaveTextContent("Access denied");
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      "دسترسی رد شد",
+    );
     expect(screen.queryByText(/offboarding preview/i)).not.toBeInTheDocument();
   });
 
@@ -142,12 +174,14 @@ describe("app shell permissions", () => {
   });
 });
 
-function renderShell(role: MembershipRole) {
+function renderShell(role: MembershipRole, locale: SupportedLocale = "en") {
   render(
     <MemoryRouter>
-      <AppShell onLogout={() => undefined} session={buildSession(role)}>
-        <RoleActionBar role={role} />
-      </AppShell>
+      <I18nProvider initialLocale={locale}>
+        <AppShell onLogout={() => undefined} session={buildSession(role)}>
+          <RoleActionBar role={role} />
+        </AppShell>
+      </I18nProvider>
     </MemoryRouter>,
   );
 }

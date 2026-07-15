@@ -170,6 +170,11 @@
   font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 }
 
+.localized-date-input {
+  direction: ltr;
+  text-align: start;
+}
+
 @media (max-width: 640px) {
   .page-header,
   .confirmation-dialog__actions {

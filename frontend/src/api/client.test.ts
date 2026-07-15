@@ -43,6 +43,40 @@ describe("API client", () => {
     expect(headers.get("Content-Type")).toBe("application/json");
   });
 
+  test("sends configured Accept-Language without overwriting explicit headers", async () => {
+    const fetchImpl = vi.fn(
+      async (input: RequestInfo | URL, init?: RequestInit) => {
+        void input;
+        void init;
+        return Response.json({ ok: true });
+      },
+    );
+    const client = createApiClient({
+      baseUrl: "/api/v1",
+      fetchImpl,
+      getAcceptLanguage: () => "fa-IR,fa;q=0.9,en;q=0.5",
+    });
+
+    await client.request("/matters/");
+    await client.request("/matters/", {
+      headers: { "Accept-Language": "en-US,en;q=0.9,fa;q=0.5" },
+    });
+
+    const firstCall = fetchImpl.mock.calls[0];
+    const secondCall = fetchImpl.mock.calls[1];
+    if (!firstCall || !secondCall) {
+      throw new Error("Expected both API requests to be sent.");
+    }
+    const firstHeaders = new Headers(firstCall[1]?.headers);
+    const secondHeaders = new Headers(secondCall[1]?.headers);
+    expect(firstHeaders.get("Accept-Language")).toBe(
+      "fa-IR,fa;q=0.9,en;q=0.5",
+    );
+    expect(secondHeaders.get("Accept-Language")).toBe(
+      "en-US,en;q=0.9,fa;q=0.5",
+    );
+  });
+
   test("throws parsed API errors without exposing response bodies", async () => {
     const fetchImpl = vi.fn(
       async (input: RequestInfo | URL, init?: RequestInit) => {

@@ -26,6 +26,7 @@ export type ApiClient = {
 export type ApiClientConfig = {
   baseUrl?: string;
   fetchImpl?: typeof fetch;
+  getAcceptLanguage?: () => string | undefined;
   getAccessToken?: AccessTokenProvider;
   onUnauthorized?: UnauthorizedHandler;
   refreshAccessToken?: RefreshAccessToken;
@@ -35,12 +36,15 @@ const DEFAULT_BASE_URL =
   import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8000/api/v1";
 
 let defaultAccessTokenProvider: AccessTokenProvider | undefined;
+let defaultAcceptLanguageProvider: (() => string | undefined) | undefined;
 let defaultRefreshAccessToken: RefreshAccessToken | undefined;
 let defaultUnauthorizedHandler: UnauthorizedHandler | undefined;
 
 export function createApiClient(config: ApiClientConfig = {}): ApiClient {
   const baseUrl = config.baseUrl ?? DEFAULT_BASE_URL;
   const fetchImpl = config.fetchImpl ?? ((input, init) => fetch(input, init));
+  const getAcceptLanguage =
+    config.getAcceptLanguage ?? (() => defaultAcceptLanguageProvider?.());
   const getAccessToken =
     config.getAccessToken ?? (() => defaultAccessTokenProvider?.());
   const refreshAccessToken =
@@ -54,6 +58,7 @@ export function createApiClient(config: ApiClientConfig = {}): ApiClient {
       apiRequest(path, options, {
         baseUrl,
         fetchImpl,
+        getAcceptLanguage,
         getAccessToken,
         onUnauthorized,
         refreshAccessToken,
@@ -73,8 +78,15 @@ export function configureApiClientAuth(config: {
   defaultUnauthorizedHandler = config.onUnauthorized;
 }
 
+export function configureApiClientLocale(config: {
+  getAcceptLanguage?: () => string | undefined;
+}): void {
+  defaultAcceptLanguageProvider = config.getAcceptLanguage;
+}
+
 export function resetApiClientAuth(): void {
   defaultAccessTokenProvider = undefined;
+  defaultAcceptLanguageProvider = undefined;
   defaultRefreshAccessToken = undefined;
   defaultUnauthorizedHandler = undefined;
 }
@@ -85,7 +97,10 @@ async function apiRequest<TResponse>(
   config: Required<Pick<ApiClientConfig, "baseUrl" | "fetchImpl">> &
     Pick<
       ApiClientConfig,
-      "getAccessToken" | "onUnauthorized" | "refreshAccessToken"
+      | "getAcceptLanguage"
+      | "getAccessToken"
+      | "onUnauthorized"
+      | "refreshAccessToken"
     >,
 ): Promise<TResponse> {
   const response = await sendRequest(path, options, config);
@@ -147,7 +162,7 @@ async function sendRequest(
   path: string,
   options: ApiRequestOptions,
   config: Required<Pick<ApiClientConfig, "baseUrl" | "fetchImpl">> &
-    Pick<ApiClientConfig, "getAccessToken">,
+    Pick<ApiClientConfig, "getAcceptLanguage" | "getAccessToken">,
 ): Promise<Response> {
   try {
     return await config.fetchImpl(
@@ -158,6 +173,7 @@ async function sendRequest(
         headers: buildHeaders(
           options.headers,
           options.body,
+          config.getAcceptLanguage?.(),
           config.getAccessToken?.(),
         ),
         method: options.method ?? "GET",
@@ -172,10 +188,14 @@ async function sendRequest(
 function buildHeaders(
   baseHeaders: HeadersInit | undefined,
   body: unknown,
+  acceptLanguage: string | undefined,
   token: string | null | undefined,
 ) {
   const headers = new Headers(baseHeaders);
   headers.set("Accept", "application/json");
+  if (acceptLanguage && !headers.has("Accept-Language")) {
+    headers.set("Accept-Language", acceptLanguage);
+  }
 
   if (
     body !== undefined &&

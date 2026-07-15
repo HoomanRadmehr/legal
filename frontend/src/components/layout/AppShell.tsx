@@ -22,16 +22,16 @@ type AppShellProps = {
 };
 
 export function AppShell({ children, onLogout, session }: AppShellProps) {
-  const { changeLocale, locale } = useI18n();
+  const { changeLocale, direction, locale, t } = useI18n();
   const role = session.membership.role;
   const organizationName =
     session.membership.organization_name ?? session.membership.organization_id;
 
   return (
-    <div className="layout-shell">
-      <aside className="layout-sidebar" aria-label="Workspace">
+    <div className={`layout-shell layout-shell--${direction}`}>
+      <aside className="layout-sidebar" aria-label={t("layout.workspace")}>
         <div>
-          <p className="layout-kicker">Organization</p>
+          <p className="layout-kicker">{t("layout.organization")}</p>
           <p className="layout-organization">{organizationName}</p>
         </div>
         <WorkspaceNavigation role={role} />
@@ -39,7 +39,12 @@ export function AppShell({ children, onLogout, session }: AppShellProps) {
       <div className="layout-main">
         <header className="layout-header">
           <div>
-            <p className="layout-kicker">Signed in as</p>
+            <span className="layout-sr-only">
+              {t("layout.signedInAsName", {
+                name: session.user.display_name,
+              })}
+            </span>
+            <p className="layout-kicker">{t("layout.signedInAs")}</p>
             <p className="layout-user">{session.user.display_name}</p>
           </div>
           <div className="layout-header__actions">
@@ -50,7 +55,7 @@ export function AppShell({ children, onLogout, session }: AppShellProps) {
               onPersian={() => changeLocale("fa")}
             />
             <button className="layout-button" onClick={onLogout} type="button">
-              Sign out
+              {t("layout.signOut")}
             </button>
           </div>
         </header>
@@ -62,51 +67,70 @@ export function AppShell({ children, onLogout, session }: AppShellProps) {
 
 export function RoleActionBar({ role }: { role: string }) {
   const reason = readonlyReason(role);
+  const { t } = useI18n();
 
   return (
-    <section className="layout-actions" aria-label="Available actions">
+    <section
+      className="layout-actions"
+      aria-label={t("layout.availableActions")}
+    >
       {canCreateMatter(role) ? (
-        <button type="button">Create matter</button>
+        <button type="button">{t("layout.actions.createMatter")}</button>
       ) : null}
-      {canEditMatter(role) ? <button type="button">Edit matter</button> : null}
+      {canEditMatter(role) ? (
+        <button type="button">{t("layout.actions.editMatter")}</button>
+      ) : null}
       {canUploadDocument(role) ? (
-        <button type="button">Upload document</button>
+        <button type="button">{t("layout.actions.uploadDocument")}</button>
       ) : null}
       {canChangeMatterOwner(role) ? (
-        <button type="button">Transfer owner</button>
+        <button type="button">{t("layout.actions.transferOwner")}</button>
       ) : null}
       {canRunOffboarding(role) ? (
         <NavLink className="layout-action-link" to="/admin/offboarding">
-          Run offboarding
+          {t("layout.actions.runOffboarding")}
         </NavLink>
       ) : null}
-      {reason ? <p className="layout-readonly">{reason}</p> : null}
+      {reason ? (
+        <p className="layout-readonly">{t("layout.readonly.viewer")}</p>
+      ) : null}
     </section>
   );
 }
 
 function WorkspaceNavigation({ role }: { role: string }) {
+  const { t } = useI18n();
+
   return (
-    <nav className="layout-nav" aria-label="Main navigation">
-      <NavItem to="/" label="Dashboard" />
-      <NavItem to="/cases" label="Cases" />
-      <NavItem to="/contracts" label="Contracts" />
-      <NavItem to="/notices" label="Notices" />
-      <NavItem to="/deadlines" label="Deadlines" />
-      <NavItem to="/tasks" label="Tasks" />
-      <NavItem to="/documents" label="Documents" />
+    <nav className="layout-nav" aria-label={t("layout.mainNavigation")}>
+      <NavItem to="/" label={t("layout.navigation.dashboard")} />
+      <NavItem to="/cases" label={t("layout.navigation.cases")} />
+      <NavItem to="/contracts" label={t("layout.navigation.contracts")} />
+      <NavItem to="/notices" label={t("layout.navigation.notices")} />
+      <NavItem to="/deadlines" label={t("layout.navigation.deadlines")} />
+      <NavItem to="/tasks" label={t("layout.navigation.tasks")} />
+      <NavItem to="/documents" label={t("layout.navigation.documents")} />
       {canViewActivityLog(role) ? (
-        <NavItem to="/activity" label="Activity" />
+        <NavItem to="/activity" label={t("layout.navigation.activity")} />
       ) : null}
-      <NavItem to="/notifications" label="Notifications" />
+      <NavItem
+        to="/notifications"
+        label={t("layout.navigation.notifications")}
+      />
       {canManageOrganization(role) ? (
-        <NavItem to="/admin/users" label="Admin" />
+        <NavItem to="/admin/users" label={t("layout.navigation.admin")} />
       ) : null}
       {canManageOrganization(role) ? (
-        <NavItem to="/admin/users/new" label="Invite user" />
+        <NavItem
+          to="/admin/users/new"
+          label={t("layout.navigation.inviteUser")}
+        />
       ) : null}
       {canRunOffboarding(role) ? (
-        <NavItem to="/admin/offboarding" label="Offboarding" />
+        <NavItem
+          to="/admin/offboarding"
+          label={t("layout.navigation.offboarding")}
+        />
       ) : null}
     </nav>
   );
@@ -128,8 +152,13 @@ function NavItem({ label, to }: { label: string; to: string }) {
 }
 
 function NotificationIndicator() {
+  const { t } = useI18n();
+
   return (
-    <span className="layout-notification" aria-label="Notifications">
+    <span
+      className="layout-notification"
+      aria-label={t("layout.notifications")}
+    >
       0
     </span>
   );
@@ -144,23 +173,25 @@ function LocaleSwitcher({
   onEnglish: () => void;
   onPersian: () => void;
 }) {
+  const { t } = useI18n();
+
   return (
-    <div className="layout-locale" aria-label="Locale switcher">
-      <button
-        aria-pressed={locale === "en"}
-        className="layout-button"
-        onClick={onEnglish}
-        type="button"
-      >
-        English
-      </button>
+    <div className="layout-locale" aria-label={t("layout.localeSwitcher")}>
       <button
         aria-pressed={locale === "fa"}
         className="layout-button"
         onClick={onPersian}
         type="button"
       >
-        Persian
+        {t("locale.fa")}
+      </button>
+      <button
+        aria-pressed={locale === "en"}
+        className="layout-button"
+        onClick={onEnglish}
+        type="button"
+      >
+        {t("locale.en")}
       </button>
     </div>
   );

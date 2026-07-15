@@ -1,42 +1,64 @@
-import { type PropsWithChildren, useEffect, useMemo, useState } from "react";
+import {
+  type PropsWithChildren,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 
+import { configureApiClientLocale } from "../api/client";
 import {
   type SupportedLocale,
   createI18nInstance,
-  defaultLocale,
   getAcceptLanguageHeader,
   getTextDirection,
+  resolveInitialLocale,
+  setDocumentLocale,
+  setStoredLocale,
   translate,
 } from "./config";
 import { I18nContext } from "./context";
 
 export function I18nProvider({
   children,
-  initialLocale = defaultLocale,
+  initialLocale,
 }: PropsWithChildren<{ initialLocale?: SupportedLocale }>) {
-  const [i18n] = useState(() => createI18nInstance(initialLocale));
-  const [locale, setLocale] = useState<SupportedLocale>(initialLocale);
+  const [startingLocale] = useState(() => resolveInitialLocale(initialLocale));
+  const [i18n] = useState(() => createI18nInstance(startingLocale));
+  const [locale, setLocale] = useState<SupportedLocale>(startingLocale);
   const direction = getTextDirection(locale);
+  const acceptLanguage = getAcceptLanguageHeader(locale);
 
   useEffect(() => {
-    document.documentElement.lang = locale;
-    document.documentElement.dir = direction;
-  }, [direction, locale]);
+    setDocumentLocale(locale);
+    configureApiClientLocale({ getAcceptLanguage: () => acceptLanguage });
+  }, [acceptLanguage, locale]);
+
+  const changeLocale = useCallback(
+    (
+      nextLocale: SupportedLocale,
+      options: { persist?: boolean } = { persist: true },
+    ) => {
+      void i18n.changeLanguage(nextLocale);
+      setLocale(nextLocale);
+      if (options.persist !== false) {
+        setStoredLocale(nextLocale);
+      }
+    },
+    [i18n],
+  );
 
   const value = useMemo(
     () => ({
-      acceptLanguage: getAcceptLanguageHeader(locale),
-      changeLocale: (nextLocale: SupportedLocale) => {
-        void i18n.changeLanguage(nextLocale);
-        setLocale(nextLocale);
-      },
+      acceptLanguage,
+      changeLocale,
       direction,
       i18n,
       locale,
       t: (key: string, values?: Record<string, string | number>) =>
         translate(i18n.t, key, values),
     }),
-    [direction, i18n, locale],
+    [acceptLanguage, changeLocale, direction, i18n, locale],
   );
 
   return <I18nContext.Provider value={value}>{children}</I18nContext.Provider>;

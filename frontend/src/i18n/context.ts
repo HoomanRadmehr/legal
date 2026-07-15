@@ -12,10 +12,14 @@ import {
 } from "./config";
 
 export type TranslationValues = Record<string, string | number>;
+export type LocaleChangeOptions = { persist?: boolean };
 
 export type I18nContextValue = {
   acceptLanguage: string;
-  changeLocale: (locale: SupportedLocale) => void;
+  changeLocale: (
+    locale: SupportedLocale,
+    options?: LocaleChangeOptions,
+  ) => void;
   direction: TextDirection;
   i18n: I18nInstance;
   locale: SupportedLocale;

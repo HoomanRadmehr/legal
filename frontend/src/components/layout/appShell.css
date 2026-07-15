@@ -5,6 +5,10 @@
   background: #f8fafc;
 }
 
+.layout-shell--rtl {
+  grid-template-columns: minmax(0, 1fr) 260px;
+}
+
 .layout-sidebar {
   display: flex;
   flex-direction: column;
@@ -12,6 +16,17 @@
   border-inline-end: 1px solid #d0d5dd;
   padding: 24px;
   background: #ffffff;
+  text-align: start;
+}
+
+.layout-shell--rtl .layout-sidebar {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+.layout-shell--rtl .layout-main {
+  grid-column: 1;
+  grid-row: 1;
 }
 
 .layout-main {
@@ -116,9 +131,24 @@
   color: #475467;
 }
 
+.layout-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
 @media (max-width: 760px) {
   .layout-shell {
     grid-template-columns: 1fr;
+  }
+
+  .layout-shell--rtl .layout-sidebar,
+  .layout-shell--rtl .layout-main {
+    grid-column: auto;
+    grid-row: auto;
   }
 
   .layout-sidebar {

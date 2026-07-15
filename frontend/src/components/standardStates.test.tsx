@@ -8,6 +8,7 @@ import {
   LoadingState,
   NotFoundState,
 } from "./standardStates";
+import { I18nProvider } from "../i18n";
 
 test("renders an accessible loading state", () => {
   render(<LoadingState label="Loading matters" />);
@@ -17,10 +18,10 @@ test("renders an accessible loading state", () => {
 
 test("renders empty and not found states with headings", () => {
   render(
-    <>
+    <I18nProvider initialLocale="en">
       <EmptyState title="No matters" message="Create the first matter." />
       <NotFoundState />
-    </>,
+    </I18nProvider>,
   );
 
   expect(
@@ -33,14 +34,14 @@ test("renders empty and not found states with headings", () => {
 
 test("renders error states without raw server details", () => {
   render(
-    <>
+    <I18nProvider initialLocale="en">
       <ErrorState
         message="Too many requests."
         requestId="req-123"
         retryAfterSeconds={30}
       />
       <ForbiddenState />
-    </>,
+    </I18nProvider>,
   );
 
   const alerts = screen.getAllByRole("alert");

@@ -1,15 +1,19 @@
 import type { ReactNode } from "react";
 
+import { useI18n } from "../i18n";
+
 export type StandardStateProps = {
   title: string;
   message?: string;
 };
 
-export function LoadingState({ label = "Loading" }: { label?: string }) {
+export function LoadingState({ label }: { label?: string }) {
+  const { t } = useI18n();
+
   return (
     <div className="state state--loading" role="status" aria-live="polite">
       <span className="state__spinner" aria-hidden="true" />
-      <span>{label}</span>
+      <span>{label ?? t("components.standardStates.loading")}</span>
     </div>
   );
 }
@@ -24,8 +28,8 @@ export function EmptyState({ title, message }: StandardStateProps) {
 }
 
 export function ErrorState({
-  title = "Request failed",
-  message = "The request could not be completed.",
+  title,
+  message,
   requestId,
   retryAfterSeconds,
 }: {
@@ -34,14 +38,18 @@ export function ErrorState({
   requestId?: string;
   retryAfterSeconds?: number;
 }) {
+  const { t } = useI18n();
+
   return (
     <section
       className="state state--error"
       role="alert"
       aria-labelledby="error-state-title"
     >
-      <h2 id="error-state-title">{title}</h2>
-      <p>{message}</p>
+      <h2 id="error-state-title">
+        {title ?? t("components.standardStates.requestFailed")}
+      </h2>
+      <p>{message ?? t("components.standardStates.requestFailedMessage")}</p>
       <ErrorMetadata
         requestId={requestId}
         retryAfterSeconds={retryAfterSeconds}
@@ -51,29 +59,37 @@ export function ErrorState({
 }
 
 export function ForbiddenState({
-  title = "Access denied",
-  message = "You do not have permission to view this page.",
+  title,
+  message,
 }: Partial<StandardStateProps>) {
+  const { t } = useI18n();
+
   return (
     <section
       className="state state--error"
       role="alert"
       aria-labelledby="forbidden-state-title"
     >
-      <h2 id="forbidden-state-title">{title}</h2>
-      <p>{message}</p>
+      <h2 id="forbidden-state-title">
+        {title ?? t("components.standardStates.accessDenied")}
+      </h2>
+      <p>{message ?? t("components.standardStates.forbiddenMessage")}</p>
     </section>
   );
 }
 
 export function NotFoundState({
-  title = "Page not found",
-  message = "The page could not be found.",
+  title,
+  message,
 }: Partial<StandardStateProps>) {
+  const { t } = useI18n();
+
   return (
     <section className="state" aria-labelledby="not-found-state-title">
-      <h2 id="not-found-state-title">{title}</h2>
-      <p>{message}</p>
+      <h2 id="not-found-state-title">
+        {title ?? t("components.standardStates.pageNotFound")}
+      </h2>
+      <p>{message ?? t("components.standardStates.notFoundMessage")}</p>
     </section>
   );
 }
@@ -85,7 +101,8 @@ function ErrorMetadata({
   requestId?: string;
   retryAfterSeconds?: number;
 }) {
-  const metadata = buildErrorMetadata({ requestId, retryAfterSeconds });
+  const { t } = useI18n();
+  const metadata = buildErrorMetadata({ requestId, retryAfterSeconds, t });
 
   if (!metadata) {
     return null;
@@ -97,18 +114,25 @@ function ErrorMetadata({
 function buildErrorMetadata({
   requestId,
   retryAfterSeconds,
+  t,
 }: {
   requestId?: string;
   retryAfterSeconds?: number;
+  t: (key: string, values?: Record<string, string | number>) => string;
 }): ReactNode {
   if (requestId && retryAfterSeconds !== undefined) {
-    return `Request ID ${requestId}. Retry after ${retryAfterSeconds} seconds.`;
+    return t("components.standardStates.requestIdWithRetry", {
+      requestId,
+      seconds: retryAfterSeconds,
+    });
   }
   if (requestId) {
-    return `Request ID ${requestId}.`;
+    return t("components.standardStates.requestId", { requestId });
   }
   if (retryAfterSeconds !== undefined) {
-    return `Retry after ${retryAfterSeconds} seconds.`;
+    return t("components.standardStates.retryAfter", {
+      seconds: retryAfterSeconds,
+    });
   }
   return null;
 }

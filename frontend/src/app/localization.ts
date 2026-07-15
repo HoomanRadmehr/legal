@@ -3,13 +3,13 @@ import { createContext, useContext } from "react";
 export type TextDirection = "ltr" | "rtl";
 
 export type LocalizationState = {
-  locale: "en";
+  locale: "fa";
   direction: TextDirection;
 };
 
 export const defaultLocalizationState: LocalizationState = {
-  locale: "en",
-  direction: "ltr",
+  locale: "fa",
+  direction: "rtl",
 };
 
 export const LocalizationContext = createContext<LocalizationState>(

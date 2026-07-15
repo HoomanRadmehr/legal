@@ -29,6 +29,18 @@ test("renders a domain-neutral page header and status badge", () => {
   expect(screen.getByText("Complete")).toBeInTheDocument();
 });
 
+test("status badges expose status through text, not color alone", () => {
+  renderWithI18n(
+    <>
+      <StatusBadge tone="danger" />
+      <StatusBadge tone="warning" />
+    </>,
+  );
+
+  expect(screen.getByText("Needs attention")).toBeInTheDocument();
+  expect(screen.getByText("In progress")).toBeInTheDocument();
+});
+
 test("renders a paginated table shell with rows and page status", () => {
   type Row = { id: string; owner: string; reference: string };
   const columns: TableColumn<Row>[] = [

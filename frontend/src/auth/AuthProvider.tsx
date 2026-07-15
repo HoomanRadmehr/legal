@@ -8,6 +8,7 @@ import {
 } from "react";
 
 import { configureApiClientAuth } from "../api/client";
+import { normalizeLocale, useI18n } from "../i18n";
 import {
   login as loginRequest,
   logoutSession,
@@ -27,6 +28,8 @@ import {
 export function AuthProvider({ children }: PropsWithChildren) {
   const [session, setSession] = useState<AuthSession | null>(null);
   const [status, setStatus] = useState<AuthStatus>("restoring");
+  const { changeLocale } = useI18n();
+  const appliedPreferredLanguageRef = useRef("");
   const restoredRef = useRef(false);
 
   const clearSession = useCallback(() => {
@@ -70,6 +73,20 @@ export function AuthProvider({ children }: PropsWithChildren) {
       clearSession();
     }
   }, [clearSession]);
+
+  useEffect(() => {
+    if (!session) {
+      appliedPreferredLanguageRef.current = "";
+      return;
+    }
+    const nextLocale = normalizeLocale(session.user.preferred_language);
+    const preferenceKey = `${session.user.id}:${nextLocale}`;
+    if (appliedPreferredLanguageRef.current === preferenceKey) {
+      return;
+    }
+    appliedPreferredLanguageRef.current = preferenceKey;
+    changeLocale(nextLocale, { persist: false });
+  }, [changeLocale, session]);
 
   const login = useCallback(async (input: LoginInput) => {
     const nextSession = await loginRequest(input);
