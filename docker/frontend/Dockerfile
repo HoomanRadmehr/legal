@@ -7,7 +7,9 @@ WORKDIR /build/frontend
 COPY frontend/package.json frontend/package-lock.json ./
 RUN npm ci
 
-COPY frontend/ ./
+COPY frontend/index.html frontend/tsconfig.json frontend/vite.config.ts ./
+COPY frontend/src/ ./src/
+COPY frontend/scripts/ ./scripts/
 
 ARG VITE_API_BASE_URL=/api/v1
 ARG VITE_WS_BASE_URL=/ws/v1
@@ -22,7 +24,9 @@ RUN npm run build
 FROM nginxinc/nginx-unprivileged:1.27-alpine AS runtime
 
 COPY docker/frontend/nginx.conf /etc/nginx/conf.d/default.conf
-COPY --from=builder --chown=101:101 /build/frontend/dist /usr/share/nginx/html
+COPY --from=builder --chown=101:101 /build/frontend/dist/ /usr/share/nginx/html/
+
+USER 101
 
 EXPOSE 8080
 
