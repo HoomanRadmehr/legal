@@ -68,3 +68,17 @@ docker compose run --rm api python -m pytest tests/integration/test_legal_record
   - `python3 scripts/validate_docs.py` - passed, 27 specs, 63 tasks, 172 Markdown files.
 - Result: BLOCKED. Dependencies `BE-016` and `FE-010` are `DONE`, and the required reading was completed, but the task's required Compose verification command cannot execute tests because the `legal-backend:dev` runtime image does not include pytest.
 - Deviations/questions: No integration test was added because the required Docker verification runner fails before test collection. Blocking finding is owned by Docker/test infrastructure from `BE-005`/`BE-006`: reproduce with `docker compose run --rm api python -m pytest tests/integration/test_legal_records.py -q`; after clearing port conflicts, the API image exits with `/opt/venv/bin/python: No module named pytest`. Product code outside INT-002's allowed scope was not patched.
+
+## Codex execution log - rerun 2026-07-15
+
+- Started: 2026-07-15 18:35 +0330
+- Completed: 2026-07-15 18:35 +0330
+- Files changed:
+  - `tasks/integration/INT-002-verify-cases-contracts-and-notices.md`
+  - `AI_USAGE.md`
+- Commands run:
+  - `docker compose run --rm api python -m pytest tests/integration/test_legal_records.py -q` - failed before test collection with `/opt/venv/bin/python: No module named pytest`.
+  - `python3 scripts/check_simplicity.py` - passed; scanned 519 source files.
+  - `python3 scripts/validate_docs.py` - failed on pre-existing decimal task heading IDs: `BE-038`, `BE-036`, `BE-037`, `FE-022`, `FE-023`, and `FE-024`.
+- Result: BLOCKED. Dependencies `BE-016` and `FE-010` were confirmed `DONE`, but the exact required Compose verification command still cannot run because the API runtime image lacks `pytest`.
+- Deviations/questions: No backend or frontend product code was patched outside INT-002 allowed scope. The reproducible blocker remains owned by backend Docker/test infrastructure from `BE-005`/`BE-006`: `docker compose run --rm api python -m pytest tests/integration/test_legal_records.py -q`.

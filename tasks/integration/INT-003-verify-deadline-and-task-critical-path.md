@@ -64,3 +64,20 @@ docker compose run --rm api python -m pytest tests/integration/test_deadlines_ta
   - `python3 scripts/validate_docs.py` - passed, 27 specs, 63 tasks, 172 Markdown files.
 - Result: BLOCKED. Dependencies `BE-017` and `FE-011` are `DONE`, and the required reading was completed, but the required Compose verification command cannot run to test collection. The local override first conflicts with host PostgreSQL on `5432`; with host port publishing removed, the `legal-backend:dev` runtime image still lacks pytest.
 - Deviations/questions: No integration test was added because the required Docker verification runner fails before test collection. Blocking finding is owned by Docker/test infrastructure from `BE-005`/`BE-006`: reproduce the exact local command with `docker compose run --rm api python -m pytest tests/integration/test_deadlines_tasks.py -q`; after avoiding port publishing, reproduce the image defect with `docker compose -f compose.yaml run --rm api python -m pytest tests/integration/test_deadlines_tasks.py -q`, which exits with `/opt/venv/bin/python: No module named pytest`. Product code outside INT-003's allowed scope was not patched.
+
+## Codex execution log - rerun 2026-07-15
+
+- Started: 2026-07-15 18:36 +0330
+- Completed: 2026-07-15 18:36 +0330
+- Files changed:
+  - `tasks/integration/INT-003-verify-deadline-and-task-critical-path.md`
+  - `AI_USAGE.md`
+- Dependency check:
+  - `BE-017` status confirmed `DONE`.
+  - `FE-011` status confirmed `DONE`.
+- Commands run:
+  - `docker compose run --rm api python -m pytest tests/integration/test_deadlines_tasks.py -q` - failed before test collection with `/opt/venv/bin/python: No module named pytest`; Compose dependencies were running or healthy, including PostgreSQL, Redis, RabbitMQ, MinIO, and `minio-init`.
+  - `python3 scripts/check_simplicity.py` - passed, scanned 519 source files.
+  - `python3 scripts/validate_docs.py` - failed on pre-existing task heading IDs: `tasks/backend/BE-038-implement-membership-role-management.md`, `tasks/backend/BE-036-implement-admin-user-invitation-api.md`, `tasks/backend/BE-037-implement-user-invitation-acceptance.md`, `tasks/frontend/FE-022-implement-admin-user-creation-form.md`, `tasks/frontend/FE-023-implement-user-invitation-acceptance-page.md`, and `tasks/frontend/FE-024-implement-user-role-management-page.md`.
+- Result: BLOCKED. The required API integration test runner still cannot reach collection because the Compose API runtime image does not include `pytest`; therefore the deadline/task critical path, REST/JWT/cookie/CSRF/WebSocket/MinIO/error contracts, and acceptance criteria cannot be truthfully marked verified in this task.
+- Deviations/questions: No product code or integration test code was patched outside INT-003's allowed scope. Blocking finding is owned by backend Docker/test infrastructure from `BE-005`/`BE-006`; reproduce with `docker compose run --rm api python -m pytest tests/integration/test_deadlines_tasks.py -q`.

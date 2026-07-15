@@ -1,0 +1,87 @@
+# FE-022: Implement Admin user creation form
+
+Status: DONE
+Priority: P0
+Area: Frontend
+Related specs: FE-001, FE-002, FE-011, FE-012
+Depends on: FE-002, FE-004, FE-005, FE-006, BE-036
+
+## Goal
+
+Allow a Legal Admin to create and invite a new organization user through a simple localized form.
+
+The form never asks for a password or organization identifier.
+
+## Route
+
+```text
+/admin/users/new
+```
+
+## Allowed scope
+
+- `frontend/src/features/adminUsers/`
+- `frontend/src/app/routes.tsx`
+- `frontend/src/components/layout/AppShell.tsx`
+- `frontend/src/components/layout/AppShell.test.tsx`
+- `frontend/src/i18n/resources.ts`
+- `tasks/frontend/FE-022-implement-admin-user-creation-form.md`
+- `AI_USAGE.md`
+
+## Required reading
+
+- `AGENTS.md`
+- `frontend/AGENTS.md`
+- `specs/frontend/FE-001-authentication.md`
+- `specs/frontend/FE-002-app-shell-permissions.md`
+- `specs/frontend/FE-011-localization-accessibility.md`
+- `specs/frontend/FE-012-testing-delivery.md`
+- `tasks/backend/BE-036-implement-admin-user-invitation-api.md`
+- Relevant files in `docs/guardrails/` and `docs/tech/`
+
+## Implementation steps
+
+1. Add typed admin-user invitation API input and response handling.
+2. Add localized, admin-only invitation form at `/admin/users/new`.
+3. Send canonical role and language values without password or organization fields.
+4. Generate an idempotency key per invitation request.
+5. Display validation, duplicate-email, rate-limit, and generic API errors safely.
+6. Add tests for permissions, payload shape, localization, and negative paths.
+
+## Acceptance criteria
+
+- [x] Only Legal Admin users can access the create-user form.
+- [x] The form sends `email`, optional names, `role`, and `preferred_language` only.
+- [x] The form never renders or submits password or organization identifiers.
+- [x] Requests include an `Idempotency-Key` header.
+- [x] Duplicate email and rate-limit API errors are shown without sensitive details.
+- [x] English and Persian labels render, with canonical API role values preserved.
+
+## Verification commands
+
+```bash
+cd frontend && npm test -- --run src/features/adminUsers src/components/layout/AppShell.test.tsx
+cd frontend && npm run typecheck
+cd frontend && npm run format:check
+cd frontend && npm run lint
+cd frontend && npx eslint src/features/adminUsers src/app/routes.tsx src/components/layout/AppShell.tsx src/components/layout/AppShell.test.tsx src/i18n/resources.ts --max-warnings=0
+cd frontend && npm run build
+python3 scripts/check_simplicity.py frontend/src/features/adminUsers frontend/src/app/routes.tsx frontend/src/components/layout/AppShell.tsx frontend/src/i18n/resources.ts
+python3 scripts/validate_docs.py
+```
+
+## Out of scope
+
+- Backend invitation behavior.
+- User list, role management, invitation acceptance, or offboarding screens.
+- Generic CRUD/user-management frameworks.
+
+## Codex execution log
+
+- Started: 2026-07-15 11:45 +0330
+- Completed: 2026-07-15 11:51 +0330
+- Files changed: `frontend/src/app/routes.tsx`; `frontend/src/components/layout/AppShell.tsx`; `frontend/src/components/layout/AppShell.test.tsx`; `frontend/src/i18n/resources.ts`; `frontend/src/features/adminUsers/api.ts`; `frontend/src/features/adminUsers/hooks.ts`; `frontend/src/features/adminUsers/index.ts`; `frontend/src/features/adminUsers/schemas.ts`; `frontend/src/features/adminUsers/types.ts`; `frontend/src/features/adminUsers/adminUsers.css`; `frontend/src/features/adminUsers/pages/AdminUserCreatePage.tsx`; `frontend/src/features/adminUsers/pages/index.ts`; `frontend/src/features/adminUsers/tests/AdminUserCreatePage.test.tsx`; `tasks/frontend/FE-022-implement-admin-user-creation-form.md`; `AI_USAGE.md`.
+- Commands run: `cd frontend && npm ci` (passed, restored locked dependencies needed to run frontend verification); `cd frontend && npm test -- --run src/features/adminUsers src/components/layout/AppShell.test.tsx` (passed, 2 files/11 tests); `cd frontend && npm run typecheck` (initially failed on strict mock tuple typing, passed after test fix); `cd frontend && npx prettier --write src/features/adminUsers/pages/AdminUserCreatePage.tsx src/features/adminUsers/schemas.ts src/features/adminUsers/tests/AdminUserCreatePage.test.tsx` (passed); `cd frontend && npm run format:check` (passed); `cd frontend && npm run lint` (failed on pre-existing `frontend/src/features/notifications/components/NotificationPreferenceForm.tsx` `react-hooks/set-state-in-effect` violation outside FE-022 scope); `cd frontend && npx eslint src/features/adminUsers src/app/routes.tsx src/components/layout/AppShell.tsx src/components/layout/AppShell.test.tsx src/i18n/resources.ts --max-warnings=0` (passed); `cd frontend && npm run build` (passed with existing Vite large-chunk warning); `python3 scripts/check_simplicity.py frontend/src/features/adminUsers frontend/src/app/routes.tsx frontend/src/components/layout/AppShell.tsx frontend/src/i18n/resources.ts` (passed); `python3 scripts/validate_docs.py` (failed on existing decimal task IDs and unrelated `FE-023` missing acceptance/verification section).
+- Result: Implemented the admin-only localized user invitation page, typed POST to `/memberships/`, idempotency header generation, safe error rendering, app-shell navigation, and focused tests.
+- Deviations/questions: The original task file was truncated after the route code fence and had no verification section; it was repaired in this execution note. Full frontend lint is blocked by an unrelated notification component outside the allowed scope. Documentation validation rejects decimal task IDs such as `FE-022`, so this task remains a known validator limitation rather than being renumbered.
+- Verification rerun: 2026-07-15 11:55 +0330. Re-read the root/frontend instructions, FE-022 task, linked specs, backend invitation task, and relevant guardrails. No product-code changes were needed. Commands run: `cd frontend && npm ci` (passed); `cd frontend && npm test -- --run src/features/adminUsers src/components/layout/AppShell.test.tsx` (passed, 2 files/11 tests); `cd frontend && npm run typecheck` (passed); `cd frontend && npm run format:check` (passed); `cd frontend && npm run lint` (failed on existing `frontend/src/features/notifications/components/NotificationPreferenceForm.tsx` `react-hooks/set-state-in-effect` issue outside FE-022 scope); `cd frontend && npx eslint src/features/adminUsers src/app/routes.tsx src/components/layout/AppShell.tsx src/components/layout/AppShell.test.tsx src/i18n/resources.ts --max-warnings=0` (passed); `cd frontend && npm run build` (passed with Vite large-chunk warning); `python3 scripts/check_simplicity.py frontend/src/features/adminUsers frontend/src/app/routes.tsx frontend/src/components/layout/AppShell.tsx frontend/src/i18n/resources.ts` (passed); `python3 scripts/validate_docs.py` (failed on existing decimal task IDs and unrelated `FE-023` missing acceptance/verification section). Removed generated `frontend/node_modules` and `frontend/dist` after verification.

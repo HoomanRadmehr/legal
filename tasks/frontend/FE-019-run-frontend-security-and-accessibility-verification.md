@@ -1,6 +1,6 @@
 # FE-019: Run frontend security and accessibility verification
 
-Status: TODO
+Status: DONE
 Priority: P0
 Area: Frontend
 Related specs: FE-012
@@ -51,9 +51,24 @@ cd frontend && npm test -- --run
 
 ## Codex execution log
 
-- Started:
-- Completed:
+- Started: 2026-07-15 17:54 +0330
+- Completed: 2026-07-15 17:58 +0330
 - Files changed:
+  - `frontend/src/auth/session.test.ts`
+  - `frontend/src/components/commonComponents.test.tsx`
+  - `frontend/src/components/localizedDateInput.tsx`
+  - `frontend/src/features/deadlines/tests/DeadlinePages.test.tsx`
+  - `frontend/src/features/documents/tests/DocumentUploadPanel.test.tsx`
+  - `frontend/src/features/documents/tests/DocumentSection.test.tsx`
+  - `frontend/src/features/documents/tests/recovery.test.ts`
+  - `frontend/src/features/notifications/components/NotificationPreferenceForm.tsx`
+  - `frontend/src/realtime/client.test.ts`
+  - `tasks/frontend/FE-019-run-frontend-security-and-accessibility-verification.md`
+  - `AI_USAGE.md`
 - Commands run:
-- Result:
-- Deviations/questions:
+  - `cd frontend && npm run lint` (initially failed on `react-hooks/set-state-in-effect`; passed after minimal confirmed source fixes)
+  - `cd frontend && npm run typecheck`
+  - `cd frontend && npm test -- --run` (initially failed on the new tab-focus assumption; passed after correcting the test)
+  - `python3 scripts/check_simplicity.py frontend/src`
+- Result: Added explicit frontend security and accessibility verification for refresh retry secrecy, token/presigned URL non-persistence, direct-transfer console secrecy, realtime reconnect/unknown-message handling, polling fallback guidance, upload event boundaries, keyboardable deadline tabs, and non-color status labels. Required lint, typecheck, and full test suite passed.
+- Deviations/questions: FE-019 allowed scope lists test files only, but its required `npm run lint` command failed on source files and implementation step 6 says to fix confirmed issues. Minimal source fixes were made in `localizedDateInput.tsx` and `NotificationPreferenceForm.tsx` to remove synchronous state updates inside effects without redesign.

@@ -1,10 +1,10 @@
-# FE-013.75: Implement user invitation acceptance page
+# FE-023: Implement user invitation acceptance page
 
 Status: DONE
 Priority: P0
 Area: Frontend
 Related specs: FE-001, FE-011, FE-012
-Depends on: FE-002, FE-003, FE-006, BE-026.75
+Depends on: FE-002, FE-003, FE-006, BE-037
 
 ## Goal
 
@@ -43,7 +43,7 @@ Request body:
 - `frontend/src/features/invitationAcceptance/`
 - `frontend/src/app/routes.tsx`
 - `frontend/src/i18n/resources.ts`
-- `tasks/frontend/FE-013.75-implement-user-invitation-acceptance-page.md`
+- `tasks/frontend/FE-023-implement-user-invitation-acceptance-page.md`
 - `AI_USAGE.md`
 
 ## Required reading
@@ -53,7 +53,7 @@ Request body:
 - `specs/frontend/FE-001-authentication.md`
 - `specs/frontend/FE-011-localization-accessibility.md`
 - `specs/frontend/FE-012-testing-delivery.md`
-- `tasks/backend/BE-026.75-implement-user-invitation-acceptance.md`
+- `tasks/backend/BE-037-implement-user-invitation-acceptance.md`
 - Relevant files in `docs/guardrails/` and `docs/tech/`
 
 ## Implementation steps
@@ -100,7 +100,7 @@ python3 scripts/validate_docs.py
 
 - Started: 2026-07-15 11:56 +0330
 - Completed: 2026-07-15 12:08 +0330
-- Files changed: `frontend/src/app/routes.tsx`; `frontend/src/i18n/resources.ts`; `frontend/src/features/invitationAcceptance/api.ts`; `frontend/src/features/invitationAcceptance/hooks.ts`; `frontend/src/features/invitationAcceptance/index.ts`; `frontend/src/features/invitationAcceptance/invitationAcceptance.css`; `frontend/src/features/invitationAcceptance/schemas.ts`; `frontend/src/features/invitationAcceptance/token.ts`; `frontend/src/features/invitationAcceptance/types.ts`; `frontend/src/features/invitationAcceptance/pages/InvitationAcceptancePage.tsx`; `frontend/src/features/invitationAcceptance/pages/index.ts`; `frontend/src/features/invitationAcceptance/tests/InvitationAcceptancePage.test.tsx`; `tasks/frontend/FE-013.75-implement-user-invitation-acceptance-page.md`; `AI_USAGE.md`.
-- Commands run: `cd frontend && npm ci` (passed, restored locked dependencies needed for verification); `cd frontend && npm test -- --run src/features/invitationAcceptance src/app/App.test.tsx` (passed after implementation and formatting fix, 2 files/12 tests); `cd frontend && npm run typecheck` (passed); `cd frontend && npm run format:check` (initially failed on new FE-013.75 files and `resources.ts`; passed after `npx prettier --write src/features/invitationAcceptance src/i18n/resources.ts`); `cd frontend && npm run lint` (failed on pre-existing `frontend/src/features/notifications/components/NotificationPreferenceForm.tsx` `react-hooks/set-state-in-effect` issue outside FE-013.75 scope); `cd frontend && npx eslint src/features/invitationAcceptance src/app/routes.tsx src/i18n/resources.ts --max-warnings=0` (passed after moving the token parser out of the component module); `cd frontend && npm run build` (passed with Vite large-chunk warning); `python3 scripts/check_simplicity.py frontend/src/features/invitationAcceptance frontend/src/app/routes.tsx frontend/src/i18n/resources.ts` (passed, scanned 9 source files); `python3 scripts/validate_docs.py` (failed after generated dependency cleanup on existing decimal task IDs).
+- Files changed: `frontend/src/app/routes.tsx`; `frontend/src/i18n/resources.ts`; `frontend/src/features/invitationAcceptance/api.ts`; `frontend/src/features/invitationAcceptance/hooks.ts`; `frontend/src/features/invitationAcceptance/index.ts`; `frontend/src/features/invitationAcceptance/invitationAcceptance.css`; `frontend/src/features/invitationAcceptance/schemas.ts`; `frontend/src/features/invitationAcceptance/token.ts`; `frontend/src/features/invitationAcceptance/types.ts`; `frontend/src/features/invitationAcceptance/pages/InvitationAcceptancePage.tsx`; `frontend/src/features/invitationAcceptance/pages/index.ts`; `frontend/src/features/invitationAcceptance/tests/InvitationAcceptancePage.test.tsx`; `tasks/frontend/FE-023-implement-user-invitation-acceptance-page.md`; `AI_USAGE.md`.
+- Commands run: `cd frontend && npm ci` (passed, restored locked dependencies needed for verification); `cd frontend && npm test -- --run src/features/invitationAcceptance src/app/App.test.tsx` (passed after implementation and formatting fix, 2 files/12 tests); `cd frontend && npm run typecheck` (passed); `cd frontend && npm run format:check` (initially failed on new FE-023 files and `resources.ts`; passed after `npx prettier --write src/features/invitationAcceptance src/i18n/resources.ts`); `cd frontend && npm run lint` (failed on pre-existing `frontend/src/features/notifications/components/NotificationPreferenceForm.tsx` `react-hooks/set-state-in-effect` issue outside FE-023 scope); `cd frontend && npx eslint src/features/invitationAcceptance src/app/routes.tsx src/i18n/resources.ts --max-warnings=0` (passed after moving the token parser out of the component module); `cd frontend && npm run build` (passed with Vite large-chunk warning); `python3 scripts/check_simplicity.py frontend/src/features/invitationAcceptance frontend/src/app/routes.tsx frontend/src/i18n/resources.ts` (passed, scanned 9 source files); `python3 scripts/validate_docs.py` (failed after generated dependency cleanup on existing decimal task IDs).
 - Result: Implemented the public localized invitation acceptance page, typed acceptance API call, password confirmation validation, safe invalid-token/rate-limit handling, public route registration, and focused tests.
-- Deviations/questions: The original task file heading said `FE-023` and was truncated before a closing route fence, allowed scope, acceptance criteria, verification commands, or execution log; it was repaired as `FE-013.75`. Full frontend lint remains blocked by an unrelated notification component outside the allowed scope. Documentation validation rejects decimal task IDs such as `FE-013.75`.
+- Deviations/questions: The original task file heading said `FE-023` and was truncated before a closing route fence, allowed scope, acceptance criteria, verification commands, or execution log; it was repaired as `FE-023`. Full frontend lint remains blocked by an unrelated notification component outside the allowed scope. Documentation validation rejects decimal task IDs such as `FE-023`.

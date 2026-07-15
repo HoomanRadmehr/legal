@@ -1,6 +1,6 @@
 # FE-021: Complete frontend README and final acceptance
 
-Status: TODO
+Status: BLOCKED
 Priority: P0
 Area: Frontend
 Related specs: FE-012
@@ -55,9 +55,22 @@ python scripts/check_simplicity.py frontend
 
 ## Codex execution log
 
-- Started:
-- Completed:
+- Started: 2026-07-15 18:03 +0330
+- Completed: 2026-07-15 18:06 +0330
 - Files changed:
+  - `frontend/README.md`
+  - `README.md`
+  - `tasks/frontend/FE-021-complete-frontend-readme-and-final-acceptance.md`
+  - `AI_USAGE.md`
 - Commands run:
-- Result:
-- Deviations/questions:
+  - `python scripts/validate_docs.py` (failed before script startup because local pyenv `3.12` is not installed)
+  - `cd frontend && npm run lint` (passed)
+  - `cd frontend && npm run typecheck` (passed)
+  - `cd frontend && npm test -- --run` (passed, 46 test files and 169 tests)
+  - `cd frontend && npm run build` (passed with existing Vite large chunk warning)
+  - `python scripts/check_simplicity.py frontend` (failed before script startup because local pyenv `3.12` is not installed)
+  - `python3 scripts/validate_docs.py` after removing generated `frontend/node_modules` and `frontend/dist` (failed on existing decimal task ID headings outside FE-021 scope)
+  - `python3 scripts/check_simplicity.py frontend` after removing generated frontend artifacts (passed, scanned 245 source files)
+  - `docker build -f docker/frontend/Dockerfile -t legal-frontend:prod .` (passed)
+- Result: Completed frontend and root README delivery documentation for install, environment, start, quality commands, OpenAPI type generation, authentication storage, realtime recovery, localization/Jalali behavior, production image, and known limitations. Frontend lint, typecheck, tests, build, source simplicity support check, and production frontend image build passed. Final acceptance remains blocked by documentation validation failures outside FE-021 scope.
+- Deviations/questions: The task allowed scope names `tasks/frontend/FE-021-final-frontend-acceptance.md`, but the assigned file is `tasks/frontend/FE-021-complete-frontend-readme-and-final-acceptance.md`; this execution log was added to the assigned file. Documentation validation still rejects existing decimal task IDs: `BE-038`, `BE-036`, `BE-037`, `FE-022`, `FE-023`, and `FE-024`.

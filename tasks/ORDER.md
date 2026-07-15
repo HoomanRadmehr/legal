@@ -26,7 +26,7 @@ Integration checkpoints: INT-002, INT-003
 
 ## Phase 3 - documents, realtime, notifications
 
-Backend: BE-020 -> BE-021 -> BE-022 -> BE-023 -> BE-024
+Backend: BE-020 -> BE-021 -> BE-022 -> BE-023 -> BE-024 -> BE-035
 
 Frontend: FE-012 -> FE-013 -> FE-015
 
@@ -34,9 +34,9 @@ Integration checkpoint: INT-004
 
 ## Phase 4 - dashboard, activity, offboarding , user managements
 
-Backend: BE-025 -> BE-026  -> BE-026.5 -> BE-026.75 -> BE-026.8 -> BE-027
+Backend: BE-025 -> BE-026 -> BE-036 -> BE-037 -> BE-038 -> BE-027
 
-Frontend: FE-013.5 -> FE-013.75 -> FE-013.8 -> FE-014 -> FE-016 -> FE-017
+Frontend: FE-022 -> FE-023 -> FE-024 -> FE-014 -> FE-016 -> FE-017
 
 Integration checkpoints: INT-005, INT-006
 

@@ -1,4 +1,4 @@
-# BE-026.5: Implement Admin user invitation API
+# BE-036: Implement Admin user invitation API
 
 Status: DONE
 Priority: P0
@@ -86,7 +86,7 @@ cd backend && python -m pytest apps/organizations/tests -q
   - `backend/apps/organizations/tests/test_migration.py`
   - `backend/apps/organizations/tests/test_selectors.py`
   - `backend/config/urls.py`
-  - `tasks/backend/BE-026.5-implement-admin-user-invitation-api.md`
+  - `tasks/backend/BE-036-implement-admin-user-invitation-api.md`
   - `AI_USAGE.md`
 - Commands run:
   - `cd backend && python -m pytest apps/organizations/tests -q` (failed before pytest startup because `.python-version` points to uninstalled `3.12`)
@@ -99,3 +99,22 @@ cd backend && python -m pytest apps/organizations/tests -q
   - `python3 scripts/validate_docs.py`
 - Result: Implemented and verified the admin-only user invitation API. Organizations tests passed with 22 tests; lint, format, simplicity, migration drift, and OpenAPI validation passed.
 - Deviations/questions: The task file was malformed before implementation: no closing API contract fence, no allowed scope, no acceptance section, no verification section, and no execution log. Root URL routing was added so `POST /api/v1/memberships/` resolves. `python3 scripts/validate_docs.py` still fails because decimal task IDs are not accepted by the validator and unrelated future task references are missing.
+
+## Codex verification rerun
+
+- Started: 2026-07-15 19:04 +0330
+- Completed: 2026-07-15 19:04 +0330
+- Files changed:
+  - `tasks/backend/BE-036-implement-admin-user-invitation-api.md`
+  - `AI_USAGE.md`
+- Commands run:
+  - `cd backend && python -m pytest apps/organizations/tests -q` - failed before pytest startup because `.python-version` points to unavailable pyenv `3.12`
+  - `cd backend && UV_PROJECT_ENVIRONMENT=/tmp/legal-be036-verify-venv uv run --python /usr/bin/python3.12 python -m pytest apps/organizations/tests -q` - passed, 29 tests
+  - `cd backend && UV_PROJECT_ENVIRONMENT=/tmp/legal-be036-verify-venv uv run --python /usr/bin/python3.12 ruff check apps/organizations config/urls.py` - passed
+  - `cd backend && UV_PROJECT_ENVIRONMENT=/tmp/legal-be036-verify-venv uv run --python /usr/bin/python3.12 ruff format --check apps/organizations config/urls.py` - passed, 26 files already formatted
+  - `python3 scripts/check_simplicity.py backend/apps/organizations backend/config/urls.py` - passed, scanned 22 source files
+  - `cd backend && UV_PROJECT_ENVIRONMENT=/tmp/legal-be036-verify-venv uv run --python /usr/bin/python3.12 python manage.py makemigrations --check --dry-run` - passed with a local PostgreSQL connection warning; no changes detected
+  - `cd backend && UV_PROJECT_ENVIRONMENT=/tmp/legal-be036-verify-venv uv run --python /usr/bin/python3.12 python manage.py spectacular --file /tmp/legal-be036-verify-openapi.yaml --validate` - passed with one existing enum-name warning and 0 errors
+  - `python3 scripts/validate_docs.py` - passed, 27 specs, 70 tasks, 180 Markdown files
+- Result: Re-verified BE-036 without product-code changes. The admin invitation behavior remains implemented and the task remains `DONE`.
+- Deviations/questions: The exact task command is still blocked by the local pyenv `3.12` shim before project code starts; the same test scope passed through the locked uv environment on `/usr/bin/python3.12`.

@@ -1,6 +1,6 @@
 # FE-020: Create production frontend image and proxy integration
 
-Status: TODO
+Status: DONE
 Priority: P0
 Area: Frontend
 Related specs: FE-012
@@ -53,9 +53,20 @@ docker compose -f compose.yaml -f compose.production.yaml config
 
 ## Codex execution log
 
-- Started:
-- Completed:
+- Started: 2026-07-15 18:00 +0330
+- Completed: 2026-07-15 18:02 +0330
 - Files changed:
+  - `docker/frontend/Dockerfile`
+  - `docker/frontend/nginx.conf`
+  - `tasks/frontend/FE-020-create-production-frontend-image-and-proxy-integration.md`
+  - `AI_USAGE.md`
 - Commands run:
-- Result:
-- Deviations/questions:
+  - `cd frontend && npm ci && npm run build` (initially failed on a root-owned generated Vite cache; passed after correcting ownership and removing `node_modules/.vite`)
+  - `docker build -f docker/frontend/Dockerfile -t legal-frontend:prod .`
+  - `docker compose -f compose.yaml -f compose.production.yaml config`
+  - `docker run --rm --entrypoint id legal-frontend:prod -u`
+  - `docker run -d --rm --name legal-frontend-fe020-smoke -p 18080:8080 legal-frontend:prod` with health, SPA fallback, `/api`, and `/ws` smoke curls
+  - `docker history --no-trunc legal-frontend:prod | rg -i 'DJANGO_SECRET|MINIO_SECRET|PASSWORD|legal_management_dev_password|P@|secret-key' || true`
+  - `python3 scripts/check_simplicity.py frontend/src docker/frontend docker/nginx`
+- Result: Tightened the production frontend Dockerfile to copy only explicit build inputs, run a locked `npm ci` build, and serve generated assets from the unprivileged nginx runtime as user `101`. Added static nginx guards so direct `/api/` and `/ws/` requests are not handled by SPA fallback. Verified the production image builds, Compose renders, runtime is non-root, health returns `ok`, unknown SPA paths return `index.html`, and direct static `/api` and `/ws` paths return `404`.
+- Deviations/questions: The exact frontend build command was initially blocked by a generated `node_modules/.vite` cache owned by root from prior local runs. Only the generated cache ownership/artifact was corrected; no source behavior was changed for that cleanup. The broad simplicity scan was not used as evidence because it included the generated production bundle; the source/config scoped scan passed.

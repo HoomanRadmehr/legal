@@ -1,10 +1,10 @@
-# BE-026.75: Implement user invitation acceptance
+# BE-037: Implement user invitation acceptance
 
 Status: DONE
 Priority: P0
 Area: Backend
 Related specs: BE-001, BE-002, BE-008, BE-012, BE-013
-Depends on: BE-010, BE-019, BE-026.5
+Depends on: BE-010, BE-019, BE-036
 
 ## Goal
 
@@ -73,7 +73,7 @@ cd backend && python -m pytest apps/accounts/tests apps/organizations/tests -q
   - `backend/apps/organizations/services.py`
   - `backend/common/api/throttles.py`
   - `backend/config/settings/base.py`
-  - `tasks/backend/BE-026.75-implement-user-invitation-acceptance.md`
+  - `tasks/backend/BE-037-implement-user-invitation-acceptance.md`
   - `AI_USAGE.md`
 - Commands run:
   - `cd backend && python -m pytest apps/accounts/tests apps/organizations/tests -q` (failed before pytest startup because `.python-version` points to uninstalled `3.12`)
@@ -87,3 +87,22 @@ cd backend && python -m pytest apps/accounts/tests apps/organizations/tests -q
   - `python3 scripts/validate_docs.py`
 - Result: Implemented and verified public one-time invitation acceptance. Focused account and organization tests passed with 51 tests; lint, format, simplicity, migration drift, and OpenAPI validation passed.
 - Deviations/questions: The task file was malformed before implementation: no closing API contract fence, no allowed scope, no acceptance section, no verification section, and no execution log. `python3 scripts/validate_docs.py` still fails because decimal task IDs are not accepted by the validator and unrelated task files remain malformed or reference missing dependencies.
+
+## Codex verification rerun
+
+- Started: 2026-07-15 19:06 +0330
+- Completed: 2026-07-15 19:06 +0330
+- Files changed:
+  - `tasks/backend/BE-037-implement-user-invitation-acceptance.md`
+  - `AI_USAGE.md`
+- Commands run:
+  - `cd backend && python -m pytest apps/accounts/tests apps/organizations/tests -q` - failed before pytest startup because `.python-version` points to unavailable pyenv `3.12`
+  - `cd backend && UV_PROJECT_ENVIRONMENT=/tmp/legal-be037-verify-venv uv run --python /usr/bin/python3.12 python -m pytest apps/accounts/tests apps/organizations/tests -q` - passed, 58 tests
+  - `cd backend && UV_PROJECT_ENVIRONMENT=/tmp/legal-be037-verify-venv uv run --python /usr/bin/python3.12 ruff check apps/accounts apps/organizations common/api/throttles.py config/settings/base.py` - passed
+  - `cd backend && UV_PROJECT_ENVIRONMENT=/tmp/legal-be037-verify-venv uv run --python /usr/bin/python3.12 ruff format --check apps/accounts apps/organizations common/api/throttles.py config/settings/base.py` - passed, 46 files already formatted
+  - `python3 scripts/check_simplicity.py backend/apps/accounts backend/apps/organizations backend/common/api/throttles.py backend/config/settings/base.py` - passed, scanned 39 source files
+  - `cd backend && UV_PROJECT_ENVIRONMENT=/tmp/legal-be037-verify-venv uv run --python /usr/bin/python3.12 python manage.py makemigrations --check --dry-run` - passed with a local PostgreSQL connection warning; no changes detected
+  - `cd backend && UV_PROJECT_ENVIRONMENT=/tmp/legal-be037-verify-venv uv run --python /usr/bin/python3.12 python manage.py spectacular --file /tmp/legal-be037-verify-openapi.yaml --validate` - passed with one existing enum-name warning and 0 errors
+  - `python3 scripts/validate_docs.py` - passed, 27 specs, 70 tasks, 180 Markdown files
+- Result: Re-verified BE-037 without product-code changes. The public invitation acceptance endpoint remains implemented and the task remains `DONE`.
+- Deviations/questions: The exact task command is still blocked by the local pyenv `3.12` shim before project code starts; the same test scope passed through the locked uv environment on `/usr/bin/python3.12`.

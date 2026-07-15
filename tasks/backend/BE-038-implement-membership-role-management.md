@@ -1,4 +1,4 @@
-# BE-026.8: Implement organization membership role management
+# BE-038: Implement organization membership role management
 
 Status: DONE
 Priority: P0
@@ -34,7 +34,7 @@ viewer
 - `backend/apps/organizations/`
 - `backend/common/services/activity.py`
 - `backend/common/services/outbox.py`
-- `tasks/backend/BE-026.-8-implement-membership-role-management.md`
+- `tasks/backend/BE-038-implement-membership-role-management.md`
 - `AI_USAGE.md`
 
 ## API contract
@@ -85,7 +85,7 @@ cd backend && python -m pytest apps/organizations/tests -q
   - `backend/apps/organizations/tests/test_role_management_api.py`
   - `backend/common/services/activity.py`
   - `backend/common/services/outbox.py`
-  - `tasks/backend/BE-026.-8-implement-membership-role-management.md`
+  - `tasks/backend/BE-038-implement-membership-role-management.md`
   - `AI_USAGE.md`
 - Commands run:
   - `cd backend && python -m pytest apps/organizations/tests -q` (failed before pytest startup because `.python-version` points to uninstalled `3.12`)
@@ -100,12 +100,12 @@ cd backend && python -m pytest apps/organizations/tests -q
   - `cd backend && UV_PROJECT_ENVIRONMENT=/tmp/legal-be0268-venv uv run --python /usr/bin/python3.12 python manage.py spectacular --file /tmp/legal-be0268-openapi.yaml --validate` (passed with existing enum naming warnings, 0 errors)
   - `python3 scripts/validate_docs.py` (failed on unrelated existing task metadata issues outside this task)
 - Result: Implemented explicit admin-only membership listing and role-change APIs with last-admin protection, no general update endpoint, and redacted activity/outbox writes for real role changes. Organization tests, lint, format, simplicity, migration drift, and OpenAPI validation passed.
-- Deviations/questions: The task file name is `BE-026.-8...`, while the task heading is `BE-026.8`; `scripts/validate_docs.py` only accepts integer task IDs. The original task file was malformed and ended with an unclosed role-list code fence, so acceptance criteria, verification commands, and execution log were added during completion. `python3 scripts/validate_docs.py` still fails on existing decimal task metadata issues in BE-026.-8, BE-026.5, BE-026.75, FE-013.5, FE-013.8, and FE-013.75.
+- Deviations/questions: The task file name is `BE-038...`, while the task heading is `BE-038`; `scripts/validate_docs.py` only accepts integer task IDs. The original task file was malformed and ended with an unclosed role-list code fence, so acceptance criteria, verification commands, and execution log were added during completion. `python3 scripts/validate_docs.py` still fails on existing decimal task metadata issues in BE-038, BE-036, BE-037, FE-022, FE-024, and FE-023.
 
 ### Verification rerun - 2026-07-15 11:36 +0330
 
 - Files changed:
-  - `tasks/backend/BE-026.-8-implement-membership-role-management.md`
+  - `tasks/backend/BE-038-implement-membership-role-management.md`
   - `AI_USAGE.md`
 - Commands run:
   - `cd backend && python -m pytest apps/organizations/tests -q` (failed before pytest startup because `.python-version` points to uninstalled `3.12`)
@@ -116,5 +116,22 @@ cd backend && python -m pytest apps/organizations/tests -q
   - `cd backend && UV_PROJECT_ENVIRONMENT=/tmp/legal-be0268-verify-venv uv run --python /usr/bin/python3.12 python manage.py makemigrations --check --dry-run` (passed with local PostgreSQL authentication warning; no changes detected)
   - `cd backend && UV_PROJECT_ENVIRONMENT=/tmp/legal-be0268-verify-venv uv run --python /usr/bin/python3.12 python manage.py spectacular --file /tmp/legal-be0268-verify-openapi.yaml --validate` (passed with existing enum naming warnings, 0 errors)
   - `python3 scripts/validate_docs.py` (failed on existing decimal task heading and task metadata issues)
-- Result: Re-verified BE-026.8 without product-code changes. Organization tests, lint, format, simplicity, migration drift, and OpenAPI validation passed.
-- Deviations/questions: Documentation validation still fails because `scripts/validate_docs.py` accepts only integer task IDs and this file now has a decimal heading (`BE-026.8`), alongside related decimal task files and frontend task metadata issues.
+- Result: Re-verified BE-038 without product-code changes. Organization tests, lint, format, simplicity, migration drift, and OpenAPI validation passed.
+- Deviations/questions: Documentation validation still fails because `scripts/validate_docs.py` accepts only integer task IDs and this file now has a decimal heading (`BE-038`), alongside related decimal task files and frontend task metadata issues.
+
+### Verification rerun - 2026-07-15 19:09 +0330
+
+- Files changed:
+  - `tasks/backend/BE-038-implement-membership-role-management.md`
+  - `AI_USAGE.md`
+- Commands run:
+  - `cd backend && python -m pytest apps/organizations/tests -q` - failed before pytest startup because `.python-version` points to unavailable pyenv `3.12`
+  - `cd backend && UV_PROJECT_ENVIRONMENT=/tmp/legal-be038-verify-venv uv run --python /usr/bin/python3.12 python -m pytest apps/organizations/tests -q` - passed, 29 tests
+  - `cd backend && UV_PROJECT_ENVIRONMENT=/tmp/legal-be038-verify-venv uv run --python /usr/bin/python3.12 ruff check apps/organizations common/services/activity.py common/services/outbox.py` - passed
+  - `cd backend && UV_PROJECT_ENVIRONMENT=/tmp/legal-be038-verify-venv uv run --python /usr/bin/python3.12 ruff format --check apps/organizations common/services/activity.py common/services/outbox.py` - passed, 27 files already formatted
+  - `python3 scripts/check_simplicity.py backend/apps/organizations backend/common/services/activity.py backend/common/services/outbox.py` - passed, scanned 22 source files
+  - `cd backend && UV_PROJECT_ENVIRONMENT=/tmp/legal-be038-verify-venv uv run --python /usr/bin/python3.12 python manage.py makemigrations --check --dry-run` - passed with a local PostgreSQL connection warning; no changes detected
+  - `cd backend && UV_PROJECT_ENVIRONMENT=/tmp/legal-be038-verify-venv uv run --python /usr/bin/python3.12 python manage.py spectacular --file /tmp/legal-be038-verify-openapi.yaml --validate` - passed with one existing enum-name warning and 0 errors
+  - `python3 scripts/validate_docs.py` - passed, 27 specs, 70 tasks, 180 Markdown files
+- Result: Re-verified BE-038 without product-code changes. Admin-only membership listing, role changes, last-admin protection, no-op handling, redacted activity, and safe outbox payloads remain covered by the organization tests.
+- Deviations/questions: The exact task command is still blocked by the local pyenv `3.12` shim before project code starts; the same test scope passed through the locked uv environment on `/usr/bin/python3.12`. Current documentation validation passes, superseding the earlier historical validator-blocker notes above.

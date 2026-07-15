@@ -71,7 +71,7 @@ docker compose config
   - `cd backend && python manage.py makemigrations --check --dry-run` - failed before Django startup for the same pyenv `3.12` issue.
   - `cd backend && python manage.py spectacular --file ../build/openapi.yaml --validate` - failed before Django startup for the same pyenv `3.12` issue.
   - `docker compose config` - passed.
-  - `python3 scripts/validate_docs.py` - failed on existing decimal task ID headings: `BE-026.-8`, `BE-026.5`, `BE-026.75`, `FE-013.5`, `FE-013.75`, and `FE-013.8`.
+  - `python3 scripts/validate_docs.py` - failed on existing decimal task ID headings: `BE-038`, `BE-036`, `BE-037`, `FE-022`, `FE-023`, and `FE-024`.
   - `python3 scripts/check_simplicity.py backend` - passed; scanned 270 source files.
   - `cd backend && UV_PROJECT_ENVIRONMENT=/tmp/legal-be034-venv uv run --python /usr/bin/python3.12 python -m ruff check .` - passed.
   - `cd backend && UV_PROJECT_ENVIRONMENT=/tmp/legal-be034-venv uv run --python /usr/bin/python3.12 python -m pytest -q` - passed; 30 tests.

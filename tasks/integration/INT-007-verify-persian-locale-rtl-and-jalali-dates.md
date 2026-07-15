@@ -1,6 +1,6 @@
 # INT-007: Verify Persian locale, RTL, and Jalali dates
 
-Status: TODO
+Status: BLOCKED
 Priority: P0
 Area: Integration
 Related specs: BE-012, FE-011
@@ -51,9 +51,22 @@ docker compose run --rm api python -m pytest tests/integration/test_localization
 
 ## Codex execution log
 
-- Started:
-- Completed:
+- Started: 2026-07-15
+- Completed: 2026-07-15
 - Files changed:
+  - `backend/tests/integration/test_localization.py`
+  - `frontend/src/test/integration/localization.test.ts`
+  - `tasks/integration/INT-007-verify-persian-locale-rtl-and-jalali-dates.md`
+  - `AI_USAGE.md`
 - Commands run:
-- Result:
-- Deviations/questions:
+  - `docker compose run --rm api python -m pytest tests/integration/test_localization.py -q` (failed: `/opt/venv/bin/python: No module named pytest`)
+  - `docker compose up -d postgres redis rabbitmq minio minio-init api` (passed; live services started)
+  - `curl -fsS http://127.0.0.1:8000/health/ready/` (passed after API startup)
+  - `cd backend && DATABASE_URL=postgresql://legal_management:legal_management_dev_password@127.0.0.1:5432/legal_management REDIS_URL=redis://127.0.0.1:6379/0 CHANNEL_LAYER_REDIS_URL=redis://127.0.0.1:6379/1 CELERY_BROKER_URL=amqp://legal_management:legal_management_dev_password@127.0.0.1:5672// MINIO_ENDPOINT=127.0.0.1:9000 INTEGRATION_API_BASE_URL=http://127.0.0.1:8000 UV_PROJECT_ENVIRONMENT=/tmp/legal-int007-venv uv run --python /usr/bin/python3.12 python -m pytest tests/integration/test_localization.py -q` (failed as support evidence because pytest-django seeded its isolated test database while the live API read the Compose development database)
+  - `cd frontend && npm ci` (passed)
+  - `cd frontend && npm test -- --run src/test/integration/localization.test.ts` (passed)
+  - `python3 scripts/check_simplicity.py` (passed after splitting the integration test helper)
+  - `cd backend && UV_PROJECT_ENVIRONMENT=/tmp/legal-int007-venv uv run --python /usr/bin/python3.12 --group dev ruff check tests/integration/test_localization.py` (passed)
+  - `python3 scripts/validate_docs.py` (failed on pre-existing decimal task heading IDs outside INT-007 allowed scope)
+- Result: BLOCKED. The integration evidence was added, but the exact required Compose verification command cannot run because the API runtime image does not include `pytest`; documentation validation also remains blocked by pre-existing decimal task heading IDs.
+- Deviations/questions: The Compose pytest blocker belongs outside this task's allowed scope; the owning area is backend runtime/test packaging from the backend CI/production image tasks. No product code was changed.

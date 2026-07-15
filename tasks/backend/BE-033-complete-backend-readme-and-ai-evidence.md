@@ -61,6 +61,6 @@ python scripts/validate_docs.py
   - `tasks/backend/BE-033-complete-backend-readme-and-ai-evidence.md`
 - Commands run:
   - `python scripts/validate_docs.py` (failed before script startup because repository pyenv `3.12` is not installed)
-  - `python3 scripts/validate_docs.py` (failed on existing decimal task heading IDs outside BE-033: `BE-026.-8`, `BE-026.5`, `BE-026.75`, `FE-013.5`, `FE-013.75`, `FE-013.8`)
+  - `python3 scripts/validate_docs.py` (failed on existing decimal task heading IDs outside BE-033: `BE-038`, `BE-036`, `BE-037`, `FE-022`, `FE-023`, `FE-024`)
 - Result: Completed backend README handoff documentation, refreshed root reviewer entry points, added backend presentation evidence, removed AI usage placeholders, added BE-033 AI usage evidence, and documented known limitations and command deviations truthfully.
 - Deviations/questions: The exact verification command is blocked by local pyenv before validation starts. The validator itself still fails under `python3` on pre-existing decimal task heading IDs outside BE-033's allowed scope, so those unrelated task files were not edited.

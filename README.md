@@ -40,10 +40,11 @@ Read [AGENTS.md](AGENTS.md) before making changes.
 ## Reviewer Start Here
 
 1. For backend setup and operations, read [backend/README.md](backend/README.md).
-2. For AI usage, mistakes, corrections, and verification evidence, read [AI_USAGE.md](AI_USAGE.md).
-3. For architecture and constraints, read [AGENTS.md](AGENTS.md), [backend/AGENTS.md](backend/AGENTS.md), and [docs/tech/01-architecture.md](docs/tech/01-architecture.md).
-4. For product scope, read [docs/business/06-mvp-scope.md](docs/business/06-mvp-scope.md).
-5. For task traceability, read [tasks/ORDER.md](tasks/ORDER.md) and the relevant task file.
+2. For frontend setup, delivery, auth storage, realtime, localization, and production image notes, read [frontend/README.md](frontend/README.md).
+3. For AI usage, mistakes, corrections, and verification evidence, read [AI_USAGE.md](AI_USAGE.md).
+4. For architecture and constraints, read [AGENTS.md](AGENTS.md), [backend/AGENTS.md](backend/AGENTS.md), [frontend/AGENTS.md](frontend/AGENTS.md), and [docs/tech/01-architecture.md](docs/tech/01-architecture.md).
+5. For product scope, read [docs/business/06-mvp-scope.md](docs/business/06-mvp-scope.md).
+6. For task traceability, read [tasks/ORDER.md](tasks/ORDER.md) and the relevant task file.
 
 The repository contains 27 approved behavior specifications and the atomic backend, frontend, and integration tasks used during implementation.
 
@@ -110,11 +111,28 @@ cd backend
 DJANGO_SETTINGS_MODULE=config.settings.production uv run python manage.py check --deploy
 ```
 
+## Frontend quality checks
+
+A reviewer can run the frontend checks below. `npm run build` creates `frontend/dist/`; remove that generated directory before running the simplicity scan so the guard reviews source rather than bundled third-party code.
+
+```bash
+python scripts/validate_docs.py
+cd frontend && npm ci
+cd frontend && npm run lint
+cd frontend && npm run typecheck
+cd frontend && npm test -- --run
+cd frontend && npm run build
+rm -rf frontend/dist
+python scripts/check_simplicity.py frontend
+docker build -f docker/frontend/Dockerfile -t legal-frontend:prod .
+docker compose -f compose.yaml -f compose.production.yaml config
+```
+
 ## Source assignment coverage
 
 The plans cover authentication and roles, legal cases, contracts, notices, deadlines, tasks, documents, audit logs, dashboard, reassignment/offboarding, Persian date handling, seed data, tests, setup instructions, and required AI usage documentation.
 Discussions, financial records, OCR, semantic search, and enterprise workflow orchestration are explicitly deferred from the MVP.
 
-## Known Evidence Caveat
+## Evidence Notes
 
-`python scripts/validate_docs.py` currently reports existing decimal task heading IDs such as `BE-026.5` and `FE-013.8` as invalid because the validator accepts only `PREFIX-000` style IDs. That is documentation metadata, not a backend runtime failure. Task logs and `AI_USAGE.md` record the exact command outcomes.
+Task IDs use canonical integer forms such as `BE-036` and `FE-024`. Older decimal task IDs were renumbered during the Compose integration test-runner repair so `python scripts/validate_docs.py` can validate repository metadata without weakening the validator.

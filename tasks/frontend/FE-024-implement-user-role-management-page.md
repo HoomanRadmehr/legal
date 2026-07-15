@@ -1,10 +1,10 @@
-# FE-013.8: Implement organization user role management page
+# FE-024: Implement organization user role management page
 
 Status: DONE
 Priority: P0
 Area: Frontend
 Related specs: FE-001, FE-002, FE-011, FE-012
-Depends on: FE-002, FE-004, FE-005, FE-006, BE-026.8
+Depends on: FE-002, FE-004, FE-005, FE-006, BE-038
 
 ## Goal
 
@@ -56,7 +56,7 @@ viewer
 - `frontend/src/auth/context.ts`
 - `frontend/src/auth/AuthProvider.tsx`
 - `frontend/src/i18n/resources.ts`
-- `tasks/frontend/FE-013.8-implement-user-role-management-page.md`
+- `tasks/frontend/FE-024-implement-user-role-management-page.md`
 - `AI_USAGE.md`
 
 ## Required reading
@@ -67,7 +67,7 @@ viewer
 - `specs/frontend/FE-002-app-shell-permissions.md`
 - `specs/frontend/FE-011-localization-accessibility.md`
 - `specs/frontend/FE-012-testing-delivery.md`
-- `tasks/backend/BE-026.-8-implement-membership-role-management.md`
+- `tasks/backend/BE-038-implement-membership-role-management.md`
 - Relevant files in `docs/guardrails/` and `docs/tech/`
 
 ## Implementation steps
@@ -114,7 +114,7 @@ python3 scripts/validate_docs.py
 ## Codex execution log
 
 - Started: 2026-07-15 12:10 +0330
-- Deviations/questions: The original task file was truncated after the route code fence. It referenced `FE-022`, but the implemented backend dependency for this frontend page is the membership role-management API in `tasks/backend/BE-026.-8-implement-membership-role-management.md`.
+- Deviations/questions: The original task file was truncated after the route code fence. It referenced `FE-022`, but the implemented backend dependency for this frontend page is the membership role-management API in `tasks/backend/BE-038-implement-membership-role-management.md`.
 - Completed: 2026-07-15 12:18 +0330
 - Files changed:
   - `frontend/src/features/adminUsers/api.ts`
@@ -131,13 +131,13 @@ python3 scripts/validate_docs.py
   - `frontend/src/auth/context.ts`
   - `frontend/src/auth/AuthProvider.tsx`
   - `frontend/src/i18n/resources.ts`
-  - `tasks/frontend/FE-013.8-implement-user-role-management-page.md`
+  - `tasks/frontend/FE-024-implement-user-role-management-page.md`
   - `AI_USAGE.md`
 - Tests and verification:
   - `cd frontend && npm test -- --run src/features/adminUsers src/components/layout/AppShell.test.tsx` passed, 3 files and 17 tests.
   - `cd frontend && npm run typecheck` passed.
   - `cd frontend && npm run format:check` passed after targeted Prettier formatting.
-  - `cd frontend && npm run lint` failed on existing `frontend/src/features/notifications/components/NotificationPreferenceForm.tsx` `react-hooks/set-state-in-effect`, outside FE-013.8 allowed scope.
+  - `cd frontend && npm run lint` failed on existing `frontend/src/features/notifications/components/NotificationPreferenceForm.tsx` `react-hooks/set-state-in-effect`, outside FE-024 allowed scope.
   - `cd frontend && npx eslint src/features/adminUsers src/app/routes.tsx src/components/layout/AppShell.tsx src/components/layout/AppShell.test.tsx src/auth/context.ts src/auth/AuthProvider.tsx src/i18n/resources.ts --max-warnings=0` passed.
   - `cd frontend && npm run build` passed with Vite's large chunk warning.
   - `python3 scripts/check_simplicity.py frontend/src/features/adminUsers frontend/src/app/routes.tsx frontend/src/components/layout/AppShell.tsx frontend/src/auth/context.ts frontend/src/auth/AuthProvider.tsx frontend/src/i18n/resources.ts` passed, scanned 10 source files.

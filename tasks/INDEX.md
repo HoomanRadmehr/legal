@@ -38,6 +38,10 @@ Generated index of atomic tasks. The task file remains authoritative.
 | backend | [BE-032](backend/BE-032-create-idempotent-seed-data-command.md) | Create idempotent seed data command | TODO | BE-013 |
 | backend | [BE-033](backend/BE-033-complete-backend-readme-and-ai-evidence.md) | Complete backend README and AI evidence | TODO | BE-013 |
 | backend | [BE-034](backend/BE-034-final-backend-acceptance-verification.md) | Final backend acceptance verification | TODO | BE-013 |
+| backend | [BE-035](backend/BE-035-add-compose-integration-test-runner.md) | Add Compose integration test runner | DONE | BE-000, BE-013 |
+| backend | [BE-036](backend/BE-036-implement-admin-user-invitation-api.md) | Implement Admin user invitation API | DONE | BE-001, BE-002, BE-008, BE-012, BE-013 |
+| backend | [BE-037](backend/BE-037-implement-user-invitation-acceptance.md) | Implement user invitation acceptance | DONE | BE-001, BE-002, BE-008, BE-012, BE-013 |
+| backend | [BE-038](backend/BE-038-implement-membership-role-management.md) | Implement organization membership role management | DONE | BE-001, BE-002, BE-008, BE-012, BE-013 |
 | frontend | [FE-001](frontend/FE-001-scaffold-react-typescript-application.md) | Scaffold React TypeScript application | TODO | FE-000 |
 | frontend | [FE-002](frontend/FE-002-implement-typed-api-client-and-error-contract.md) | Implement typed API client and error contract | TODO | FE-000 |
 | frontend | [FE-003](frontend/FE-003-create-app-providers-router-and-standard-states.md) | Create app providers, router, and standard states | TODO | FE-000 |
@@ -59,6 +63,9 @@ Generated index of atomic tasks. The task file remains authoritative.
 | frontend | [FE-019](frontend/FE-019-run-frontend-security-and-accessibility-verification.md) | Run frontend security and accessibility verification | TODO | FE-012 |
 | frontend | [FE-020](frontend/FE-020-create-production-frontend-image-and-proxy-integration.md) | Create production frontend image and proxy integration | TODO | FE-012 |
 | frontend | [FE-021](frontend/FE-021-complete-frontend-readme-and-final-acceptance.md) | Complete frontend README and final acceptance | TODO | FE-012 |
+| frontend | [FE-022](frontend/FE-022-implement-admin-user-creation-form.md) | Implement Admin user creation form | DONE | FE-001, FE-002, FE-011, FE-012 |
+| frontend | [FE-023](frontend/FE-023-implement-user-invitation-acceptance-page.md) | Implement user invitation acceptance page | DONE | FE-001, FE-011, FE-012 |
+| frontend | [FE-024](frontend/FE-024-implement-user-role-management-page.md) | Implement organization user role management page | DONE | FE-001, FE-002, FE-011, FE-012 |
 | integration | [INT-001](integration/INT-001-verify-authentication-and-role-contract.md) | Verify authentication and role contract | TODO | BE-001, BE-002, FE-001, FE-002 |
 | integration | [INT-002](integration/INT-002-verify-cases-contracts-and-notices.md) | Verify cases, contracts, and notices | TODO | BE-003, BE-004, BE-005, FE-003, FE-004, FE-005 |
 | integration | [INT-003](integration/INT-003-verify-deadline-and-task-critical-path.md) | Verify deadline and task critical path | TODO | BE-006, FE-006 |
