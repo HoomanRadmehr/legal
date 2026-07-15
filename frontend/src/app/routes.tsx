@@ -2,12 +2,13 @@ import type { RouteObject } from "react-router-dom";
 
 import { ProtectedRoute } from "../auth";
 import { NotFoundState } from "../components/standardStates";
+import { ConfidentialRecordNotFoundPage, PublicLoginPage } from "./pages";
 import {
-  AdminOffboardingPage,
-  ConfidentialRecordNotFoundPage,
-  ProtectedAppShellPage,
-  PublicLoginPage,
-} from "./pages";
+  AdminUserCreatePage,
+  AdminUserManagementPage,
+} from "../features/adminUsers";
+import { ActivityListPage } from "../features/activity";
+import { AdminOffboardingPage } from "../features/offboarding";
 import {
   CaseCreatePage,
   CaseDetailPage,
@@ -26,6 +27,7 @@ import {
   DeadlineEditPage,
   DeadlineListPage,
 } from "../features/deadlines/pages";
+import { DashboardPage } from "../features/dashboard";
 import {
   NoticeCreatePage,
   NoticeDetailPage,
@@ -36,6 +38,7 @@ import {
   NotificationCenterPage,
   NotificationPreferencesPage,
 } from "../features/notifications";
+import { InvitationAcceptancePage } from "../features/invitationAcceptance";
 import {
   TaskCreatePage,
   TaskDetailPage,
@@ -50,8 +53,11 @@ export const appRoutes: RouteObject[] = [
     element: <ProtectedRoute />,
     errorElement: <RouteErrorState />,
     children: [
-      { index: true, element: <ProtectedAppShellPage /> },
+      { index: true, element: <DashboardPage /> },
+      { path: "activity", element: <ActivityListPage /> },
       { path: "admin/offboarding", element: <AdminOffboardingPage /> },
+      { path: "admin/users", element: <AdminUserManagementPage /> },
+      { path: "admin/users/new", element: <AdminUserCreatePage /> },
       { path: "cases", element: <CaseListPage /> },
       { path: "cases/new", element: <CaseCreatePage /> },
       { path: "cases/:caseId", element: <CaseDetailPage /> },
@@ -86,6 +92,11 @@ export const appRoutes: RouteObject[] = [
   {
     path: "/login",
     element: <PublicLoginPage />,
+    errorElement: <RouteErrorState />,
+  },
+  {
+    path: "/accept-invitation",
+    element: <InvitationAcceptancePage />,
     errorElement: <RouteErrorState />,
   },
   {

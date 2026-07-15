@@ -32,11 +32,11 @@ Frontend: FE-012 -> FE-013 -> FE-015
 
 Integration checkpoint: INT-004
 
-## Phase 4 - dashboard, activity, offboarding
+## Phase 4 - dashboard, activity, offboarding , user managements
 
-Backend: BE-025 -> BE-026 -> BE-027 -> BE-026.5 -> BE-026.75
+Backend: BE-025 -> BE-026  -> BE-026.5 -> BE-026.75 -> BE-026.8 -> BE-027
 
-Frontend: FE-014 -> FE-016 -> FE-017 -> FE-013.5 -> FE-013.75
+Frontend: FE-013.5 -> FE-013.75 -> FE-013.8 -> FE-014 -> FE-016 -> FE-017
 
 Integration checkpoints: INT-005, INT-006
 

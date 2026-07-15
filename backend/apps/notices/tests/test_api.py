@@ -2,8 +2,11 @@
 
 from __future__ import annotations
 
+from datetime import timedelta
+
 import pytest
 from django.urls import reverse
+from django.utils import timezone
 from rest_framework.test import APIClient
 
 from apps.activity.models import ActivityLog
@@ -115,6 +118,8 @@ def test_notice_api_permission_scoping_and_deadline_view_inclusion() -> None:
     viewer = MembershipFactory(organization=organization, role=ROLE_VIEWER)
     other_admin = MembershipFactory(role=ROLE_LEGAL_ADMIN)
     notice = LegalNoticeFactory(matter__organization=organization, matter__owner=owner)
+    notice.linked_deadline.due_at = timezone.now() + timedelta(days=1)
+    notice.linked_deadline.save(update_fields=["due_at", "updated_at"])
     MatterAccessFactory(matter=notice.matter, membership=viewer, level=ACCESS_LEVEL_VIEW)
 
     viewer_patch = authenticated_client(member=viewer).patch(

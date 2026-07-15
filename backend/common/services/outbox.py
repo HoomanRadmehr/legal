@@ -26,6 +26,7 @@ SAFE_OUTBOX_FIELDS = {
     "matter_id",
     "organization_id",
     "reference_code",
+    "role",
     "target_id",
     "target_type",
 }

@@ -21,6 +21,7 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 
 from apps.accounts.api.v1.openapi import (
     csrf_schema,
+    invitation_accept_schema,
     login_schema,
     logout_schema,
     me_schema,
@@ -29,13 +30,21 @@ from apps.accounts.api.v1.openapi import (
 )
 from apps.accounts.api.v1.serializers import (
     AuthSessionSerializer,
+    InvitationAcceptResponseSerializer,
+    InvitationAcceptSerializer,
     LoginInputSerializer,
     MeSerializer,
     WebSocketTicketSerializer,
 )
 from apps.accounts.selectors import get_current_membership
 from apps.accounts.services import AuthError, login_user, logout_refresh_token, refresh_session
-from common.api.throttles import LoginThrottle, RefreshThrottle, WebSocketTicketThrottle
+from apps.organizations.services import accept_user_invitation
+from common.api.throttles import (
+    InvitationAcceptThrottle,
+    LoginThrottle,
+    RefreshThrottle,
+    WebSocketTicketThrottle,
+)
 from common.auth.tickets import create_websocket_ticket
 
 
@@ -88,6 +97,21 @@ def logout(request):
     response = Response(status=204)
     clear_refresh_cookie(response=response)
     return response
+
+
+@invitation_accept_schema
+@api_view(["POST"])
+@authentication_classes([])
+@permission_classes([AllowAny])
+@throttle_classes([InvitationAcceptThrottle])
+def accept_invitation(request):
+    serializer = InvitationAcceptSerializer(data=request.data)
+    serializer.is_valid(raise_exception=True)
+    body = accept_user_invitation(
+        data=serializer.validated_data,
+        request_id=getattr(request, "request_id", ""),
+    )
+    return Response(InvitationAcceptResponseSerializer(body).data)
 
 
 @me_schema

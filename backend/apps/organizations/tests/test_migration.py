@@ -21,7 +21,7 @@ def test_organizations_initial_migration_creates_models() -> None:
     assert created_models == ["Organization", "Membership"]
 
 
-def test_organizations_migration_has_single_initial_leaf() -> None:
+def test_organizations_migration_has_single_leaf() -> None:
     loader = MigrationLoader(connection)
 
-    assert loader.graph.leaf_nodes("organizations") == [("organizations", "0001_initial")]
+    assert loader.graph.leaf_nodes("organizations") == [("organizations", "0002_userinvitation")]

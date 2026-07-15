@@ -6,6 +6,8 @@ from drf_spectacular.utils import OpenApiExample, OpenApiResponse, extend_schema
 
 from apps.accounts.api.v1.serializers import (
     AuthSessionSerializer,
+    InvitationAcceptResponseSerializer,
+    InvitationAcceptSerializer,
     LoginInputSerializer,
     MeSerializer,
     WebSocketTicketSerializer,
@@ -70,6 +72,18 @@ logout_schema = extend_schema(
     responses={
         204: OpenApiResponse(description="Logged out"),
         403: COMMON_ERROR_RESPONSES[403],
+    },
+)
+
+invitation_accept_schema = extend_schema(
+    operation_id="auth_invitations_accept",
+    summary="Accept a user invitation without logging in",
+    parameters=[RETRY_AFTER_HEADER],
+    request=InvitationAcceptSerializer,
+    responses={
+        200: InvitationAcceptResponseSerializer,
+        400: COMMON_ERROR_RESPONSES[400],
+        429: COMMON_ERROR_RESPONSES[429],
     },
 )
 

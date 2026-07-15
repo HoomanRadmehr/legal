@@ -1,6 +1,6 @@
 # BE-026: Implement activity list and matter timeline APIs
 
-Status: TODO
+Status: DONE
 Priority: P0
 Area: Backend
 Related specs: BE-008
@@ -33,10 +33,10 @@ Expose read-only permission-scoped activity and matter timelines.
 
 ## Acceptance criteria
 
-- [ ] Viewer/Counsel cannot see activity for hidden matters.
-- [ ] No mutation endpoint exists.
-- [ ] Newest-first ordering and filters are stable.
-- [ ] Sensitive fields remain redacted.
+- [x] Viewer/Counsel cannot see activity for hidden matters.
+- [x] No mutation endpoint exists.
+- [x] Newest-first ordering and filters are stable.
+- [x] Sensitive fields remain redacted.
 
 ## Verification commands
 
@@ -50,9 +50,29 @@ cd backend && python -m pytest apps/activity/tests -q
 
 ## Codex execution log
 
-- Started:
-- Completed:
+- Started: 2026-07-15 10:38 +0330
+- Completed: 2026-07-15 10:38 +0330
 - Files changed:
+  - `backend/apps/activity/selectors.py`
+  - `backend/apps/activity/api/v1/__init__.py`
+  - `backend/apps/activity/api/v1/filters.py`
+  - `backend/apps/activity/api/v1/openapi.py`
+  - `backend/apps/activity/api/v1/serializers.py`
+  - `backend/apps/activity/api/v1/urls.py`
+  - `backend/apps/activity/api/v1/views.py`
+  - `backend/apps/activity/tests/test_activity_api.py`
+  - `backend/config/urls.py`
+  - `tasks/backend/BE-026-implement-activity-list-and-matter-timeline-apis.md`
+  - `AI_USAGE.md`
 - Commands run:
-- Result:
-- Deviations/questions:
+  - `cd backend && python -m pytest apps/activity/tests -q` (failed before pytest startup because `.python-version` points to uninstalled `3.12`)
+  - `cd backend && UV_PROJECT_ENVIRONMENT=/tmp/legal-be026-venv uv run --python /usr/bin/python3.12 python -m pytest apps/activity/tests -q`
+  - `cd backend && UV_PROJECT_ENVIRONMENT=/tmp/legal-be026-venv uv run --python /usr/bin/python3.12 ruff check apps/activity config/urls.py`
+  - `cd backend && UV_PROJECT_ENVIRONMENT=/tmp/legal-be026-venv uv run --python /usr/bin/python3.12 ruff format apps/activity/api/v1/urls.py apps/activity/tests/test_activity_api.py`
+  - `cd backend && UV_PROJECT_ENVIRONMENT=/tmp/legal-be026-venv uv run --python /usr/bin/python3.12 ruff format --check apps/activity config/urls.py`
+  - `python3 scripts/check_simplicity.py backend/apps/activity backend/config/urls.py`
+  - `cd backend && UV_PROJECT_ENVIRONMENT=/tmp/legal-be026-venv uv run --python /usr/bin/python3.12 python manage.py makemigrations --check --dry-run`
+  - `cd backend && UV_PROJECT_ENVIRONMENT=/tmp/legal-be026-venv uv run --python /usr/bin/python3.12 python manage.py spectacular --file /tmp/legal-be026-openapi.yaml --validate`
+  - `python3 scripts/validate_docs.py`
+- Result: Implemented and verified read-only permission-scoped activity and matter timeline APIs. Targeted activity tests passed with 14 tests; lint, format, simplicity, migration drift, and OpenAPI validation passed.
+- Deviations/questions: Added `backend/config/urls.py` route wiring because the documented endpoints cannot resolve without root URL inclusion. `python3 scripts/validate_docs.py` failed on unrelated malformed decimal task files and missing task dependency references outside BE-026.

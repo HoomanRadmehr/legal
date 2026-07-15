@@ -49,8 +49,10 @@ def test_list_admin_memberships_is_organization_scoped_and_active_only() -> None
     organization = OrganizationFactory()
     other_organization = OrganizationFactory()
     admin = MembershipFactory(organization=organization, role=ROLE_LEGAL_ADMIN)
+    inactive_user = UserFactory(is_active=False)
     MembershipFactory(organization=organization, role=ROLE_LEGAL_COUNSEL)
     MembershipFactory(organization=organization, role=ROLE_LEGAL_ADMIN, status=STATUS_SUSPENDED)
+    MembershipFactory(organization=organization, role=ROLE_LEGAL_ADMIN, user=inactive_user)
     MembershipFactory(organization=other_organization, role=ROLE_LEGAL_ADMIN)
 
     found = list(list_admin_memberships(organization=organization))

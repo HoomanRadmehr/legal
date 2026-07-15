@@ -78,6 +78,16 @@ export function AuthProvider({ children }: PropsWithChildren) {
     setStatus("authenticated");
   }, []);
 
+  const refresh = useCallback(async () => {
+    const nextSession = await refreshSessionOnce();
+    if (nextSession) {
+      setSession(nextSession);
+      setStatus("authenticated");
+      return;
+    }
+    clearSession();
+  }, [clearSession]);
+
   const logout = useCallback(async () => {
     try {
       await logoutSession();
@@ -89,8 +99,8 @@ export function AuthProvider({ children }: PropsWithChildren) {
   }, [clearSession]);
 
   const value = useMemo<AuthContextValue>(
-    () => ({ login, logout, session, status }),
-    [login, logout, session, status],
+    () => ({ login, logout, refresh, session, status }),
+    [login, logout, refresh, session, status],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

@@ -1,6 +1,6 @@
 # BE-029: Review filters, indexes, and query efficiency
 
-Status: TODO
+Status: DONE
 Priority: P0
 Area: Backend
 Related specs: BE-003, BE-004, BE-005, BE-006, BE-010, BE-012
@@ -33,10 +33,10 @@ Make filtering explicit and ensure common permission-aware lists avoid obvious N
 
 ## Acceptance criteria
 
-- [ ] No `fields="__all__"` or unrestricted ordering.
-- [ ] Common lists avoid N+1 on seeded data.
-- [ ] Deadline/dashboard queries use relevant indexes.
-- [ ] Security scope is not bypassed for performance.
+- [x] No `fields="__all__"` or unrestricted ordering.
+- [x] Common lists avoid N+1 on seeded data.
+- [x] Deadline/dashboard queries use relevant indexes.
+- [x] Security scope is not bypassed for performance.
 
 ## Verification commands
 
@@ -51,9 +51,30 @@ cd backend && python manage.py makemigrations --check --dry-run
 
 ## Codex execution log
 
-- Started:
-- Completed:
+- Started: 2026-07-15 16:39 +0330
+- Completed: 2026-07-15 16:43 +0330
 - Files changed:
+  - `backend/apps/matters/models.py`
+  - `backend/apps/matters/migrations/0002_matter_matter_org_kind_prio_idx_and_more.py`
+  - `backend/apps/tasks/models.py`
+  - `backend/apps/tasks/migrations/0002_task_task_org_assignee_due_idx.py`
+  - `backend/apps/documents/models.py`
+  - `backend/apps/documents/migrations/0003_document_doc_org_filename_idx.py`
+  - `backend/apps/dashboard/selectors.py`
+  - `backend/apps/dashboard/tests/test_dashboard_api.py`
+  - `backend/tests/test_filters_indexes.py`
+  - `tasks/backend/BE-029-review-filters-indexes-and-query-efficiency.md`
+  - `AI_USAGE.md`
 - Commands run:
-- Result:
-- Deviations/questions:
+  - `cd backend && UV_PROJECT_ENVIRONMENT=/tmp/legal-be029-venv uv run --python /usr/bin/python3.12 python manage.py makemigrations matters tasks documents` - generated index migrations; emitted a local PostgreSQL credential warning during migration-history check.
+  - `cd backend && UV_PROJECT_ENVIRONMENT=/tmp/legal-be029-venv uv run --python /usr/bin/python3.12 python -m pytest tests/test_filters_indexes.py apps/dashboard/tests/test_dashboard_api.py -q` - passed, 11 tests.
+  - `cd backend && UV_PROJECT_ENVIRONMENT=/tmp/legal-be029-venv uv run --python /usr/bin/python3.12 ruff check apps/matters/models.py apps/tasks/models.py apps/documents/models.py apps/dashboard/selectors.py apps/dashboard/tests/test_dashboard_api.py tests/test_filters_indexes.py apps/matters/migrations/0002_matter_matter_org_kind_prio_idx_and_more.py apps/tasks/migrations/0002_task_task_org_assignee_due_idx.py apps/documents/migrations/0003_document_doc_org_filename_idx.py` - passed after sorting an import and formatting generated migrations.
+  - `cd backend && UV_PROJECT_ENVIRONMENT=/tmp/legal-be029-venv uv run --python /usr/bin/python3.12 ruff format --check apps/matters/models.py apps/tasks/models.py apps/documents/models.py apps/dashboard/selectors.py apps/dashboard/tests/test_dashboard_api.py tests/test_filters_indexes.py apps/matters/migrations/0002_matter_matter_org_kind_prio_idx_and_more.py apps/tasks/migrations/0002_task_task_org_assignee_due_idx.py apps/documents/migrations/0003_document_doc_org_filename_idx.py` - passed.
+  - `cd backend && python -m pytest -q` - failed before pytest startup because `.python-version` points to unavailable pyenv `3.12`.
+  - `cd backend && python manage.py makemigrations --check --dry-run` - failed before Django startup because `.python-version` points to unavailable pyenv `3.12`.
+  - `cd backend && UV_PROJECT_ENVIRONMENT=/tmp/legal-be029-venv uv run --python /usr/bin/python3.12 python -m pytest -q` - passed, 30 tests.
+  - `cd backend && UV_PROJECT_ENVIRONMENT=/tmp/legal-be029-venv uv run --python /usr/bin/python3.12 python manage.py makemigrations --check --dry-run` - passed with no changes detected; emitted the same local PostgreSQL credential warning.
+  - `python3 scripts/check_simplicity.py` - passed, scanned 506 source files.
+  - `python3 scripts/validate_docs.py` - failed on pre-existing invalid task heading IDs in decimal task files outside BE-029 scope.
+- Result: DONE. Added targeted indexes for reviewed matter, task, and document list/dashboard paths; reduced dashboard recent-activity query work through the permission-scoped matter selector; tightened the dashboard query-count regression; and added filter/order/index regression tests.
+- Deviations/questions: Exact `python ...` verification commands remain blocked by the repository pyenv `3.12` configuration, but equivalent `/usr/bin/python3.12` uv-backed commands passed. Migration commands emit a local PostgreSQL credential warning while using the configured default database for history checks; the dry-run still reports no model drift. Documentation validation remains blocked by existing invalid decimal task heading IDs in `BE-026.-8`, `BE-026.5`, `BE-026.75`, `FE-013.5`, `FE-013.75`, and `FE-013.8`.

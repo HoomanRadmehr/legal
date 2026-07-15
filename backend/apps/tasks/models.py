@@ -84,6 +84,10 @@ class Task(CommonModel):
             models.Index(
                 fields=("organization", "assignee", "status"), name="task_org_assignee_idx"
             ),
+            models.Index(
+                fields=("organization", "assignee", "status", "due_at"),
+                name="task_org_assignee_due_idx",
+            ),
             models.Index(fields=("organization", "matter", "status"), name="task_org_matter_idx"),
         ]
         ordering = ("due_at", "created_at")

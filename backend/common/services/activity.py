@@ -18,6 +18,7 @@ SAFE_ACTIVITY_FIELDS = {
     "priority",
     "reference_code",
     "request_id",
+    "role",
     "status",
     "target_id",
     "target_type",

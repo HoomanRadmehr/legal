@@ -30,6 +30,8 @@ INSTALLED_APPS = [
     "apps.tasks.apps.TasksConfig",
     "apps.documents.apps.DocumentsConfig",
     "apps.notifications.apps.NotificationsConfig",
+    "apps.dashboard.apps.DashboardConfig",
+    "apps.offboarding.apps.OffboardingConfig",
     "channels",
     "corsheaders",
     "django.contrib.admin",
@@ -108,6 +110,7 @@ LANGUAGES = [
     ("en", _("English")),
     ("fa", _("Persian")),
 ]
+LOCALE_PATHS = [BASE_DIR / "locale"]
 USE_I18N = True
 USE_TZ = True
 
@@ -129,6 +132,29 @@ REST_FRAMEWORK = {
 SPECTACULAR_SETTINGS = {
     "TITLE": "Legal Management API",
     "VERSION": "0.1.0",
+    "ENUM_NAME_OVERRIDES": {
+        "MatterStatusEnum": [
+            ("open", "Open"),
+            ("pending", "Pending"),
+            ("on_hold", "On hold"),
+            ("closed", "Closed"),
+            ("archived", "Archived"),
+            ("draft", "Draft"),
+            ("active", "Active"),
+            ("expired", "Expired"),
+            ("terminated", "Terminated"),
+            ("received", "Received"),
+            ("under_review", "Under review"),
+            ("response_due", "Response due"),
+            ("responded", "Responded"),
+        ],
+        "MembershipRoleEnum": [
+            ("legal_admin", "Legal admin"),
+            ("legal_manager", "Legal manager"),
+            ("legal_counsel", "Legal counsel"),
+            ("viewer", "Viewer"),
+        ],
+    },
 }
 
 MINIO_ENDPOINT = env.value("MINIO_ENDPOINT", default="localhost:9000")
@@ -148,6 +174,11 @@ MINIO_PRESIGNED_DOWNLOAD_TTL_SECONDS = env.integer(
     minimum=60,
 )
 MAX_UPLOAD_SIZE_BYTES = env.integer("MAX_UPLOAD_SIZE_BYTES", default=26_214_400, minimum=1)
+
+INVITATION_SIGNING_SALT = env.value(
+    "INVITATION_SIGNING_SALT",
+    default="legal-management-user-invitation",
+)
 
 JWT_ACCESS_MINUTES = env.integer("JWT_ACCESS_MINUTES", default=10, minimum=1)
 JWT_REFRESH_DAYS = env.integer("JWT_REFRESH_DAYS", default=7, minimum=1)

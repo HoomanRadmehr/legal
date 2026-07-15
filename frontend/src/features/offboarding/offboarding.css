@@ -1,0 +1,143 @@
+.offboarding-page {
+  display: grid;
+  gap: 24px;
+}
+
+.offboarding-form,
+.offboarding-execute {
+  display: grid;
+  max-width: 760px;
+  gap: 16px;
+}
+
+.offboarding-form label,
+.offboarding-execute label {
+  display: grid;
+  gap: 6px;
+  color: #344054;
+  font-weight: 700;
+}
+
+.offboarding-form select,
+.offboarding-execute input {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 40px;
+  border: 1px solid #aab4c3;
+  border-radius: 6px;
+  padding: 8px 10px;
+  color: #101828;
+  font: inherit;
+}
+
+.offboarding-form button,
+.offboarding-execute button {
+  min-height: 40px;
+  justify-self: start;
+  border: 1px solid #175cd3;
+  border-radius: 8px;
+  padding: 8px 14px;
+  background: #175cd3;
+  color: #ffffff;
+  cursor: pointer;
+  font-weight: 800;
+}
+
+.offboarding-form button:disabled,
+.offboarding-execute button:disabled {
+  border-color: #98a2b3;
+  background: #eaecf0;
+  color: #475467;
+  cursor: not-allowed;
+}
+
+.offboarding-feedback {
+  margin: 0;
+  border: 1px solid #abefc6;
+  border-radius: 8px;
+  padding: 12px;
+  background: #f6fef9;
+  color: #067647;
+}
+
+.offboarding-feedback[role="alert"] {
+  border-color: #fedf89;
+  background: #fffcf5;
+  color: #93370d;
+}
+
+.offboarding-preview,
+.offboarding-result {
+  display: grid;
+  gap: 16px;
+  max-width: 980px;
+}
+
+.offboarding-counts {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin: 0;
+}
+
+.offboarding-counts div {
+  border: 1px solid #d0d5dd;
+  border-radius: 8px;
+  padding: 12px;
+  background: #ffffff;
+}
+
+.offboarding-counts dt {
+  color: #475467;
+  font-weight: 700;
+}
+
+.offboarding-counts dd {
+  margin: 4px 0 0;
+  color: #101828;
+  font-weight: 800;
+}
+
+.offboarding-summary {
+  display: grid;
+  gap: 8px;
+}
+
+.offboarding-summary h3 {
+  margin: 0;
+}
+
+.offboarding-summary ul {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding-inline-start: 20px;
+}
+
+.offboarding-summary p,
+.offboarding-execute p {
+  margin: 0;
+  color: #475467;
+}
+
+.offboarding-result dl {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+}
+
+.offboarding-result dl div {
+  display: grid;
+  grid-template-columns: 10rem 1fr;
+  gap: 8px;
+}
+
+@media (max-width: 760px) {
+  .offboarding-counts {
+    grid-template-columns: 1fr;
+  }
+
+  .offboarding-result dl div {
+    grid-template-columns: 1fr;
+  }
+}

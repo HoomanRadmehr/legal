@@ -15,11 +15,12 @@ RUN apt-get update \
 RUN python -m pip install --no-cache-dir uv==0.11.6
 
 COPY backend/pyproject.toml backend/uv.lock ./
-RUN uv sync --frozen --no-dev
+RUN uv sync --frozen --no-dev \
+    && uv pip install --python /opt/venv/bin/python daphne==4.1.2
 
 FROM python:3.12-slim AS runtime
 
-ENV DJANGO_SETTINGS_MODULE=config.settings.development \
+ENV DJANGO_SETTINGS_MODULE=config.settings.production \
     PATH=/opt/venv/bin:$PATH \
     PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1
@@ -30,7 +31,7 @@ RUN apt-get update \
     && apt-get install -y --no-install-recommends ca-certificates libpq5 \
     && groupadd --system app \
     && useradd --system --gid app --home-dir /app --shell /usr/sbin/nologin app \
-    && mkdir -p /app/backend \
+    && mkdir -p /app/backend /app/backend/staticfiles \
     && chown -R app:app /app \
     && rm -rf /var/lib/apt/lists/*
 
@@ -41,4 +42,4 @@ USER app
 
 EXPOSE 8000
 
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+CMD ["daphne", "-b", "0.0.0.0", "-p", "8000", "config.asgi:application"]

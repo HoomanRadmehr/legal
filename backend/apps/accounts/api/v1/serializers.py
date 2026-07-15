@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from django.contrib.auth.password_validation import validate_password
+from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from apps.accounts.models import User
@@ -11,6 +13,24 @@ from apps.organizations.models import Membership
 class LoginInputSerializer(serializers.Serializer):
     username = serializers.CharField(trim_whitespace=True)
     password = serializers.CharField(write_only=True, trim_whitespace=False)
+
+
+class InvitationAcceptSerializer(serializers.Serializer):
+    token = serializers.CharField(write_only=True, trim_whitespace=False)
+    password = serializers.CharField(write_only=True, trim_whitespace=False)
+    password_confirm = serializers.CharField(write_only=True, trim_whitespace=False)
+
+    def validate(self, attrs):
+        if attrs["password"] != attrs["password_confirm"]:
+            raise serializers.ValidationError(
+                {"password_confirm": [_("Password confirmation does not match.")]}
+            )
+        validate_password(attrs["password"])
+        return attrs
+
+
+class InvitationAcceptResponseSerializer(serializers.Serializer):
+    status = serializers.CharField()
 
 
 class SafeUserSerializer(serializers.ModelSerializer):

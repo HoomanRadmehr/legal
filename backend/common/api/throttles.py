@@ -38,6 +38,14 @@ class WebSocketTicketThrottle(SimpleRateThrottle):
         return build_throttle_key(scope=self.scope, parts=(str(request.user.id),))
 
 
+class InvitationAcceptThrottle(SimpleRateThrottle):
+    scope = "invitation_accept"
+    rate = "10/hour"
+
+    def get_cache_key(self, request, view) -> str:
+        return build_throttle_key(scope=self.scope, parts=(self.get_ident(request),))
+
+
 class UploadInitiateThrottle(SimpleRateThrottle):
     scope = "upload_initiate"
     rate = "20/hour"

@@ -23,8 +23,22 @@ ERROR_EXAMPLE = OpenApiExample(
     },
 )
 
+LOCALIZED_ERROR_EXAMPLE = OpenApiExample(
+    "Localized error",
+    value={
+        "code": "permission_denied",
+        "message": "شما اجازه انجام این عملیات را ندارید.",
+        "details": {},
+        "request_id": "11111111-1111-1111-1111-111111111111",
+    },
+)
+
 COMMON_ERROR_RESPONSES = {
-    400: OpenApiResponse(ErrorEnvelopeSerializer, "Malformed or validation error", [ERROR_EXAMPLE]),
+    400: OpenApiResponse(
+        ErrorEnvelopeSerializer,
+        "Malformed or validation error",
+        [ERROR_EXAMPLE, LOCALIZED_ERROR_EXAMPLE],
+    ),
     401: OpenApiResponse(ErrorEnvelopeSerializer, "Authentication required or failed"),
     403: OpenApiResponse(ErrorEnvelopeSerializer, "Permission denied"),
     404: OpenApiResponse(ErrorEnvelopeSerializer, "Not found or not visible"),
@@ -34,6 +48,17 @@ COMMON_ERROR_RESPONSES = {
     429: OpenApiResponse(ErrorEnvelopeSerializer, "Rate limit exceeded"),
     503: OpenApiResponse(ErrorEnvelopeSerializer, "Temporary dependency unavailable"),
 }
+
+ACCEPT_LANGUAGE_HEADER = OpenApiParameter(
+    name="Accept-Language",
+    type=str,
+    location=OpenApiParameter.HEADER,
+    enum=["en", "fa"],
+    description=(
+        "Optional response language preference. Machine-readable codes and canonical enum "
+        "values remain English stable values."
+    ),
+)
 
 IDEMPOTENCY_KEY_HEADER = OpenApiParameter(
     name="Idempotency-Key",

@@ -130,6 +130,20 @@ class Matter(CommonModel):
             models.Index(
                 fields=("organization", "kind", "status"), name="matter_org_kind_status_idx"
             ),
+            models.Index(
+                fields=("organization", "kind", "priority"), name="matter_org_kind_prio_idx"
+            ),
+            models.Index(
+                fields=("organization", "kind", "created_at"),
+                name="matter_org_kind_created_idx",
+            ),
+            models.Index(
+                fields=("organization", "kind", "opened_on"), name="matter_org_kind_opened_idx"
+            ),
+            models.Index(
+                fields=("organization", "kind", "archived_at"),
+                name="matter_org_kind_archive_idx",
+            ),
         ]
         ordering = ("reference_code",)
         verbose_name = _("matter")

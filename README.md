@@ -1,8 +1,8 @@
-# Legal Management Module - Codex Starter
+# Legal Management Module
 
-This repository is a **specification-first implementation starter** for the Legal Management Module coding assignment.
-It intentionally contains plans, constraints, acceptance criteria, task breakdowns, and repository guardrails rather than a generated application.
-The goal is to let Codex implement the system one small, reviewable task at a time.
+This repository contains a specification-driven Legal Management Module implementation and the evidence trail used to build it one reviewable task at a time.
+
+The backend is a Django modular monolith with DRF, Channels, Celery, PostgreSQL, Redis, RabbitMQ, and MinIO. The frontend is a React, TypeScript, Vite application. The project keeps the original specs, guardrails, atomic tasks, and AI usage evidence alongside the implementation so a reviewer can trace decisions and verification.
 
 ## Chosen architecture
 
@@ -37,16 +37,15 @@ This project prioritizes code that is obvious during review.
 
 Read [AGENTS.md](AGENTS.md) before making changes.
 
-## Start here
+## Reviewer Start Here
 
-1. Read [CODEX_START_HERE.md](CODEX_START_HERE.md).
-2. Read the root [AGENTS.md](AGENTS.md), then the nested `AGENTS.md` for the area being changed.
-3. Read [docs/business/06-mvp-scope.md](docs/business/06-mvp-scope.md).
-4. Read [tasks/README.md](tasks/README.md), [tasks/ORDER.md](tasks/ORDER.md), and [tasks/INDEX.md](tasks/INDEX.md).
-5. Execute exactly one task at a time.
-6. Update the task status and `AI_USAGE.md` after each completed task.
+1. For backend setup and operations, read [backend/README.md](backend/README.md).
+2. For AI usage, mistakes, corrections, and verification evidence, read [AI_USAGE.md](AI_USAGE.md).
+3. For architecture and constraints, read [AGENTS.md](AGENTS.md), [backend/AGENTS.md](backend/AGENTS.md), and [docs/tech/01-architecture.md](docs/tech/01-architecture.md).
+4. For product scope, read [docs/business/06-mvp-scope.md](docs/business/06-mvp-scope.md).
+5. For task traceability, read [tasks/ORDER.md](tasks/ORDER.md) and the relevant task file.
 
-The starter contains 27 approved behavior specifications and 63 atomic backend, frontend, and integration tasks.
+The repository contains 27 approved behavior specifications and the atomic backend, frontend, and integration tasks used during implementation.
 
 ## Repository map
 
@@ -69,9 +68,9 @@ The starter contains 27 approved behavior specifications and 63 atomic backend, 
 │   ├── backend/                  Atomic backend tasks
 │   ├── frontend/                 Atomic frontend tasks
 │   └── integration/              Cross-stack verification tasks
-├── backend/                      Backend implementation target
-├── frontend/                     Frontend implementation target
-├── infra/                        Docker and deployment target
+├── backend/                      Django backend implementation and README
+├── frontend/                     React frontend implementation
+├── infra/                        Deployment support files
 ├── scripts/                      Documentation and simplicity checks
 └── .codex/prompts/               Reusable Codex prompts
 ```
@@ -90,7 +89,7 @@ The critical path is:
 
 ## Backend quality checks
 
-The backend CI runs the same explicit checks a reviewer can run locally:
+A reviewer can run the backend checks below. In this local checkout, plain `python` may fail if pyenv does not have `3.12` installed; use `/usr/bin/python3.12` through `uv` as shown in [backend/README.md](backend/README.md).
 
 ```bash
 python scripts/validate_docs.py
@@ -115,3 +114,7 @@ DJANGO_SETTINGS_MODULE=config.settings.production uv run python manage.py check 
 
 The plans cover authentication and roles, legal cases, contracts, notices, deadlines, tasks, documents, audit logs, dashboard, reassignment/offboarding, Persian date handling, seed data, tests, setup instructions, and required AI usage documentation.
 Discussions, financial records, OCR, semantic search, and enterprise workflow orchestration are explicitly deferred from the MVP.
+
+## Known Evidence Caveat
+
+`python scripts/validate_docs.py` currently reports existing decimal task heading IDs such as `BE-026.5` and `FE-013.8` as invalid because the validator accepts only `PREFIX-000` style IDs. That is documentation metadata, not a backend runtime failure. Task logs and `AI_USAGE.md` record the exact command outcomes.

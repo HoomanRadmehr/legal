@@ -7,6 +7,7 @@ export type AuthStatus = "anonymous" | "authenticated" | "restoring";
 export type AuthContextValue = {
   login: (input: LoginInput) => Promise<void>;
   logout: () => Promise<void>;
+  refresh?: () => Promise<void>;
   session: AuthSession | null;
   status: AuthStatus;
 };

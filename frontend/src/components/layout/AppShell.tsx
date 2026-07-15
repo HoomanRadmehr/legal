@@ -100,7 +100,10 @@ function WorkspaceNavigation({ role }: { role: string }) {
       ) : null}
       <NavItem to="/notifications" label="Notifications" />
       {canManageOrganization(role) ? (
-        <NavItem to="/admin" label="Admin" />
+        <NavItem to="/admin/users" label="Admin" />
+      ) : null}
+      {canManageOrganization(role) ? (
+        <NavItem to="/admin/users/new" label="Invite user" />
       ) : null}
       {canRunOffboarding(role) ? (
         <NavItem to="/admin/offboarding" label="Offboarding" />

@@ -39,6 +39,17 @@ MEMBERSHIP_STATUS_CHOICES = (
     (STATUS_OFFBOARDED, _("Offboarded")),
 )
 
+INVITATION_STATUS_PENDING = "pending"
+INVITATION_STATUS_ACCEPTED = "accepted"
+INVITATION_STATUS_EXPIRED = "expired"
+INVITATION_STATUS_REVOKED = "revoked"
+INVITATION_STATUS_CHOICES = (
+    (INVITATION_STATUS_PENDING, _("Pending")),
+    (INVITATION_STATUS_ACCEPTED, _("Accepted")),
+    (INVITATION_STATUS_EXPIRED, _("Expired")),
+    (INVITATION_STATUS_REVOKED, _("Revoked")),
+)
+
 
 def validate_timezone(value: str) -> None:
     try:
@@ -114,3 +125,72 @@ class Membership(CommonModel):
 
     def __str__(self) -> str:
         return f"{self.user} in {self.organization}"
+
+
+class UserInvitation(CommonModel):
+    organization = models.ForeignKey(
+        Organization,
+        on_delete=models.PROTECT,
+        related_name="user_invitations",
+        verbose_name=_("organization"),
+    )
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.PROTECT,
+        related_name="user_invitations",
+        verbose_name=_("user"),
+    )
+    membership = models.OneToOneField(
+        Membership,
+        on_delete=models.PROTECT,
+        related_name="invitation",
+        verbose_name=_("membership"),
+    )
+    invited_by = models.ForeignKey(
+        Membership,
+        on_delete=models.PROTECT,
+        related_name="sent_invitations",
+        verbose_name=_("invited by"),
+    )
+    token_hash = models.CharField(_("token hash"), max_length=64, unique=True)
+    status = models.CharField(
+        _("status"),
+        max_length=16,
+        choices=INVITATION_STATUS_CHOICES,
+        default=INVITATION_STATUS_PENDING,
+    )
+    expires_at = models.DateTimeField(_("expires at"))
+    accepted_at = models.DateTimeField(_("accepted at"), blank=True, null=True)
+
+    class Meta:
+        indexes = [
+            models.Index(
+                fields=("organization", "status", "expires_at"),
+                name="org_invitation_status_exp_idx",
+            ),
+        ]
+        ordering = ("-created_at",)
+        verbose_name = _("user invitation")
+        verbose_name_plural = _("user invitations")
+
+    def clean(self) -> None:
+        validate_invitation_member(
+            organization_id=self.organization_id,
+            membership=self.membership,
+            field_name="membership",
+        )
+        validate_invitation_member(
+            organization_id=self.organization_id,
+            membership=self.invited_by,
+            field_name="invited_by",
+        )
+
+    def __str__(self) -> str:
+        return f"{self.user} invited to {self.organization}"
+
+
+def validate_invitation_member(*, organization_id, membership, field_name: str) -> None:
+    if membership is None:
+        return
+    if membership.organization_id != organization_id:
+        raise ValidationError({field_name: _("Membership must belong to the organization.")})

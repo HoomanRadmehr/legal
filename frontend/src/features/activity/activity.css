@@ -1,0 +1,97 @@
+.activity-page {
+  display: grid;
+  gap: 24px;
+}
+
+.activity-filters fieldset {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
+  align-items: end;
+  border: 1px solid #d0d5dd;
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.activity-filters legend {
+  color: #101828;
+  font-weight: 800;
+}
+
+.activity-filters label {
+  display: grid;
+  gap: 6px;
+  color: #344054;
+  font-weight: 700;
+}
+
+.activity-filters input,
+.activity-filters select {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 40px;
+  border: 1px solid #d0d5dd;
+  border-radius: 8px;
+  padding: 8px 10px;
+  color: #101828;
+  font: inherit;
+}
+
+.activity-filters button {
+  min-height: 40px;
+  border: 1px solid #98a2b3;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #101828;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.activity-count {
+  margin: 0;
+  color: #475467;
+  font-weight: 700;
+}
+
+.activity-timeline {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.activity-timeline li {
+  display: grid;
+  gap: 8px;
+  border: 1px solid #eaecf0;
+  border-radius: 8px;
+  background: #ffffff;
+  padding: 12px;
+}
+
+.activity-timeline time {
+  color: #667085;
+}
+
+.activity-timeline dl {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+}
+
+.activity-timeline dl div {
+  display: grid;
+  grid-template-columns: minmax(120px, max-content) 1fr;
+  gap: 12px;
+}
+
+.activity-timeline dt {
+  color: #667085;
+  font-weight: 700;
+}
+
+.activity-timeline dd {
+  margin: 0;
+  color: #101828;
+}

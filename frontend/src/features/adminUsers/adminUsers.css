@@ -1,0 +1,143 @@
+.admin-user-page {
+  display: grid;
+  gap: 24px;
+}
+
+.admin-user-form {
+  display: grid;
+  max-width: 720px;
+  gap: 16px;
+}
+
+.admin-user-form fieldset {
+  display: grid;
+  gap: 16px;
+  margin: 0;
+  border: 1px solid #d0d5dd;
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.admin-user-form legend {
+  color: #101828;
+  font-weight: 800;
+}
+
+.admin-user-form label {
+  display: grid;
+  gap: 6px;
+  color: #344054;
+  font-weight: 700;
+}
+
+.admin-user-form input,
+.admin-user-form select {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 40px;
+  border: 1px solid #d0d5dd;
+  border-radius: 8px;
+  padding: 8px 10px;
+  color: #101828;
+  font: inherit;
+}
+
+.admin-user-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.admin-user-filters {
+  display: grid;
+  grid-template-columns: minmax(16rem, 1fr) minmax(12rem, 16rem);
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+
+.admin-user-filters label,
+.admin-user-role-control {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.admin-user-filters input,
+.admin-user-filters select,
+.admin-user-role-control select {
+  border: 1px solid #aab4c3;
+  border-radius: 6px;
+  font: inherit;
+  padding: 0.65rem;
+}
+
+.admin-user-table {
+  overflow-x: auto;
+}
+
+.admin-user-table table {
+  width: 100%;
+  min-width: 720px;
+  border-collapse: collapse;
+  background: #ffffff;
+}
+
+.admin-user-table caption {
+  margin-bottom: 0.75rem;
+  color: #344054;
+  font-weight: 700;
+  text-align: start;
+}
+
+.admin-user-table th,
+.admin-user-table td {
+  padding: 0.85rem;
+  border-bottom: 1px solid #e5e7eb;
+  text-align: start;
+  vertical-align: top;
+}
+
+.admin-user-row-message {
+  margin: 0.5rem 0 0;
+  color: #475467;
+}
+
+@media (max-width: 720px) {
+  .admin-user-filters {
+    grid-template-columns: 1fr;
+  }
+}
+
+.admin-user-actions button,
+.admin-user-page a {
+  min-height: 40px;
+  box-sizing: border-box;
+  border: 1px solid #98a2b3;
+  border-radius: 8px;
+  padding: 8px 12px;
+  background: #ffffff;
+  color: #101828;
+  cursor: pointer;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.admin-user-alert {
+  margin: 0;
+  border: 1px solid #fedf89;
+  border-radius: 8px;
+  padding: 12px;
+  background: #fffcf5;
+  color: #93370d;
+}
+
+.admin-user-alert--success {
+  border-color: #abefc6;
+  background: #f6fef9;
+  color: #067647;
+}
+
+@media (max-width: 640px) {
+  .admin-user-actions button,
+  .admin-user-page a {
+    width: 100%;
+  }
+}

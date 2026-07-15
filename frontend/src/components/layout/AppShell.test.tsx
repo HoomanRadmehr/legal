@@ -30,7 +30,13 @@ describe("app shell permissions", () => {
     renderShell(ROLE_LEGAL_ADMIN);
 
     expect(screen.getByRole("link", { name: "Dashboard" })).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Admin" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Admin" })).toHaveAttribute(
+      "href",
+      "/admin/users",
+    );
+    expect(
+      screen.getByRole("link", { name: "Invite user" }),
+    ).toBeInTheDocument();
     expect(
       screen.getByRole("link", { name: "Offboarding" }),
     ).toBeInTheDocument();
@@ -57,6 +63,9 @@ describe("app shell permissions", () => {
     expect(screen.getByRole("link", { name: "Activity" })).toBeInTheDocument();
     expect(
       screen.queryByRole("link", { name: "Admin" }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("link", { name: "Invite user" }),
     ).not.toBeInTheDocument();
     expect(
       screen.queryByRole("link", { name: "Offboarding" }),

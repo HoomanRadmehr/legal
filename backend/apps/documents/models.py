@@ -177,6 +177,10 @@ class Document(CommonModel):
                 fields=("matter", "status", "-created_at"),
                 name="doc_matter_status_idx",
             ),
+            models.Index(
+                fields=("organization", "original_filename"),
+                name="doc_org_filename_idx",
+            ),
         ]
         ordering = ("-created_at",)
         verbose_name = _("document")
