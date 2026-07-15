@@ -1,0 +1,262 @@
+[
+  {
+    "model": "accounts.user",
+    "pk": "10000000-0000-0000-0000-000000000001",
+    "fields": {
+      "password": "!sample-fixture-login-disabled",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "sample-admin",
+      "first_name": "Sample",
+      "last_name": "Admin",
+      "email": "sample-admin@example.test",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2026-01-01T09:00:00Z",
+      "preferred_language": "en",
+      "updated_at": "2026-01-01T09:00:00Z",
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": "10000000-0000-0000-0000-000000000002",
+    "fields": {
+      "password": "!sample-fixture-login-disabled",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "sample-counsel",
+      "first_name": "Sample",
+      "last_name": "Counsel",
+      "email": "sample-counsel@example.test",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2026-01-01T09:05:00Z",
+      "preferred_language": "en",
+      "updated_at": "2026-01-01T09:05:00Z",
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "organizations.organization",
+    "pk": "20000000-0000-0000-0000-000000000001",
+    "fields": {
+      "created_at": "2026-01-01T09:10:00Z",
+      "updated_at": "2026-01-01T09:10:00Z",
+      "name": "Sample Legal Organization",
+      "timezone": "UTC",
+      "default_language": "en",
+      "is_active": true
+    }
+  },
+  {
+    "model": "organizations.membership",
+    "pk": "30000000-0000-0000-0000-000000000001",
+    "fields": {
+      "created_at": "2026-01-01T09:15:00Z",
+      "updated_at": "2026-01-01T09:15:00Z",
+      "organization": "20000000-0000-0000-0000-000000000001",
+      "user": "10000000-0000-0000-0000-000000000001",
+      "role": "legal_admin",
+      "status": "active",
+      "joined_at": "2026-01-01T09:15:00Z",
+      "offboarded_at": null
+    }
+  },
+  {
+    "model": "organizations.membership",
+    "pk": "30000000-0000-0000-0000-000000000002",
+    "fields": {
+      "created_at": "2026-01-01T09:20:00Z",
+      "updated_at": "2026-01-01T09:20:00Z",
+      "organization": "20000000-0000-0000-0000-000000000001",
+      "user": "10000000-0000-0000-0000-000000000002",
+      "role": "legal_counsel",
+      "status": "active",
+      "joined_at": "2026-01-01T09:20:00Z",
+      "offboarded_at": null
+    }
+  },
+  {
+    "model": "matters.matter",
+    "pk": "40000000-0000-0000-0000-000000000001",
+    "fields": {
+      "created_at": "2026-01-02T09:00:00Z",
+      "updated_at": "2026-01-02T09:00:00Z",
+      "organization": "20000000-0000-0000-0000-000000000001",
+      "kind": "case",
+      "title": "Sample employment dispute",
+      "reference_code": "SAMPLE-CASE-001",
+      "status": "open",
+      "priority": "normal",
+      "owner": "30000000-0000-0000-0000-000000000002",
+      "description": "Sample matter for local review and UI smoke checks.",
+      "opened_on": "2026-01-02",
+      "closed_on": null,
+      "version": 1,
+      "archived_at": null,
+      "archived_by": null,
+      "created_by": "30000000-0000-0000-0000-000000000001"
+    }
+  },
+  {
+    "model": "matters.matter",
+    "pk": "40000000-0000-0000-0000-000000000002",
+    "fields": {
+      "created_at": "2026-01-03T09:00:00Z",
+      "updated_at": "2026-01-03T09:00:00Z",
+      "organization": "20000000-0000-0000-0000-000000000001",
+      "kind": "contract",
+      "title": "Sample vendor agreement",
+      "reference_code": "SAMPLE-CON-001",
+      "status": "active",
+      "priority": "high",
+      "owner": "30000000-0000-0000-0000-000000000001",
+      "description": "Sample contract matter for local review.",
+      "opened_on": "2026-01-03",
+      "closed_on": null,
+      "version": 1,
+      "archived_at": null,
+      "archived_by": null,
+      "created_by": "30000000-0000-0000-0000-000000000001"
+    }
+  },
+  {
+    "model": "matters.matter",
+    "pk": "40000000-0000-0000-0000-000000000003",
+    "fields": {
+      "created_at": "2026-01-04T09:00:00Z",
+      "updated_at": "2026-01-04T09:00:00Z",
+      "organization": "20000000-0000-0000-0000-000000000001",
+      "kind": "notice",
+      "title": "Sample regulator notice",
+      "reference_code": "SAMPLE-NOT-001",
+      "status": "response_due",
+      "priority": "critical",
+      "owner": "30000000-0000-0000-0000-000000000002",
+      "description": "Sample notice matter with a linked response deadline.",
+      "opened_on": "2026-01-04",
+      "closed_on": null,
+      "version": 1,
+      "archived_at": null,
+      "archived_by": null,
+      "created_by": "30000000-0000-0000-0000-000000000001"
+    }
+  },
+  {
+    "model": "cases.legalcase",
+    "pk": "40000000-0000-0000-0000-000000000001",
+    "fields": {
+      "case_type": "litigation",
+      "court_or_authority": "Sample Civil Court",
+      "filing_date": "2026-01-05",
+      "outcome_summary": ""
+    }
+  },
+  {
+    "model": "cases.caseparty",
+    "pk": "41000000-0000-0000-0000-000000000001",
+    "fields": {
+      "created_at": "2026-01-05T10:00:00Z",
+      "updated_at": "2026-01-05T10:00:00Z",
+      "organization": "20000000-0000-0000-0000-000000000001",
+      "case": "40000000-0000-0000-0000-000000000001",
+      "name": "Sample Client LLC",
+      "role": "client",
+      "contact_summary": "sample-client@example.test"
+    }
+  },
+  {
+    "model": "contracts.contract",
+    "pk": "40000000-0000-0000-0000-000000000002",
+    "fields": {
+      "contract_type": "vendor",
+      "counterparty": "Sample Vendor LLC",
+      "effective_date": "2026-01-10",
+      "expiration_date": "2027-01-09",
+      "renewal_date": "2026-12-10",
+      "key_terms": {
+        "payment_terms": "Net 30",
+        "termination_notice_days": 30
+      }
+    }
+  },
+  {
+    "model": "deadlines.deadline",
+    "pk": "50000000-0000-0000-0000-000000000001",
+    "fields": {
+      "created_at": "2026-01-04T10:00:00Z",
+      "updated_at": "2026-01-04T10:00:00Z",
+      "organization": "20000000-0000-0000-0000-000000000001",
+      "matter": "40000000-0000-0000-0000-000000000003",
+      "title": "Sample notice response deadline",
+      "description": "Support deadline required by the sample notice.",
+      "due_at": "2026-08-15T12:00:00Z",
+      "assignee": "30000000-0000-0000-0000-000000000002",
+      "status": "open",
+      "priority": "critical",
+      "reminder_enabled": true,
+      "completed_at": null,
+      "completed_by": null,
+      "cancelled_at": null,
+      "cancelled_by": null,
+      "version": 1
+    }
+  },
+  {
+    "model": "notices.legalnotice",
+    "pk": "40000000-0000-0000-0000-000000000003",
+    "fields": {
+      "sender": "Sample Regulator",
+      "received_date": "2026-01-04",
+      "response_deadline": "2026-08-15T12:00:00Z",
+      "response_status": "pending",
+      "linked_deadline": "50000000-0000-0000-0000-000000000001"
+    }
+  },
+  {
+    "model": "documents.uploadsession",
+    "pk": "60000000-0000-0000-0000-000000000001",
+    "fields": {
+      "created_at": "2026-01-06T09:00:00Z",
+      "updated_at": "2026-01-06T09:00:00Z",
+      "organization": "20000000-0000-0000-0000-000000000001",
+      "matter": "40000000-0000-0000-0000-000000000001",
+      "requested_by": "30000000-0000-0000-0000-000000000002",
+      "object_key": "sample-fixture/40000000-0000-0000-0000-000000000001/case-summary.pdf",
+      "original_filename": "sample-case-summary.pdf",
+      "expected_size": 2048,
+      "expected_content_type": "application/pdf",
+      "expected_checksum": "",
+      "description": "Sample document metadata only; no object bytes are stored in MinIO.",
+      "status": "available",
+      "expires_at": "2026-08-15T12:00:00Z",
+      "completed_at": "2026-01-06T09:05:00Z",
+      "failure_code": ""
+    }
+  },
+  {
+    "model": "documents.document",
+    "pk": "70000000-0000-0000-0000-000000000001",
+    "fields": {
+      "created_at": "2026-01-06T09:10:00Z",
+      "updated_at": "2026-01-06T09:10:00Z",
+      "organization": "20000000-0000-0000-0000-000000000001",
+      "matter": "40000000-0000-0000-0000-000000000001",
+      "upload_session": "60000000-0000-0000-0000-000000000001",
+      "object_key": "sample-fixture/40000000-0000-0000-0000-000000000001/case-summary.pdf",
+      "original_filename": "sample-case-summary.pdf",
+      "content_type": "application/pdf",
+      "size": 2048,
+      "checksum": "",
+      "status": "available",
+      "description": "Sample document metadata only; no object bytes are stored in MinIO.",
+      "uploaded_by": "30000000-0000-0000-0000-000000000002",
+      "available_at": "2026-01-06T09:10:00Z",
+      "revoked_at": null,
+      "revoked_by": null
+    }
+  }
+]
