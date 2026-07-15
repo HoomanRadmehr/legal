@@ -80,4 +80,4 @@ Explicit values: `in_app`, `email`, `sms`, `push`.
 
 ## Related tasks
 
-- BE-010, BE-022, BE-023, BE-024
+- BE-010, BE-022, BE-023, BE-024, BE-041

@@ -84,4 +84,4 @@ Expected version is mandatory for updates.
 
 ## Related tasks
 
-- BE-014, BE-018, BE-019, BE-029
+- BE-014, BE-018, BE-019, BE-029, BE-042

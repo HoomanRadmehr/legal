@@ -18,7 +18,7 @@ Use one `.env.example` key set for infrastructure and deployment-specific values
 
 - database URL and credentials;
 - Redis/RabbitMQ URLs;
-- MinIO endpoints and credentials;
+- MinIO internal endpoint, public endpoint, region, and credentials;
 - allowed hosts and trusted origins;
 - provider endpoints and credentials;
 - token durations and storage limits.

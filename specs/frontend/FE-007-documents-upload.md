@@ -13,11 +13,11 @@ Allow authorized users to upload directly to MinIO with visible local progress a
 
 1. User selects a file from a matter's document section.
 2. Client validates obvious size/type constraints for immediate feedback.
-3. Client calls upload initiate endpoint.
+3. Client calls the document presign endpoint with an idempotency key.
 4. Client uploads using the exact method, headers, or form fields returned by backend.
 5. Local byte progress is displayed as frontend-only `uploading`; the server does not claim byte progress.
-6. Client calls completion with a generated idempotency key.
-7. UI listens for user event and polls session as fallback.
+6. Client calls completion for the pending document.
+7. UI listens for user event and polls document metadata as fallback.
 8. Final status is available or failed with safe explanation.
 
 Do not place presigned URLs in console logs, error telemetry, router state, or persistent storage.
@@ -29,7 +29,6 @@ Do not place presigned URLs in console logs, error telemetry, router state, or p
 - uploading with percentage;
 - completing;
 - verifying;
-- processing;
 - available;
 - failed;
 - expired;
@@ -49,14 +48,14 @@ The frontend does not invent server processing progress. It may show indetermina
 
 - User WebSocket event updates the matching upload status or invalidates query.
 - On disconnect, polling continues with bounded backoff.
-- On reconnect, refetch active uploads and documents.
+- On reconnect, refetch pending/active documents and available documents.
 - Duplicate events do not regress a final state.
 
 ## Acceptance criteria
 
 - [ ] File bytes go directly to returned MinIO URL, not through Django.
 - [ ] Client sends only backend-provided upload headers/fields and never storage credentials.
-- [ ] Completion uses a stable idempotency key for retries.
+- [ ] Presign uses a stable idempotency key for retries.
 - [ ] URL is not persisted or logged.
 - [ ] Realtime and polling produce the same final state.
 - [ ] Expired/mismatched/failure errors are safe and actionable.
@@ -66,7 +65,7 @@ The frontend does not invent server processing progress. It may show indetermina
 ## Required tests
 
 - Initiate/upload/complete success.
-- Local progress and server processing states.
+- Local progress and server verification/final states.
 - WebSocket event and polling fallback.
 - URL redaction from logs/storage.
 - Expired/failure/429.

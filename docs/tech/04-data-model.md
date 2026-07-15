@@ -151,39 +151,25 @@ Constraints:
 
 ## Documents
 
-### UploadSession
-
-- UUID
-- organization FK
-- matter FK
-- requested_by membership FK
-- object_key
-- original_filename
-- expected_size
-- expected_content_type
-- expected_checksum optional
-- status: `initiated`, `verifying`, `processing`, `available`, `failed`, `expired`, `cancelled`
-- expires_at
-- completed_at
-- failure_code optional
-- idempotency key or completion record
-- timestamps
-
 ### Document
 
 - UUID
 - organization FK
 - matter FK
-- upload session one-to-one
 - object_key unique
 - original_filename
 - content_type
-- size
-- checksum optional
-- status: `processing`, `available`, `failed`, `revoked`
+- expected_size
+- actual_size optional
+- expected_checksum optional
+- actual_checksum optional
+- ETag optional
+- status: `pending_upload`, `verifying`, `available`, `failed`, `expired`, `cancelled`
 - description
 - uploaded_by membership FK
-- available_at
+- upload_expires_at optional
+- uploaded_at optional
+- failure_code optional
 - timestamps
 
 ## Audit and reliability

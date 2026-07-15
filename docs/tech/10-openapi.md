@@ -29,8 +29,8 @@ Use stable operation IDs such as:
 cases_list
 cases_create
 contracts_partial_update
-documents_uploads_create
-documents_uploads_complete
+documents_presign
+documents_complete
 offboarding_preview
 offboarding_execute
 ```

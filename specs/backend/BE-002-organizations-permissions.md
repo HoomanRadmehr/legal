@@ -85,4 +85,4 @@ A role matrix test suite with two organizations and at least Admin, Manager, Cou
 
 ## Related tasks
 
-- BE-008, BE-011, BE-012
+- BE-008, BE-011, BE-012, BE-042

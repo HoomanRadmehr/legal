@@ -22,7 +22,7 @@ compose.production.yaml
 - Dedicated non-root user.
 - Copy application with correct ownership.
 - Exec-form command.
-- ASGI server appropriate for Django Channels.
+- ASGI server appropriate for Django Channels, started as `daphne -b 0.0.0.0 -p 8000 config.asgi:application`.
 - One image reused by API, Celery worker, Celery Beat, migration, and management jobs.
 
 ## Frontend image

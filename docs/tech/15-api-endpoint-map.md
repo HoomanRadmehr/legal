@@ -11,8 +11,10 @@ This map is a navigation aid; domain specs and generated OpenAPI are authoritati
 | Auth | `POST auth/logout/` | Revoke/clear refresh | accounts |
 | Auth | `GET auth/me/` | Current user and membership | accounts |
 | Auth | `POST auth/ws-ticket/` | One-time WebSocket ticket | accounts |
+| Users | `GET users/choices/` | Permission-scoped form user choices | accounts |
 | Memberships | `GET memberships/` | Admin/member choices according to role | organizations |
 | Memberships | `PATCH memberships/{id}/` | Admin role/status update | organizations |
+| Matters | `GET matters/choices/` | Permission-scoped form matter choices | matters |
 | Matter access | `GET matters/{id}/access/` | List active grants | matters |
 | Matter access | `POST matters/{id}/grant-access/` | Grant view/edit | matters |
 | Matter access | `POST matters/{id}/revoke-access/` | Revoke grant | matters |
@@ -36,12 +38,10 @@ This map is a navigation aid; domain specs and generated OpenAPI are authoritati
 | Tasks | `GET/PATCH tasks/{id}/` | Detail/update | tasks |
 | Tasks | `POST tasks/{id}/complete/` | Complete | tasks |
 | Tasks | `POST tasks/{id}/cancel/` | Cancel | tasks |
-| Uploads | `POST documents/uploads/` | Initiate presigned upload | documents |
-| Uploads | `GET documents/uploads/{id}/` | Poll upload state | documents |
-| Uploads | `POST documents/uploads/{id}/complete/` | Verify/schedule processing | documents |
-| Uploads | `POST documents/uploads/{id}/cancel/` | Cancel pending upload | documents |
+| Documents | `POST documents/presign/` | Create pending document and presigned upload URL | documents |
 | Documents | `GET documents/` | Permission-scoped list | documents |
 | Documents | `GET documents/{id}/` | Metadata/status | documents |
+| Documents | `POST documents/{id}/complete/` | Verify uploaded object and mark available | documents |
 | Documents | `POST documents/{id}/download-url/` | Audited short-lived download | documents |
 | Documents | `POST documents/{id}/revoke/` | Revoke availability | documents |
 | Activity | `GET activity/` | Permission-scoped activity | activity |
@@ -62,7 +62,7 @@ This map is a navigation aid; domain specs and generated OpenAPI are authoritati
 - `Authorization: Bearer <access-token>` on protected REST endpoints.
 - `X-CSRFToken: <csrf-cookie-value>` on login, refresh, logout, and other cookie-changing endpoints.
 - `Accept-Language: en|fa` for localized messages.
-- `Idempotency-Key: <uuid>` on upload completion, offboarding execute, and other explicitly documented critical writes.
+- `Idempotency-Key: <uuid>` on document presign, offboarding execute, and other explicitly documented critical writes.
 - `X-Request-ID` may be supplied; the server returns the effective value.
 
 ## WebSocket

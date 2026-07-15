@@ -42,6 +42,10 @@ Generated index of atomic tasks. The task file remains authoritative.
 | backend | [BE-036](backend/BE-036-implement-admin-user-invitation-api.md) | Implement Admin user invitation API | DONE | BE-001, BE-002, BE-008, BE-012, BE-013 |
 | backend | [BE-037](backend/BE-037-implement-user-invitation-acceptance.md) | Implement user invitation acceptance | DONE | BE-001, BE-002, BE-008, BE-012, BE-013 |
 | backend | [BE-038](backend/BE-038-implement-membership-role-management.md) | Implement organization membership role management | DONE | BE-001, BE-002, BE-008, BE-012, BE-013 |
+| backend | [BE-039](backend/BE-039-replace-session-uploading-with-direct.md) | Replace session-based uploads with direct MinIO presigned uploads | DONE | BE-007, BE-009, BE-013 |
+| backend | [BE-040](backend/BE-040-separate-internal-and-public-minio-endpoints.md) | Separate internal and public MinIO endpoints | DONE | BE-007, BE-013 |
+| backend | [BE-041](backend/BE-041-repair-asgi-websocket-routing.md) | Repair ASGI WebSocket routing | DONE | BE-009, BE-013 |
+| backend | [BE-042](backend/BE-042-return-choices.md) | Implement permission-scoped choice endpoints | DONE | BE-002, BE-003, BE-004, BE-005, BE-006, BE-007, BE-013 |
 | frontend | [FE-001](frontend/FE-001-scaffold-react-typescript-application.md) | Scaffold React TypeScript application | TODO | FE-000 |
 | frontend | [FE-002](frontend/FE-002-implement-typed-api-client-and-error-contract.md) | Implement typed API client and error contract | TODO | FE-000 |
 | frontend | [FE-003](frontend/FE-003-create-app-providers-router-and-standard-states.md) | Create app providers, router, and standard states | TODO | FE-000 |

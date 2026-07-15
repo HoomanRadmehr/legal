@@ -4,6 +4,8 @@
 
 Django Channels serves one JSON WebSocket endpoint through ASGI.
 Redis provides the channel layer and one-time ticket store.
+Development and production API containers must start `config.asgi:application`,
+not the WSGI development server, so `/ws/v1/events/` reaches the Channels router.
 
 ## Authentication flow
 

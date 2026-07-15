@@ -26,7 +26,7 @@ Integration checkpoints: INT-002, INT-003
 
 ## Phase 3 - documents, realtime, notifications
 
-Backend: BE-020 -> BE-021 -> BE-022 -> BE-023 -> BE-024 -> BE-035
+Backend: BE-020 -> BE-021 -> BE-022 -> BE-023 -> BE-024 -> BE-035 -> BE-039 -> BE-040 -> BE-041 -> BE-042
 
 Frontend: FE-012 -> FE-013 -> FE-015
 

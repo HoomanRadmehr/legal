@@ -56,11 +56,15 @@ components:
                 const: document.upload.status_changed
               data:
                 type: object
-                required: [upload_id, status]
+                required: [document_id, status]
                 properties:
+                  document_id:
+                    type: string
+                    format: uuid
                   upload_id:
                     type: string
                     format: uuid
+                    description: Compatibility alias for document_id.
                   status:
                     type: string
                   progress:

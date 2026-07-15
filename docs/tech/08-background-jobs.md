@@ -4,9 +4,8 @@
 
 - Dispatch outbox events.
 - Deliver notification channels.
-- Verify/process completed uploads.
 - Scan deadline reminder windows.
-- Expire abandoned upload sessions.
+- Expire abandoned pending document uploads.
 - Retry transient provider failures.
 
 ## Task rules

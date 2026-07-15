@@ -1,6 +1,6 @@
 # BE-039: Replace session-based uploads with direct MinIO presigned uploads
 
-Status: TODO
+Status: DONE
 Priority: P0
 Area: Backend
 Related specs: BE-002, BE-007, BE-008, BE-009, BE-010, BE-013
@@ -670,39 +670,39 @@ Do not refactor unrelated domains.
 
 ## Acceptance criteria
 
-* [ ] Backend never receives document file bytes.
-* [ ] No multipart document-upload endpoint exists.
-* [ ] Frontend receives a short-lived presigned upload response.
-* [ ] Object key is generated only by the backend.
-* [ ] Bucket remains private.
-* [ ] Upload permission is checked before presign generation.
-* [ ] Upload permission is checked again during completion.
-* [ ] Cross-organization matter is not visible.
-* [ ] Client cannot choose organization, bucket, object key, status, or uploader.
-* [ ] Document is created with `pending_upload`.
-* [ ] No separate UploadSession model is used.
-* [ ] Presign supports idempotency.
-* [ ] Complete supports safe replay.
-* [ ] Backend verifies object existence using MinIO HEAD/stat.
-* [ ] Backend verifies expected size.
-* [ ] Backend verifies permitted content type.
-* [ ] Backend verifies checksum when configured.
-* [ ] Mismatched objects never become available.
-* [ ] Expired uploads cannot be completed.
-* [ ] Losing permission prevents completion.
-* [ ] Available Documents can be downloaded only through permission-scoped presigned GET URLs.
-* [ ] Invalid objects are cleaned up safely.
-* [ ] Expired pending uploads are cleaned up.
-* [ ] Browser upload percentage is not fabricated by backend events.
-* [ ] Backend publishes verifying, available, failed, and expired statuses.
-* [ ] Presigned URLs are absent from logs, activity and outbox payloads.
-* [ ] MinIO credentials never reach the frontend.
-* [ ] Production CORS does not use wildcard origins.
-* [ ] Rate limits use Redis and return `Retry-After`.
-* [ ] OpenAPI schema validates.
-* [ ] Every class has exactly one direct base.
-* [ ] Services and selectors are plain functions.
-* [ ] No service class, repository, storage strategy, polymorphism, multiple inheritance or business signal is introduced.
+* [x] Backend never receives document file bytes.
+* [x] No multipart document-upload endpoint exists.
+* [x] Frontend receives a short-lived presigned upload response.
+* [x] Object key is generated only by the backend.
+* [x] Bucket remains private.
+* [x] Upload permission is checked before presign generation.
+* [x] Upload permission is checked again during completion.
+* [x] Cross-organization matter is not visible.
+* [x] Client cannot choose organization, bucket, object key, status, or uploader.
+* [x] Document is created with `pending_upload`.
+* [x] No separate UploadSession model is used.
+* [x] Presign supports idempotency.
+* [x] Complete supports safe replay.
+* [x] Backend verifies object existence using MinIO HEAD/stat.
+* [x] Backend verifies expected size.
+* [x] Backend verifies permitted content type.
+* [x] Backend verifies checksum when configured.
+* [x] Mismatched objects never become available.
+* [x] Expired uploads cannot be completed.
+* [x] Losing permission prevents completion.
+* [x] Available Documents can be downloaded only through permission-scoped presigned GET URLs.
+* [x] Invalid objects are cleaned up safely.
+* [x] Expired pending uploads are cleaned up.
+* [x] Browser upload percentage is not fabricated by backend events.
+* [x] Backend publishes verifying, available, failed, and expired statuses.
+* [x] Presigned URLs are absent from logs, activity and outbox payloads.
+* [x] MinIO credentials never reach the frontend.
+* [x] Production CORS does not use wildcard origins.
+* [x] Rate limits use Redis and return `Retry-After`.
+* [x] OpenAPI schema validates.
+* [x] Every class has exactly one direct base.
+* [x] Services and selectors are plain functions.
+* [x] No service class, repository, storage strategy, polymorphism, multiple inheritance or business signal is introduced.
 
 ## Required tests
 
@@ -783,9 +783,71 @@ python3 scripts/validate_docs.py
 
 ## Codex execution log
 
-* Started:
-* Completed:
+* Started: 2026-07-15 19:05 +0330
+* Completed: 2026-07-15 20:16 +0330
 * Files changed:
+  * `backend/apps/documents/models.py`
+  * `backend/apps/documents/migrations/0004_direct_document_uploads.py`
+  * `backend/apps/documents/services.py`
+  * `backend/apps/documents/selectors.py`
+  * `backend/apps/documents/tasks.py`
+  * `backend/apps/documents/api/v1/openapi.py`
+  * `backend/apps/documents/api/v1/serializers.py`
+  * `backend/apps/documents/api/v1/urls.py`
+  * `backend/apps/documents/api/v1/viewsets.py`
+  * `backend/apps/documents/tests/factories.py`
+  * `backend/apps/documents/tests/test_document_services.py`
+  * `backend/apps/documents/tests/test_upload_api.py`
+  * `backend/apps/documents/tests/test_upload_services.py`
+  * `backend/apps/organizations/fixtures/sample_data.json`
+  * `backend/apps/organizations/management/commands/_seed_demo_data.py`
+  * `backend/apps/organizations/management/commands/load_sample_fixture.py`
+  * `backend/common/api/throttles.py`
+  * `backend/common/realtime/publisher.py`
+  * `backend/common/realtime/tests/test_user_events.py`
+  * `backend/common/services/outbox.py`
+  * `backend/tests/integration/test_documents.py`
+  * `backend/tests/security/test_backend_security_suite.py`
+  * `backend/tests/test_openapi.py`
+  * `backend/tests/test_sample_fixture.py`
+  * `backend/tests/test_seed.py`
+  * `docs/decisions/ADR-005-presigned-upload-realtime.md`
+  * `docs/business/04-core-workflows.md`
+  * `docs/guardrails/03-data-tenancy-and-transactions.md`
+  * `docs/guardrails/06-realtime-and-upload.md`
+  * `docs/tech/04-data-model.md`
+  * `docs/tech/06-minio-upload.md`
+  * `docs/tech/08-background-jobs.md`
+  * `docs/tech/10-openapi.md`
+  * `docs/tech/15-api-endpoint-map.md`
+  * `docs/tech/asyncapi.yaml`
+  * `specs/backend/BE-007-documents-uploads.md`
+  * `specs/frontend/FE-007-documents-upload.md`
+  * `tasks/integration/INT-004-verify-document-upload-and-realtime-recovery.md`
 * Commands run:
-* Result:
+  * `cd backend && python manage.py makemigrations --check --dry-run` - failed before Django startup because pyenv `3.12` is not installed.
+  * `cd backend && UV_PROJECT_ENVIRONMENT=/tmp/legal-be039-venv uv run --python /usr/bin/python3.12 python manage.py makemigrations --check --dry-run` - passed with no changes detected; emitted a local PostgreSQL auth warning while checking migration history.
+  * `cd backend && python manage.py check` - failed before Django startup because pyenv `3.12` is not installed.
+  * `cd backend && UV_PROJECT_ENVIRONMENT=/tmp/legal-be039-venv uv run --python /usr/bin/python3.12 python manage.py check` - passed.
+  * `cd backend && python -m pytest apps/documents/tests -q` - failed before pytest startup because pyenv `3.12` is not installed.
+  * `cd backend && UV_PROJECT_ENVIRONMENT=/tmp/legal-be039-venv uv run --python /usr/bin/python3.12 python -m pytest apps/documents/tests -q` - passed, 25 tests.
+  * `cd backend && python manage.py spectacular --file /tmp/openapi.yaml --validate` - failed before Django startup because pyenv `3.12` is not installed.
+  * `cd backend && UV_PROJECT_ENVIRONMENT=/tmp/legal-be039-venv uv run --python /usr/bin/python3.12 python manage.py spectacular --file /tmp/openapi.yaml --validate` - passed with 0 errors and two existing status enum naming warnings.
+  * `docker compose run --rm api-test python -m pytest tests/integration/test_documents.py -q` - initially failed because the stale `api-test` image still contained the previous placeholder integration test.
+  * `docker compose build api-test` - passed to refresh the test image with current source.
+  * `docker compose run --rm api-test python -m pytest tests/integration/test_documents.py -q` - passed, 3 tests.
+  * `python3 scripts/check_simplicity.py backend` - initially failed on one oversized security test after updating presign headers; passed after splitting a small helper, scanning 278 source files.
+  * `python3 scripts/validate_docs.py` - passed, 27 specs, 72 tasks, 182 Markdown files.
+  * `cd backend && UV_PROJECT_ENVIRONMENT=/tmp/legal-be039-venv uv run --python /usr/bin/python3.12 python -m pytest apps/documents/tests tests/integration/test_documents.py tests/test_openapi.py tests/security/test_backend_security_suite.py -q` - passed, 41 tests.
+  * `cd backend && UV_PROJECT_ENVIRONMENT=/tmp/legal-be039-venv uv run --python /usr/bin/python3.12 python -m pytest apps/documents/tests tests/integration/test_documents.py tests/test_openapi.py tests/security/test_backend_security_suite.py common/realtime/tests/test_user_events.py -q` - passed, 48 tests after adding the `document_id` realtime alias.
+  * `cd backend && UV_PROJECT_ENVIRONMENT=/tmp/legal-be039-venv uv run --python /usr/bin/python3.12 python -m pytest tests/test_seed.py tests/test_sample_fixture.py -q` - passed, 5 tests.
+  * `cd backend && UV_PROJECT_ENVIRONMENT=/tmp/legal-be039-venv uv run --python /usr/bin/python3.12 --group dev ruff check apps/documents tests/integration/test_documents.py tests/test_openapi.py tests/security/test_backend_security_suite.py` - passed.
+  * `cd backend && UV_PROJECT_ENVIRONMENT=/tmp/legal-be039-venv uv run --python /usr/bin/python3.12 --group dev ruff format --check apps/documents tests/integration/test_documents.py tests/test_openapi.py tests/security/test_backend_security_suite.py` - passed.
+  * `docker compose build api-test && docker compose run --rm api-test python -m pytest tests/integration/test_documents.py -q` - passed on the final source, 3 tests.
+  * `cd backend && UV_PROJECT_ENVIRONMENT=/tmp/legal-be039-venv uv run --python /usr/bin/python3.12 --group dev ruff check common/realtime apps/documents tests/integration/test_documents.py tests/test_openapi.py tests/security/test_backend_security_suite.py` - passed.
+* Result: DONE. Document uploads now use a pending `Document` as the upload intent, presign returns short-lived direct MinIO upload instructions, completion verifies the backend-owned object key through MinIO stat before marking the document available, and the old runtime `UploadSession` API/model usage is removed from current application code.
 * Deviations/questions:
+  * Kept `POST /api/v1/documents/{id}/download-url/` rather than the task text's `GET` wording because issuing a download URL writes an audit record and the existing approved spec already uses `POST`.
+  * Historical migrations still contain the prior `UploadSession` model so existing databases can migrate forward to `0004_direct_document_uploads`; no current application model, serializer, view, selector, service, factory, or route uses it.
+  * The first `api-test` verification used a stale image and failed on the old placeholder test; rebuilding `api-test` corrected the environment and the required command passed.
+  * An unrelated untracked `tasks/frontend/FE-026-implement-direct-minio-uploading.md` was present in the worktree and was not modified.

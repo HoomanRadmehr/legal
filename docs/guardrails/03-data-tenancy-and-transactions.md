@@ -2,7 +2,7 @@
 
 ## Source of truth
 
-PostgreSQL is the source of truth for users, memberships, matters, permissions, deadlines, tasks, documents, activity, notification state, upload sessions, idempotency, and outbox events.
+PostgreSQL is the source of truth for users, memberships, matters, permissions, deadlines, tasks, documents, activity, notification state, pending document uploads, idempotency, and outbox events.
 Redis, RabbitMQ, WebSocket connections, and MinIO presigned URLs are derived or transient infrastructure.
 
 ## Organization scoping
@@ -52,5 +52,5 @@ Write an outbox event and process it after commit.
 
 - Core legal records are archived, closed, cancelled, or revoked instead of hard-deleted.
 - Activity logs and outbox delivery evidence are not editable through normal APIs.
-- Temporary upload sessions may be marked expired and cleaned by a scheduled task.
+- Temporary pending document uploads may be marked expired and cleaned by a scheduled task.
 - Physical object retention and legal holds are future production policies; the MVP must not pretend to implement them.

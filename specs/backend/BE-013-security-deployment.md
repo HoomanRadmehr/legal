@@ -69,4 +69,4 @@ Backend README includes:
 
 ## Related tasks
 
-- BE-005, BE-006, BE-030, BE-031, BE-032, BE-033, BE-034
+- BE-005, BE-006, BE-030, BE-031, BE-032, BE-033, BE-034, BE-042

@@ -33,14 +33,14 @@
 
 ## WF-005: Direct document upload
 
-1. The client requests an upload session for a permitted matter.
+1. The client requests a presigned upload for a permitted matter.
 2. The backend checks authorization, file policy, quota, and rate limit.
-3. The backend creates an upload session and short-lived presigned upload instructions.
+3. The backend creates a pending `Document` and short-lived presigned upload instructions.
 4. The browser uploads directly to MinIO and reports local progress.
 5. The client calls the completion endpoint.
-6. The backend verifies the object from MinIO; a worker performs post-upload checks.
-7. The browser reports byte progress locally; backend verification/processing/final status events are sent through the user WebSocket channel.
-8. The client can poll the upload session if the socket is unavailable.
+6. The backend verifies the object from MinIO before marking the document available.
+7. The browser reports byte progress locally; backend verification/final status events are sent through the user WebSocket channel.
+8. The client can poll document metadata if the socket is unavailable.
 9. The final `Document` becomes downloadable only in `available` status.
 
 ## WF-006: Download a document
