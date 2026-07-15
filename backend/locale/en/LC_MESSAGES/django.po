@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: legal-backend 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-15 16:35+0330\n"
+"POT-Creation-Date: 2026-07-15 14:50+0000\n"
 "PO-Revision-Date: 2026-07-15 16:35+0330\n"
 "Last-Translator: Codex <codex@example.test>\n"
 "Language-Team: English <en@example.test>\n"
@@ -12,50 +12,1371 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-msgid "Authentication credentials were not provided."
-msgstr "Authentication credentials were not provided."
+#: apps/accounts/admin.py:30
+msgid "Personal information"
+msgstr "Personal information"
 
-msgid "Invalid request."
-msgstr "Invalid request."
+#: apps/accounts/admin.py:34
+msgid "Permissions"
+msgstr "Permissions"
 
-msgid "Too many requests. Try again later."
-msgstr "Too many requests. Try again later."
+#: apps/accounts/admin.py:37
+msgid "Important dates"
+msgstr "Important dates"
 
-msgid "Request failed."
-msgstr "Request failed."
+#: apps/accounts/api/v1/serializers.py:26
+msgid "Password confirmation does not match."
+msgstr "Password confirmation does not match."
 
-msgid "You do not have permission to perform this action."
-msgstr "You do not have permission to perform this action."
+#: apps/accounts/api/v1/views.py:125 apps/accounts/api/v1/views.py:141
+#: apps/accounts/services.py:109 apps/accounts/services.py:110
+msgid "Unable to authenticate with the provided credentials."
+msgstr "Unable to authenticate with the provided credentials."
 
-msgid "Not found."
-msgstr "Not found."
+#: apps/accounts/api/v1/views.py:161
+msgid "CSRF verification failed."
+msgstr "CSRF verification failed."
 
-msgid "Open"
-msgstr "Open"
+#: apps/accounts/apps.py:13
+msgid "Accounts"
+msgstr "Accounts"
 
+#: apps/accounts/models.py:14 apps/organizations/models.py:18
+#: config/settings/base.py:110
+msgid "English"
+msgstr "English"
+
+#: apps/accounts/models.py:15 apps/organizations/models.py:19
+#: config/settings/base.py:111
+msgid "Persian"
+msgstr "Persian"
+
+#: apps/accounts/models.py:20
+msgid "ID"
+msgstr "ID"
+
+#: apps/accounts/models.py:22
+msgid "preferred language"
+msgstr "preferred language"
+
+#: apps/accounts/models.py:27 common/models.py:14
+msgid "updated at"
+msgstr "updated at"
+
+#: apps/accounts/models.py:30 apps/organizations/models.py:97
+#: apps/organizations/models.py:141
+msgid "user"
+msgstr "user"
+
+#: apps/accounts/models.py:31
+msgid "users"
+msgstr "users"
+
+#: apps/accounts/services.py:111
+msgid "Refresh token is invalid or expired."
+msgstr "Refresh token is invalid or expired."
+
+#: apps/accounts/services.py:112
+msgid "Refresh token is required."
+msgstr "Refresh token is required."
+
+#: apps/activity/apps.py:13
+#| msgid "Active"
+msgid "Activity"
+msgstr "Active"
+
+#: apps/activity/models.py:33
+msgid "Case created"
+msgstr "Case created"
+
+#: apps/activity/models.py:34
+msgid "Case updated"
+msgstr "Case updated"
+
+#: apps/activity/models.py:35
+msgid "Matter archived"
+msgstr "Matter archived"
+
+#: apps/activity/models.py:36
+msgid "Matter owner changed"
+msgstr "Matter owner changed"
+
+#: apps/activity/models.py:37
+msgid "Matter access granted"
+msgstr "Matter access granted"
+
+#: apps/activity/models.py:38
+msgid "Matter access revoked"
+msgstr "Matter access revoked"
+
+#: apps/activity/models.py:39
+msgid "Contract created"
+msgstr "Contract created"
+
+#: apps/activity/models.py:40
+msgid "Contract updated"
+msgstr "Contract updated"
+
+#: apps/activity/models.py:41
+msgid "Notice created"
+msgstr "Notice created"
+
+#: apps/activity/models.py:42
+msgid "Notice response deadline changed"
+msgstr "Notice response deadline changed"
+
+#: apps/activity/models.py:43
+msgid "Deadline created"
+msgstr "Deadline created"
+
+#: apps/activity/models.py:44
+msgid "Deadline completed"
+msgstr "Deadline completed"
+
+#: apps/activity/models.py:45
+msgid "Task created"
+msgstr "Task created"
+
+#: apps/activity/models.py:46
+#| msgid "Completed"
+msgid "Task completed"
+msgstr "Completed"
+
+#: apps/activity/models.py:47
+msgid "Document upload initiated"
+msgstr "Document upload initiated"
+
+#: apps/activity/models.py:48
+msgid "Document upload completed"
+msgstr "Document upload completed"
+
+#: apps/activity/models.py:49
+msgid "Document available"
+msgstr "Document available"
+
+#: apps/activity/models.py:50
+msgid "Document download requested"
+msgstr "Document download requested"
+
+#: apps/activity/models.py:51
+#| msgid "Offboarded"
+msgid "Offboarding executed"
+msgstr "Offboarded"
+
+#: apps/activity/models.py:57
+msgid "Started"
+msgstr "Started"
+
+#: apps/activity/models.py:58 apps/deadlines/models.py:17
+#: apps/offboarding/models.py:11
 msgid "Completed"
 msgstr "Completed"
 
+#: apps/activity/models.py:67 apps/activity/models.py:127
+#: apps/activity/models.py:158 apps/cases/models.py:67
+#: apps/deadlines/models.py:38 apps/documents/models.py:51
+#: apps/documents/models.py:121 apps/matters/models.py:83
+#: apps/matters/models.py:178 apps/matters/models.py:243
+#: apps/notifications/models.py:76 apps/notifications/models.py:117
+#: apps/offboarding/models.py:19 apps/organizations/models.py:79
+#: apps/organizations/models.py:91 apps/organizations/models.py:135
+#: apps/tasks/models.py:30
+msgid "organization"
+msgstr "organization"
+
+#: apps/activity/models.py:75 apps/cases/models.py:42
+#: apps/contracts/models.py:30 apps/deadlines/models.py:44
+#: apps/documents/models.py:57 apps/documents/models.py:127
+#: apps/matters/models.py:149 apps/matters/models.py:184
+#: apps/notices/models.py:24 apps/tasks/models.py:36
+msgid "matter"
+msgstr "matter"
+
+#: apps/activity/models.py:83 apps/activity/models.py:164
+msgid "actor membership"
+msgstr "actor membership"
+
+#: apps/activity/models.py:91
+msgid "actor user"
+msgstr "actor user"
+
+#: apps/activity/models.py:93
+msgid "action"
+msgstr "action"
+
+#: apps/activity/models.py:94
+msgid "target type"
+msgstr "target type"
+
+#: apps/activity/models.py:95
+msgid "target id"
+msgstr "target id"
+
+#: apps/activity/models.py:96
+msgid "before values"
+msgstr "before values"
+
+#: apps/activity/models.py:97
+msgid "after values"
+msgstr "after values"
+
+#: apps/activity/models.py:98
+msgid "metadata"
+msgstr "metadata"
+
+#: apps/activity/models.py:99
+#| msgid "Request failed."
+msgid "request id"
+msgstr "Request failed."
+
+#: apps/activity/models.py:108
+msgid "activity log"
+msgstr "activity log"
+
+#: apps/activity/models.py:109
+msgid "activity logs"
+msgstr "activity logs"
+
+#: apps/activity/models.py:113
+msgid "Activity logs are append-only."
+msgstr "Activity logs are append-only."
+
+#: apps/activity/models.py:129 apps/notifications/models.py:45
+#: apps/notifications/models.py:84
+msgid "event type"
+msgstr "event type"
+
+#: apps/activity/models.py:130
+msgid "event version"
+msgstr "event version"
+
+#: apps/activity/models.py:131
+msgid "aggregate type"
+msgstr "aggregate type"
+
+#: apps/activity/models.py:132
+msgid "aggregate id"
+msgstr "aggregate id"
+
+#: apps/activity/models.py:133
+msgid "payload"
+msgstr "payload"
+
+#: apps/activity/models.py:134 apps/documents/models.py:153
+msgid "available at"
+msgstr "available at"
+
+#: apps/activity/models.py:135
+msgid "published at"
+msgstr "published at"
+
+#: apps/activity/models.py:136 apps/notifications/models.py:135
+msgid "attempt count"
+msgstr "attempt count"
+
+#: apps/activity/models.py:137
+msgid "last error code"
+msgstr "last error code"
+
+#: apps/activity/models.py:146
+msgid "outbox event"
+msgstr "outbox event"
+
+#: apps/activity/models.py:147
+msgid "outbox events"
+msgstr "outbox events"
+
+#: apps/activity/models.py:166
+msgid "scope"
+msgstr "scope"
+
+#: apps/activity/models.py:167
+msgid "key hash"
+msgstr "key hash"
+
+#: apps/activity/models.py:168
+msgid "request hash"
+msgstr "request hash"
+
+#: apps/activity/models.py:170 apps/deadlines/models.py:56
+#: apps/documents/models.py:72 apps/documents/models.py:141
+#: apps/matters/models.py:88 apps/notifications/models.py:127
+#: apps/offboarding/models.py:46 apps/organizations/models.py:101
+#: apps/organizations/models.py:157 apps/tasks/models.py:48
+msgid "status"
+msgstr "status"
+
+#: apps/activity/models.py:176 apps/notices/models.py:30
+msgid "response status"
+msgstr "response status"
+
+#: apps/activity/models.py:180
+msgid "response body"
+msgstr "response body"
+
+#: apps/activity/models.py:181 apps/documents/models.py:77
+#: apps/organizations/models.py:162
+msgid "expires at"
+msgstr "expires at"
+
+#: apps/activity/models.py:182 apps/deadlines/models.py:68
+#: apps/documents/models.py:78 apps/tasks/models.py:53
+#| msgid "Completed"
+msgid "completed at"
+msgstr "Completed"
+
+#: apps/activity/models.py:199 apps/offboarding/models.py:43
+msgid "idempotency record"
+msgstr "idempotency record"
+
+#: apps/activity/models.py:200
+msgid "idempotency records"
+msgstr "idempotency records"
+
+#: apps/activity/models.py:205
+msgid "Actor membership must belong to the organization."
+msgstr "Actor membership must belong to the organization."
+
+#: apps/cases/apps.py:13
+msgid "Cases"
+msgstr "Cases"
+
+#: apps/cases/models.py:16
+msgid "Litigation"
+msgstr "Litigation"
+
+#: apps/cases/models.py:17
+msgid "Regulatory"
+msgstr "Regulatory"
+
+#: apps/cases/models.py:18
+msgid "Internal"
+msgstr "Internal"
+
+#: apps/cases/models.py:19 apps/cases/models.py:32 apps/contracts/models.py:18
+msgid "Other"
+msgstr "Other"
+
+#: apps/cases/models.py:28
+msgid "Client"
+msgstr "Client"
+
+#: apps/cases/models.py:29
+msgid "Opposing party"
+msgstr "Opposing party"
+
+#: apps/cases/models.py:30
+msgid "Court or authority"
+msgstr "Court or authority"
+
+#: apps/cases/models.py:31
+msgid "Witness"
+msgstr "Witness"
+
+#: apps/cases/models.py:44
+msgid "case type"
+msgstr "case type"
+
+#: apps/cases/models.py:45
+msgid "court or authority"
+msgstr "court or authority"
+
+#: apps/cases/models.py:46
+msgid "filing date"
+msgstr "filing date"
+
+#: apps/cases/models.py:47
+msgid "outcome summary"
+msgstr "outcome summary"
+
+#: apps/cases/models.py:55
+#| msgid "Legal counsel"
+msgid "legal case"
+msgstr "Legal counsel"
+
+#: apps/cases/models.py:56
+#| msgid "Legal counsel"
+msgid "legal cases"
+msgstr "Legal counsel"
+
+#: apps/cases/models.py:73
+msgid "case"
+msgstr "case"
+
+#: apps/cases/models.py:75 apps/organizations/models.py:62
+msgid "name"
+msgstr "name"
+
+#: apps/cases/models.py:76 apps/organizations/models.py:99
+msgid "role"
+msgstr "role"
+
+#: apps/cases/models.py:77
+msgid "contact summary"
+msgstr "contact summary"
+
+#: apps/cases/models.py:85
+msgid "case party"
+msgstr "case party"
+
+#: apps/cases/models.py:86
+msgid "case parties"
+msgstr "case parties"
+
+#: apps/cases/models.py:90
+msgid "Party must match the case organization."
+msgstr "Party must match the case organization."
+
+#: apps/cases/services.py:111 apps/contracts/services.py:124
+#: apps/deadlines/services.py:193 apps/documents/services.py:225
+#: apps/notices/services.py:157 apps/notifications/services.py:185
+#: apps/organizations/services.py:85 apps/tasks/services.py:114
+msgid "An active organization membership is required."
+msgstr "An active organization membership is required."
+
+#: apps/cases/services.py:119
+#| msgid "You do not have permission to perform this action."
+msgid "You do not have permission to create cases."
+msgstr "You do not have permission to perform this action."
+
+#: apps/cases/services.py:126 apps/contracts/services.py:139
+#: apps/notices/services.py:172
+msgid "Only administrators or managers may assign another owner."
+msgstr "Only administrators or managers may assign another owner."
+
+#: apps/cases/services.py:131 apps/contracts/services.py:144
+#: apps/notices/services.py:177
+msgid "Owner must be active in the organization."
+msgstr "Owner must be active in the organization."
+
+#: apps/cases/services.py:149 apps/contracts/services.py:162
+#: apps/notices/services.py:218
+msgid "Reference code already exists."
+msgstr "Reference code already exists."
+
+#: apps/cases/services.py:169
+msgid "Case parties require a name and role."
+msgstr "Case parties require a name and role."
+
+#: apps/contracts/apps.py:13
+msgid "Contracts"
+msgstr "Contracts"
+
+#: apps/contracts/models.py:14
+msgid "Service"
+msgstr "Service"
+
+#: apps/contracts/models.py:15
+msgid "Vendor"
+msgstr "Vendor"
+
+#: apps/contracts/models.py:16
+msgid "Employment"
+msgstr "Employment"
+
+#: apps/contracts/models.py:17
+msgid "NDA"
+msgstr "NDA"
+
+#: apps/contracts/models.py:33
+msgid "contract type"
+msgstr "contract type"
+
+#: apps/contracts/models.py:37
+msgid "counterparty"
+msgstr "counterparty"
+
+#: apps/contracts/models.py:38
+msgid "effective date"
+msgstr "effective date"
+
+#: apps/contracts/models.py:39
+msgid "expiration date"
+msgstr "expiration date"
+
+#: apps/contracts/models.py:40
+msgid "renewal date"
+msgstr "renewal date"
+
+#: apps/contracts/models.py:41
+msgid "key terms"
+msgstr "key terms"
+
+#: apps/contracts/models.py:52
+msgid "contract"
+msgstr "contract"
+
+#: apps/contracts/models.py:53
+msgid "contracts"
+msgstr "contracts"
+
+#: apps/contracts/services.py:43
+msgid "Contract date order is invalid."
+msgstr "Contract date order is invalid."
+
+#: apps/contracts/services.py:132
+#| msgid "You do not have permission to perform this action."
+msgid "You do not have permission to create contracts."
+msgstr "You do not have permission to perform this action."
+
+#: apps/contracts/services.py:189
+msgid "Expiration date cannot precede effective date."
+msgstr "Expiration date cannot precede effective date."
+
+#: apps/contracts/services.py:191
+msgid "Renewal date cannot precede effective date."
+msgstr "Renewal date cannot precede effective date."
+
+#: apps/contracts/services.py:193
+msgid "Renewal date cannot be after expiration date."
+msgstr "Renewal date cannot be after expiration date."
+
+#: apps/contracts/services.py:199
+msgid "Key terms must be a JSON object."
+msgstr "Key terms must be a JSON object."
+
+#: apps/contracts/services.py:203
+msgid "Key terms are too large."
+msgstr "Key terms are too large."
+
+#: apps/deadlines/models.py:16 apps/matters/models.py:35
+msgid "Open"
+msgstr "Open"
+
+#: apps/deadlines/models.py:18 apps/documents/models.py:26
+#: apps/notices/models.py:14 apps/tasks/models.py:20
 msgid "Cancelled"
 msgstr "Cancelled"
 
-msgid "Legal admin"
-msgstr "Legal admin"
+#: apps/deadlines/models.py:26 apps/matters/models.py:55
+msgid "Low"
+msgstr "Low"
 
-msgid "Legal manager"
-msgstr "Legal manager"
+#: apps/deadlines/models.py:27 apps/matters/models.py:56
+msgid "Normal"
+msgstr "Normal"
 
-msgid "Legal counsel"
-msgstr "Legal counsel"
+#: apps/deadlines/models.py:28 apps/matters/models.py:57
+msgid "High"
+msgstr "High"
 
-msgid "Viewer"
-msgstr "Viewer"
+#: apps/deadlines/models.py:29 apps/matters/models.py:58
+msgid "Critical"
+msgstr "Critical"
 
+#: apps/deadlines/models.py:46 apps/matters/models.py:86
+#: apps/notifications/models.py:85 apps/tasks/models.py:38
+msgid "title"
+msgstr "title"
+
+#: apps/deadlines/models.py:47 apps/documents/models.py:70
+#: apps/documents/models.py:146 apps/matters/models.py:96
+#: apps/tasks/models.py:39
+msgid "description"
+msgstr "description"
+
+#: apps/deadlines/models.py:48 apps/tasks/models.py:46
+msgid "due at"
+msgstr "due at"
+
+#: apps/deadlines/models.py:53 apps/tasks/models.py:44
+msgid "assignee"
+msgstr "assignee"
+
+#: apps/deadlines/models.py:62 apps/matters/models.py:89
+msgid "priority"
+msgstr "priority"
+
+#: apps/deadlines/models.py:67
+msgid "reminder enabled"
+msgstr "reminder enabled"
+
+#: apps/deadlines/models.py:75 apps/tasks/models.py:60
+#| msgid "Completed"
+msgid "completed by"
+msgstr "Completed"
+
+#: apps/deadlines/models.py:77 apps/tasks/models.py:62
+#| msgid "Cancelled"
+msgid "cancelled at"
+msgstr "Cancelled"
+
+#: apps/deadlines/models.py:84 apps/tasks/models.py:69
+#| msgid "Cancelled"
+msgid "cancelled by"
+msgstr "Cancelled"
+
+#: apps/deadlines/models.py:86 apps/matters/models.py:99
+#: apps/tasks/models.py:71
+msgid "version"
+msgstr "version"
+
+#: apps/deadlines/models.py:109
+msgid "deadline"
+msgstr "deadline"
+
+#: apps/deadlines/models.py:110
+msgid "deadlines"
+msgstr "deadlines"
+
+#: apps/deadlines/models.py:129 apps/documents/models.py:108
+#: apps/documents/models.py:191 apps/tasks/models.py:114
+msgid "Matter must belong to the organization."
+msgstr "Matter must belong to the organization."
+
+#: apps/deadlines/models.py:139 apps/organizations/models.py:196
+#: apps/tasks/models.py:124
+msgid "Membership must belong to the organization."
+msgstr "Membership must belong to the organization."
+
+#: apps/deadlines/services.py:181
+#, python-format
+msgid "Deadline reminder: %(title)s"
+msgstr "Deadline reminder: %(title)s"
+
+#: apps/deadlines/services.py:186
+#, python-format
+msgid "A deadline is due in %(days)s day(s)."
+msgstr "A deadline is due in %(days)s day(s)."
+
+#: apps/deadlines/services.py:187
+#, python-format
+msgid "A deadline is due in %(minutes)s minute(s)."
+msgstr "A deadline is due in %(minutes)s minute(s)."
+
+#: apps/deadlines/services.py:211 apps/tasks/services.py:132
+msgid "Only administrators or managers may assign another member."
+msgstr "Only administrators or managers may assign another member."
+
+#: apps/deadlines/services.py:218 apps/tasks/services.py:139
+msgid "Assignee must be active in the organization."
+msgstr "Assignee must be active in the organization."
+
+#: apps/deadlines/services.py:248
+msgid "Finalized deadlines cannot be updated."
+msgstr "Finalized deadlines cannot be updated."
+
+#: apps/deadlines/services.py:255
+msgid "Cancelled deadlines cannot be completed."
+msgstr "Cancelled deadlines cannot be completed."
+
+#: apps/deadlines/services.py:262
+msgid "Completed deadlines cannot be cancelled."
+msgstr "Completed deadlines cannot be cancelled."
+
+#: apps/documents/models.py:20
+msgid "Initiated"
+msgstr "Initiated"
+
+#: apps/documents/models.py:21
+msgid "Verifying"
+msgstr "Verifying"
+
+#: apps/documents/models.py:22 apps/documents/models.py:39
+msgid "Processing"
+msgstr "Processing"
+
+#: apps/documents/models.py:23 apps/documents/models.py:40
+msgid "Available"
+msgstr "Available"
+
+#: apps/documents/models.py:24 apps/documents/models.py:41
+#: apps/notifications/models.py:29
+msgid "Failed"
+msgstr "Failed"
+
+#: apps/documents/models.py:25 apps/matters/models.py:42
+#: apps/organizations/models.py:49
+msgid "Expired"
+msgstr "Expired"
+
+#: apps/documents/models.py:42 apps/organizations/models.py:50
+msgid "Revoked"
+msgstr "Revoked"
+
+#: apps/documents/models.py:63
+msgid "requested by"
+msgstr "requested by"
+
+#: apps/documents/models.py:65 apps/documents/models.py:135
+msgid "object key"
+msgstr "object key"
+
+#: apps/documents/models.py:66 apps/documents/models.py:136
+msgid "original filename"
+msgstr "original filename"
+
+#: apps/documents/models.py:67
+msgid "expected size"
+msgstr "expected size"
+
+#: apps/documents/models.py:68
+msgid "expected content type"
+msgstr "expected content type"
+
+#: apps/documents/models.py:69
+msgid "expected checksum"
+msgstr "expected checksum"
+
+#: apps/documents/models.py:79 apps/offboarding/models.py:53
+msgid "failure code"
+msgstr "failure code"
+
+#: apps/documents/models.py:103 apps/documents/models.py:133
+msgid "upload session"
+msgstr "upload session"
+
+#: apps/documents/models.py:104
+msgid "upload sessions"
+msgstr "upload sessions"
+
+#: apps/documents/models.py:110
+msgid "Requester must belong to the organization."
+msgstr "Requester must belong to the organization."
+
+#: apps/documents/models.py:137
+msgid "content type"
+msgstr "content type"
+
+#: apps/documents/models.py:138
+msgid "size"
+msgstr "size"
+
+#: apps/documents/models.py:139
+msgid "checksum"
+msgstr "checksum"
+
+#: apps/documents/models.py:151
+msgid "uploaded by"
+msgstr "uploaded by"
+
+#: apps/documents/models.py:154 apps/matters/models.py:199
+msgid "revoked at"
+msgstr "revoked at"
+
+#: apps/documents/models.py:161
+msgid "revoked by"
+msgstr "revoked by"
+
+#: apps/documents/models.py:186
+msgid "document"
+msgstr "document"
+
+#: apps/documents/models.py:187
+msgid "documents"
+msgstr "documents"
+
+#: apps/documents/models.py:193
+msgid "Uploader must belong to the organization."
+msgstr "Uploader must belong to the organization."
+
+#: apps/documents/models.py:195
+msgid "Revoker must belong to the organization."
+msgstr "Revoker must belong to the organization."
+
+#: apps/documents/models.py:206
+msgid "Upload must belong to the organization."
+msgstr "Upload must belong to the organization."
+
+#: apps/documents/models.py:208
+msgid "Upload must belong to the matter."
+msgstr "Upload must belong to the matter."
+
+#: apps/documents/services.py:70
+msgid "Upload exceeds the configured size limit."
+msgstr "Upload exceeds the configured size limit."
+
+#: apps/documents/services.py:76
+msgid "Too many active upload sessions."
+msgstr "Too many active upload sessions."
+
+#: apps/documents/services.py:177
+msgid "Document is not available."
+msgstr "Document is not available."
+
+#: apps/documents/services.py:236 common/permissions.py:20
+msgid "Not found."
+msgstr "Not found."
+
+#: apps/documents/services.py:262
+msgid "Upload cannot be completed from its current state."
+msgstr "Upload cannot be completed from its current state."
+
+#: apps/documents/services.py:268
+msgid "Upload session has expired."
+msgstr "Upload session has expired."
+
+#: apps/documents/services.py:273
+msgid "Upload already has a document."
+msgstr "Upload already has a document."
+
+#: apps/documents/services.py:294
+msgid "Uploaded object is not available yet."
+msgstr "Uploaded object is not available yet."
+
+#: apps/documents/services.py:317
+msgid "Uploaded object does not match the upload session."
+msgstr "Uploaded object does not match the upload session."
+
+#: apps/documents/services.py:594
+msgid "File type or upload policy is not allowed."
+msgstr "File type or upload policy is not allowed."
+
+#: apps/matters/apps.py:13
+msgid "Matters"
+msgstr "Matters"
+
+#: apps/matters/models.py:16
+msgid "Case"
+msgstr "Case"
+
+#: apps/matters/models.py:17
+msgid "Contract"
+msgstr "Contract"
+
+#: apps/matters/models.py:18
+msgid "Notice"
+msgstr "Notice"
+
+#: apps/matters/models.py:36 apps/notices/models.py:12
+#: apps/notifications/models.py:27 apps/organizations/models.py:47
+msgid "Pending"
+msgstr "Pending"
+
+#: apps/matters/models.py:37
+msgid "On hold"
+msgstr "On hold"
+
+#: apps/matters/models.py:38
+msgid "Closed"
+msgstr "Closed"
+
+#: apps/matters/models.py:39
+msgid "Archived"
+msgstr "Archived"
+
+#: apps/matters/models.py:40
+msgid "Draft"
+msgstr "Draft"
+
+#: apps/matters/models.py:41 apps/organizations/models.py:37
 msgid "Active"
 msgstr "Active"
 
+#: apps/matters/models.py:43
+msgid "Terminated"
+msgstr "Terminated"
+
+#: apps/matters/models.py:44
+msgid "Received"
+msgstr "Received"
+
+#: apps/matters/models.py:45
+msgid "Under review"
+msgstr "Under review"
+
+#: apps/matters/models.py:46
+msgid "Response due"
+msgstr "Response due"
+
+#: apps/matters/models.py:47 apps/notices/models.py:13
+#| msgid "Suspended"
+msgid "Responded"
+msgstr "Suspended"
+
+#: apps/matters/models.py:64
+#| msgid "Viewer"
+msgid "View"
+msgstr "Viewer"
+
+#: apps/matters/models.py:65
+msgid "Edit"
+msgstr "Edit"
+
+#: apps/matters/models.py:72
+msgid "Related"
+msgstr "Related"
+
+#: apps/matters/models.py:73
+msgid "Depends on"
+msgstr "Depends on"
+
+#: apps/matters/models.py:74
+msgid "Supersedes"
+msgstr "Supersedes"
+
+#: apps/matters/models.py:85
+msgid "kind"
+msgstr "kind"
+
+#: apps/matters/models.py:87
+msgid "reference code"
+msgstr "reference code"
+
+#: apps/matters/models.py:94
+msgid "owner"
+msgstr "owner"
+
+#: apps/matters/models.py:97
+msgid "opened on"
+msgstr "opened on"
+
+#: apps/matters/models.py:98
+msgid "closed on"
+msgstr "closed on"
+
+#: apps/matters/models.py:100
+msgid "archived at"
+msgstr "archived at"
+
+#: apps/matters/models.py:107
+msgid "archived by"
+msgstr "archived by"
+
+#: apps/matters/models.py:113
+msgid "created by"
+msgstr "created by"
+
+#: apps/matters/models.py:150
+msgid "matters"
+msgstr "matters"
+
+#: apps/matters/models.py:190 apps/notifications/models.py:43
+#: apps/organizations/models.py:123 apps/organizations/models.py:147
+msgid "membership"
+msgstr "membership"
+
+#: apps/matters/models.py:192
+msgid "level"
+msgstr "level"
+
+#: apps/matters/models.py:197
+msgid "granted by"
+msgstr "granted by"
+
+#: apps/matters/models.py:214
+msgid "matter access"
+msgstr "matter access"
+
+#: apps/matters/models.py:215
+msgid "matter access grants"
+msgstr "matter access grants"
+
+#: apps/matters/models.py:249
+msgid "source matter"
+msgstr "source matter"
+
+#: apps/matters/models.py:255
+msgid "target matter"
+msgstr "target matter"
+
+#: apps/matters/models.py:258
+msgid "relation type"
+msgstr "relation type"
+
+#: apps/matters/models.py:279
+msgid "matter relation"
+msgstr "matter relation"
+
+#: apps/matters/models.py:280
+msgid "matter relations"
+msgstr "matter relations"
+
+#: apps/matters/models.py:284
+msgid "A matter cannot relate to itself."
+msgstr "A matter cannot relate to itself."
+
+#: apps/matters/models.py:302 apps/matters/services.py:72
+msgid "Membership must belong to the matter organization."
+msgstr "Membership must belong to the matter organization."
+
+#: apps/matters/models.py:316
+msgid "Matter must belong to the relation organization."
+msgstr "Matter must belong to the relation organization."
+
+#: apps/matters/permissions.py:106
+#| msgid "You do not have permission to perform this action."
+msgid "You do not have permission to edit this matter."
+msgstr "You do not have permission to perform this action."
+
+#: apps/matters/services.py:69 apps/offboarding/services.py:160
+#: apps/offboarding/services.py:170
+msgid "Membership must be active."
+msgstr "Membership must be active."
+
+#: apps/notices/models.py:26
+#| msgid "Suspended"
+msgid "sender"
+msgstr "Suspended"
+
+#: apps/notices/models.py:27
+msgid "received date"
+msgstr "received date"
+
+#: apps/notices/models.py:28
+msgid "response deadline"
+msgstr "response deadline"
+
+#: apps/notices/models.py:39
+msgid "linked response deadline"
+msgstr "linked response deadline"
+
+#: apps/notices/models.py:50
+msgid "legal notice"
+msgstr "legal notice"
+
+#: apps/notices/models.py:51
+msgid "legal notices"
+msgstr "legal notices"
+
+#: apps/notices/services.py:68
+msgid "Response deadline cannot precede received date."
+msgstr "Response deadline cannot precede received date."
+
+#: apps/notices/services.py:165
+#| msgid "You do not have permission to perform this action."
+msgid "You do not have permission to create notices."
+msgstr "You do not have permission to perform this action."
+
+#: apps/notices/services.py:376
+msgid "A notice cannot relate to itself."
+msgstr "A notice cannot relate to itself."
+
+#: apps/notifications/models.py:15
+msgid "In app"
+msgstr "In app"
+
+#: apps/notifications/models.py:16
+msgid "Email"
+msgstr "Email"
+
+#: apps/notifications/models.py:17
+msgid "SMS"
+msgstr "SMS"
+
+#: apps/notifications/models.py:18
+msgid "Push"
+msgstr "Push"
+
+#: apps/notifications/models.py:28
+msgid "Sent"
+msgstr "Sent"
+
+#: apps/notifications/models.py:30
+msgid "Skipped"
+msgstr "Skipped"
+
+#: apps/notifications/models.py:46 apps/notifications/models.py:125
+msgid "channel"
+msgstr "channel"
+
+#: apps/notifications/models.py:47
+msgid "reminder offset minutes"
+msgstr "reminder offset minutes"
+
+#: apps/notifications/models.py:48
+msgid "enabled"
+msgstr "enabled"
+
+#: apps/notifications/models.py:64
+msgid "notification preference"
+msgstr "notification preference"
+
+#: apps/notifications/models.py:65
+msgid "notification preferences"
+msgstr "notification preferences"
+
+#: apps/notifications/models.py:82 apps/notifications/models.py:123
+msgid "recipient"
+msgstr "recipient"
+
+#: apps/notifications/models.py:86
+msgid "body"
+msgstr "body"
+
+#: apps/notifications/models.py:87
+msgid "data"
+msgstr "data"
+
+#: apps/notifications/models.py:88
+msgid "read at"
+msgstr "read at"
+
+#: apps/notifications/models.py:99 apps/notifications/models.py:111
+msgid "notification"
+msgstr "notification"
+
+#: apps/notifications/models.py:100
+msgid "notifications"
+msgstr "notifications"
+
+#: apps/notifications/models.py:132
+msgid "dedupe key"
+msgstr "dedupe key"
+
+#: apps/notifications/models.py:133
+msgid "safe error code"
+msgstr "safe error code"
+
+#: apps/notifications/models.py:134
+msgid "provider message id"
+msgstr "provider message id"
+
+#: apps/notifications/models.py:136
+msgid "sent at"
+msgstr "sent at"
+
+#: apps/notifications/models.py:137
+msgid "failed at"
+msgstr "failed at"
+
+#: apps/notifications/models.py:138
+msgid "skipped at"
+msgstr "skipped at"
+
+#: apps/notifications/models.py:149
+msgid "notification delivery"
+msgstr "notification delivery"
+
+#: apps/notifications/models.py:150
+msgid "notification deliveries"
+msgstr "notification deliveries"
+
+#: apps/notifications/services.py:116
+msgid "Duplicate notification delivery."
+msgstr "Duplicate notification delivery."
+
+#: apps/notifications/services.py:167
+msgid "You can only read your own notifications."
+msgstr "You can only read your own notifications."
+
+#: apps/offboarding/models.py:25
+msgid "departing membership"
+msgstr "departing membership"
+
+#: apps/offboarding/models.py:31
+msgid "replacement membership"
+msgstr "replacement membership"
+
+#: apps/offboarding/models.py:37
+msgid "initiated by"
+msgstr "initiated by"
+
+#: apps/offboarding/models.py:51
+msgid "preview snapshot"
+msgstr "preview snapshot"
+
+#: apps/offboarding/models.py:52
+msgid "executed at"
+msgstr "executed at"
+
+#: apps/offboarding/models.py:67
+msgid "offboarding run"
+msgstr "offboarding run"
+
+#: apps/offboarding/models.py:68
+msgid "offboarding runs"
+msgstr "offboarding runs"
+
+#: apps/offboarding/services.py:166 apps/organizations/permissions.py:64
+#: apps/organizations/selectors.py:63
+#| msgid "You do not have permission to perform this action."
+msgid "Only legal administrators may perform this action."
+msgstr "You do not have permission to perform this action."
+
+#: apps/offboarding/services.py:168
+msgid "Replacement must belong to the organization."
+msgstr "Replacement must belong to the organization."
+
+#: apps/offboarding/services.py:178
+msgid "Replacement must be different from departing membership."
+msgstr "Replacement must be different from departing membership."
+
+#: apps/offboarding/services.py:193 apps/organizations/services.py:220
+msgid "At least one active Legal Admin is required."
+msgstr "At least one active Legal Admin is required."
+
+#: apps/offboarding/services.py:198
+msgid "Confirmation value is invalid."
+msgstr "Confirmation value is invalid."
+
+#: apps/offboarding/services.py:204
+msgid "Offboarding preview is stale."
+msgstr "Offboarding preview is stale."
+
+#: apps/organizations/api/v1/serializers.py:29
+msgid "This field is not accepted."
+msgstr "This field is not accepted."
+
+#: apps/organizations/apps.py:13
+msgid "Organizations"
+msgstr "Organizations"
+
+#: apps/organizations/models.py:27
+msgid "Legal admin"
+msgstr "Legal admin"
+
+#: apps/organizations/models.py:28
+msgid "Legal manager"
+msgstr "Legal manager"
+
+#: apps/organizations/models.py:29
+msgid "Legal counsel"
+msgstr "Legal counsel"
+
+#: apps/organizations/models.py:30
+msgid "Viewer"
+msgstr "Viewer"
+
+#: apps/organizations/models.py:38
 msgid "Suspended"
 msgstr "Suspended"
 
+#: apps/organizations/models.py:39
 msgid "Offboarded"
 msgstr "Offboarded"
+
+#: apps/organizations/models.py:48
+msgid "Accepted"
+msgstr "Accepted"
+
+#: apps/organizations/models.py:58
+msgid "Enter a valid IANA timezone."
+msgstr "Enter a valid IANA timezone."
+
+#: apps/organizations/models.py:64
+msgid "timezone"
+msgstr "timezone"
+
+#: apps/organizations/models.py:70
+msgid "default language"
+msgstr "default language"
+
+#: apps/organizations/models.py:75
+#| msgid "Active"
+msgid "active"
+msgstr "Active"
+
+#: apps/organizations/models.py:80
+msgid "organizations"
+msgstr "organizations"
+
+#: apps/organizations/models.py:106
+msgid "joined at"
+msgstr "joined at"
+
+#: apps/organizations/models.py:107
+#| msgid "Offboarded"
+msgid "offboarded at"
+msgstr "Offboarded"
+
+#: apps/organizations/models.py:124
+msgid "memberships"
+msgstr "memberships"
+
+#: apps/organizations/models.py:153
+msgid "invited by"
+msgstr "invited by"
+
+#: apps/organizations/models.py:155
+msgid "token hash"
+msgstr "token hash"
+
+#: apps/organizations/models.py:163
+msgid "accepted at"
+msgstr "accepted at"
+
+#: apps/organizations/models.py:173
+msgid "user invitation"
+msgstr "user invitation"
+
+#: apps/organizations/models.py:174
+msgid "user invitations"
+msgstr "user invitations"
+
+#: apps/organizations/permissions.py:69
+msgid "Only legal administrators or managers may perform this action."
+msgstr "Only legal administrators or managers may perform this action."
+
+#: apps/organizations/services.py:51
+msgid "Invitation is invalid or expired."
+msgstr "Invitation is invalid or expired."
+
+#: apps/organizations/services.py:129
+msgid "A user with this email already exists."
+msgstr "A user with this email already exists."
+
+#: apps/tasks/models.py:17
+msgid "To do"
+msgstr "To do"
+
+#: apps/tasks/models.py:18
+msgid "In progress"
+msgstr "In progress"
+
+#: apps/tasks/models.py:19
+msgid "Done"
+msgstr "Done"
+
+#: apps/tasks/models.py:94
+msgid "task"
+msgstr "task"
+
+#: apps/tasks/models.py:95
+msgid "tasks"
+msgstr "tasks"
+
+#: apps/tasks/services.py:168
+msgid "Finalized tasks cannot be updated."
+msgstr "Finalized tasks cannot be updated."
+
+#: apps/tasks/services.py:173
+msgid "Cancelled tasks cannot be completed."
+msgstr "Cancelled tasks cannot be completed."
+
+#: apps/tasks/services.py:178
+msgid "Completed tasks cannot be cancelled."
+msgstr "Completed tasks cannot be cancelled."
+
+#: common/api/errors.py:11
+msgid "The request conflicts with the current resource state."
+msgstr "The request conflicts with the current resource state."
+
+#: common/api/errors.py:17
+msgid "The request violates a domain rule."
+msgstr "The request violates a domain rule."
+
+#: common/api/exception_handler.py:65
+msgid "Invalid request."
+msgstr "Invalid request."
+
+#: common/api/exception_handler.py:67
+msgid "Too many requests. Try again later."
+msgstr "Too many requests. Try again later."
+
+#: common/api/exception_handler.py:70
+msgid "Request failed."
+msgstr "Request failed."
+
+#: common/api/viewsets.py:20
+msgid "Hard delete is not allowed."
+msgstr "Hard delete is not allowed."
+
+#: common/models.py:13
+msgid "created at"
+msgstr "created at"
+
+#: common/permissions.py:11
+msgid "You do not have permission to perform this action."
+msgstr "You do not have permission to perform this action."
+
+#: common/services/idempotency.py:104
+msgid "The idempotency key was already used with different request data."
+msgstr "The idempotency key was already used with different request data."
+
+#: common/services/versioning.py:19 common/services/versioning.py:39
+msgid "The record was changed by another request."
+msgstr "The record was changed by another request."
+
+#~ msgid "Authentication credentials were not provided."
+#~ msgstr "Authentication credentials were not provided."
