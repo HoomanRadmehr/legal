@@ -4,6 +4,11 @@ x-backend-build: &backend-build
   context: .
   dockerfile: docker/backend/Dockerfile
 
+x-backend-test-build: &backend-test-build
+  context: .
+  dockerfile: docker/backend/Dockerfile
+  target: test
+
 x-backend-environment: &backend-environment
   DJANGO_SETTINGS_MODULE: ${DJANGO_SETTINGS_MODULE:-config.settings.development}
   DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY:-development-only-secret-key-change-me}
@@ -107,6 +112,30 @@ services:
       timeout: 5s
       retries: 5
       start_period: 20s
+
+  api-test:
+    build: *backend-test-build
+    image: legal-backend:test
+    command: ["python", "-m", "pytest"]
+    user: app
+    environment:
+      <<: *backend-environment
+      DJANGO_SETTINGS_MODULE: ${DJANGO_TEST_SETTINGS_MODULE:-config.settings.development}
+      INTEGRATION_API_BASE_URL: ${INTEGRATION_API_BASE_URL:-http://api:8000}
+    networks:
+      - backend
+    depends_on:
+      api:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      minio-init:
+        condition: service_completed_successfully
+    restart: "no"
 
   worker:
     <<: *backend-service

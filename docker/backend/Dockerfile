@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1.7
 
-FROM python:3.12-slim AS builder
+FROM python:3.12-slim AS builder-base
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
@@ -15,13 +15,20 @@ RUN apt-get update \
 RUN python -m pip install --no-cache-dir uv==0.11.6
 
 COPY backend/pyproject.toml backend/uv.lock ./
+
+FROM builder-base AS builder
+
 RUN uv sync --frozen --no-dev \
     && uv pip install --python /opt/venv/bin/python daphne==4.1.2
 
-FROM python:3.12-slim AS runtime
+FROM builder-base AS test-builder
 
-ENV DJANGO_SETTINGS_MODULE=config.settings.production \
-    PATH=/opt/venv/bin:$PATH \
+RUN uv sync --frozen --no-dev --group test \
+    && uv pip install --python /opt/venv/bin/python daphne==4.1.2
+
+FROM python:3.12-slim AS app-base
+
+ENV PATH=/opt/venv/bin:$PATH \
     PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1
 
@@ -35,11 +42,26 @@ RUN apt-get update \
     && chown -R app:app /app \
     && rm -rf /var/lib/apt/lists/*
 
-COPY --from=builder --chown=app:app /opt/venv /opt/venv
+EXPOSE 8000
+
+FROM app-base AS test
+
+ENV DJANGO_SETTINGS_MODULE=config.settings.development
+
+COPY --from=test-builder --chown=app:app /opt/venv /opt/venv
 COPY --chown=app:app backend/ ./
 
 USER app
 
-EXPOSE 8000
+CMD ["python", "-m", "pytest"]
+
+FROM app-base AS runtime
+
+ENV DJANGO_SETTINGS_MODULE=config.settings.production
+
+COPY --from=builder --chown=app:app /opt/venv /opt/venv
+COPY --chown=app:app backend/ ./
+
+USER app
 
 CMD ["daphne", "-b", "0.0.0.0", "-p", "8000", "config.asgi:application"]
