@@ -6,8 +6,10 @@ import {
   useRef,
   useState,
 } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 
 import { configureApiClientAuth } from "../api/client";
+import { choiceQueryKeys } from "../features/choices";
 import { normalizeLocale, useI18n } from "../i18n";
 import {
   login as loginRequest,
@@ -29,14 +31,16 @@ export function AuthProvider({ children }: PropsWithChildren) {
   const [session, setSession] = useState<AuthSession | null>(null);
   const [status, setStatus] = useState<AuthStatus>("restoring");
   const { changeLocale } = useI18n();
+  const queryClient = useQueryClient();
   const appliedPreferredLanguageRef = useRef("");
   const restoredRef = useRef(false);
 
   const clearSession = useCallback(() => {
     clearAuthSession();
+    queryClient.removeQueries({ queryKey: choiceQueryKeys.all });
     setSession(null);
     setStatus("anonymous");
-  }, []);
+  }, [queryClient]);
 
   useEffect(() => {
     configureSessionRefresh(refreshSession);

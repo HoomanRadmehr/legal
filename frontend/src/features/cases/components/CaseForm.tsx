@@ -4,14 +4,17 @@ import {
   useWatch,
   type FieldErrors,
 } from "react-hook-form";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ZodError } from "zod";
 
+import type { AsyncChoice } from "../../../components/forms/AsyncChoiceSelect";
 import {
   FormErrorSummary,
   type FormErrorItem,
 } from "../../../components/formErrorSummary";
 import { LocalizedDateInput } from "../../../components/localizedDateInput";
+import { OwnerChoiceSelect } from "../../choices";
 import { useI18n } from "../../../i18n";
 import { isApiError } from "../../../api/errors";
 import {
@@ -46,6 +49,7 @@ export function CaseForm({
   const navigate = useNavigate();
   const { locale } = useI18n();
   const labels = caseText(locale);
+  const [ownerChoice, setOwnerChoice] = useState<AsyncChoice | null>(null);
   const form = useForm<CaseFormValues>({
     defaultValues: initialCase ? undefined : defaultCaseFormValues(),
     values: initialCase ? caseToValues(initialCase) : undefined,
@@ -127,10 +131,26 @@ export function CaseForm({
             )}
           </select>
         </label>
-        <label>
-          {labels.ownerMembership}
-          <input {...form.register("owner_id")} id="owner_id" />
-        </label>
+        {mode === "create" ? (
+          <>
+            <OwnerChoiceSelect
+              id="owner_id"
+              onChange={(choice) => {
+                setOwnerChoice(choice);
+                form.setValue("owner_id", choice?.id ?? "", {
+                  shouldValidate: true,
+                });
+              }}
+              value={ownerChoice}
+            />
+            <input {...form.register("owner_id")} type="hidden" />
+          </>
+        ) : (
+          <label>
+            {labels.ownerMembership}
+            <input {...form.register("owner_id")} id="owner_id" />
+          </label>
+        )}
       </fieldset>
       <CaseDateFields form={form} labels={labels} />
       <label>
@@ -285,7 +305,9 @@ function validationMessage(
   message: string,
   labels: ReturnType<typeof caseText>,
 ): string {
-  return labels.invalidValue === "Invalid value." ? message : labels.invalidValue;
+  return labels.invalidValue === "Invalid value."
+    ? message
+    : labels.invalidValue;
 }
 
 function formErrors(
@@ -306,7 +328,10 @@ function formErrors(
   });
 }
 
-function fieldLabel(field: string, labels: ReturnType<typeof caseText>): string {
+function fieldLabel(
+  field: string,
+  labels: ReturnType<typeof caseText>,
+): string {
   const fieldLabels: Record<string, string> = {
     case_type: labels.caseType,
     closed_on: labels.closedOn,

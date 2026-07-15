@@ -4,6 +4,7 @@ import { useState } from "react";
 import { isApiError } from "../../../api/errors";
 import { useAuth } from "../../../auth";
 import { canRunOffboarding } from "../../../auth/permissions";
+import type { AsyncChoice } from "../../../components/forms/AsyncChoiceSelect";
 import { AppShell } from "../../../components/layout/AppShell";
 import { PageHeader } from "../../../components/pageHeader";
 import {
@@ -12,6 +13,7 @@ import {
   LoadingState,
 } from "../../../components/standardStates";
 import { useI18n } from "../../../i18n";
+import { ReplacementMembershipChoiceSelect } from "../../choices";
 import { useMembershipList } from "../../adminUsers/hooks";
 import type { MembershipListItem } from "../../adminUsers/types";
 import {
@@ -58,6 +60,8 @@ function AdminOffboardingContent() {
   const members = useMembershipList(MEMBER_LIST_PARAMS);
   const [departingId, setDepartingId] = useState("");
   const [replacementId, setReplacementId] = useState("");
+  const [replacementChoice, setReplacementChoice] =
+    useState<AsyncChoice | null>(null);
   const [preview, setPreview] = useState<OffboardingPreview | null>(null);
   const [run, setRun] = useState<OffboardingRun | null>(null);
   const [confirmation, setConfirmation] = useState("");
@@ -144,10 +148,19 @@ function AdminOffboardingContent() {
           departingId={departingId}
           isPending={previewMutation.isPending}
           labels={labels}
-          onDepartingChange={setDepartingId}
-          onReplacementChange={setReplacementId}
+          onDepartingChange={(value) => {
+            setDepartingId(value);
+            if (value === replacementId) {
+              setReplacementId("");
+              setReplacementChoice(null);
+            }
+          }}
+          onReplacementChange={(choice) => {
+            setReplacementChoice(choice);
+            setReplacementId(choice?.id ?? "");
+          }}
           onSubmit={requestPreview}
-          replacementId={replacementId}
+          replacementChoice={replacementChoice}
         />
       ) : null}
       {feedback ? (
@@ -178,17 +191,18 @@ function OffboardingForm({
   onDepartingChange,
   onReplacementChange,
   onSubmit,
-  replacementId,
+  replacementChoice,
 }: {
   choices: MembershipListItem[];
   departingId: string;
   isPending: boolean;
   labels: ReturnType<typeof offboardingText>;
   onDepartingChange: (value: string) => void;
-  onReplacementChange: (value: string) => void;
+  onReplacementChange: (value: AsyncChoice | null) => void;
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;
-  replacementId: string;
+  replacementChoice: AsyncChoice | null;
 }) {
+  const replacementId = replacementChoice?.id ?? "";
   const disabled = !departingId || !replacementId || isPending;
 
   return (
@@ -207,20 +221,14 @@ function OffboardingForm({
           ))}
         </select>
       </label>
-      <label>
-        {labels.replacement}
-        <select
-          aria-label={labels.selectReplacement}
-          onChange={(event) => onReplacementChange(event.currentTarget.value)}
-          required
-          value={replacementId}
-        >
-          <option value="">{labels.selectReplacement}</option>
-          {choices.map((membership) => (
-            <MembershipOption key={membership.id} membership={membership} />
-          ))}
-        </select>
-      </label>
+      <ReplacementMembershipChoiceSelect
+        disabled={!departingId}
+        excludeMembershipId={departingId}
+        helperText={!departingId ? labels.selectDeparting : undefined}
+        id="replacement_membership_id"
+        onChange={onReplacementChange}
+        value={replacementChoice}
+      />
       <button disabled={disabled} type="submit">
         {labels.preview}
       </button>

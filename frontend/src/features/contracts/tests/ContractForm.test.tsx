@@ -1,8 +1,11 @@
+import { QueryClientProvider } from "@tanstack/react-query";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import type { ReactNode } from "react";
 import { MemoryRouter } from "react-router-dom";
 import { expect, test, vi } from "vitest";
 
+import { createAppQueryClient } from "../../../app/queryClient";
 import { I18nProvider } from "../../../i18n";
 import { ContractForm } from "../components/ContractForm";
 import type {
@@ -16,12 +19,8 @@ test("validates local date order before submit", async () => {
   const onSubmit = vi.fn(async (input: ContractInput | ContractUpdateInput) =>
     contractDetail(input),
   );
-  render(
-    <I18nProvider initialLocale="en">
-      <MemoryRouter>
-        <ContractForm mode="create" mutationError={null} onSubmit={onSubmit} />
-      </MemoryRouter>
-    </I18nProvider>,
+  renderForm(
+    <ContractForm mode="create" mutationError={null} onSubmit={onSubmit} />,
   );
 
   await fillRequiredFields(user);
@@ -47,12 +46,8 @@ test("maps backend contract date errors to visible fields", async () => {
       },
     );
   });
-  render(
-    <I18nProvider initialLocale="en">
-      <MemoryRouter>
-        <ContractForm mode="create" mutationError={null} onSubmit={onSubmit} />
-      </MemoryRouter>
-    </I18nProvider>,
+  renderForm(
+    <ContractForm mode="create" mutationError={null} onSubmit={onSubmit} />,
   );
 
   await fillRequiredFields(user);
@@ -71,6 +66,16 @@ async function fillRequiredFields(user: ReturnType<typeof userEvent.setup>) {
   await user.type(screen.getByLabelText("Title"), "Vendor agreement");
   await user.type(screen.getByLabelText("Reference code"), "CON-2027-001");
   await user.type(screen.getByLabelText("Counterparty"), "Northwind");
+}
+
+function renderForm(children: ReactNode) {
+  return render(
+    <I18nProvider initialLocale="en">
+      <QueryClientProvider client={createAppQueryClient()}>
+        <MemoryRouter>{children}</MemoryRouter>
+      </QueryClientProvider>
+    </I18nProvider>,
+  );
 }
 
 function contractDetail(

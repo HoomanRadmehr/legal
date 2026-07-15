@@ -4,16 +4,19 @@ import {
   type FieldErrors,
   type FieldPath,
 } from "react-hook-form";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ZodError } from "zod";
 
 import { isApiError } from "../../../api/errors";
+import type { AsyncChoice } from "../../../components/forms/AsyncChoiceSelect";
 import {
   FormErrorSummary,
   type FormErrorItem,
 } from "../../../components/formErrorSummary";
 import { LocalizedDateInput } from "../../../components/localizedDateInput";
 import { useI18n } from "../../../i18n";
+import { OwnerChoiceSelect } from "../../choices";
 import {
   buildContractCreateInput,
   buildContractUpdateInput,
@@ -70,6 +73,7 @@ export function ContractForm({
   const navigate = useNavigate();
   const { locale } = useI18n();
   const labels = contractText(locale);
+  const [ownerChoice, setOwnerChoice] = useState<AsyncChoice | null>(null);
   const form = useForm<ContractFormValues>({
     defaultValues: initialContract ? undefined : defaultContractFormValues(),
     values: initialContract
@@ -130,10 +134,26 @@ export function ContractForm({
           locale={locale}
           register={form.register}
         />
-        <label>
-          {labels.ownerMembership}
-          <input {...form.register("owner_id")} id="owner_id" />
-        </label>
+        {mode === "create" ? (
+          <>
+            <OwnerChoiceSelect
+              id="owner_id"
+              onChange={(choice) => {
+                setOwnerChoice(choice);
+                form.setValue("owner_id", choice?.id ?? "", {
+                  shouldValidate: true,
+                });
+              }}
+              value={ownerChoice}
+            />
+            <input {...form.register("owner_id")} type="hidden" />
+          </>
+        ) : (
+          <label>
+            {labels.ownerMembership}
+            <input {...form.register("owner_id")} id="owner_id" />
+          </label>
+        )}
       </fieldset>
       <ContractDateFields form={form} labels={labels} />
       <label>
@@ -306,7 +326,9 @@ function validationMessage(
   message: string,
   labels: ReturnType<typeof contractText>,
 ): string {
-  return labels.invalidValue === "Invalid value." ? message : labels.invalidValue;
+  return labels.invalidValue === "Invalid value."
+    ? message
+    : labels.invalidValue;
 }
 
 function applyApiFieldErrors(

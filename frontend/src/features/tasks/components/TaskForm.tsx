@@ -4,16 +4,19 @@ import {
   type FieldErrors,
   type FieldPath,
 } from "react-hook-form";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ZodError } from "zod";
 
 import { isApiError } from "../../../api/errors";
+import type { AsyncChoice } from "../../../components/forms/AsyncChoiceSelect";
 import {
   FormErrorSummary,
   type FormErrorItem,
 } from "../../../components/formErrorSummary";
 import { LocalizedDateTimeInput } from "../../../components/localizedDateInput";
 import { useI18n } from "../../../i18n";
+import { AssigneeChoiceSelect, MatterChoiceSelect } from "../../choices";
 import {
   buildTaskCreateInput,
   buildTaskUpdateInput,
@@ -24,9 +27,8 @@ import {
   type TaskFormMode,
   type TaskFormValues,
 } from "../schemas";
-import { useTaskAssignees } from "../hooks";
 import type { TaskDetail, TaskInput, TaskUpdateInput } from "../types";
-import { membershipChoiceLabel, taskStatusLabel, taskText } from "./taskLabels";
+import { taskStatusLabel, taskText } from "./taskLabels";
 import { TaskMutationError } from "./TaskMutationError";
 
 export function TaskForm({
@@ -45,7 +47,10 @@ export function TaskForm({
   const navigate = useNavigate();
   const { locale } = useI18n();
   const labels = taskText(locale);
-  const assignees = useTaskAssignees();
+  const [assigneeChoice, setAssigneeChoice] = useState<AsyncChoice | null>(
+    null,
+  );
+  const [matterChoice, setMatterChoice] = useState<AsyncChoice | null>(null);
   const form = useForm<TaskFormValues>({
     defaultValues: initialTask ? undefined : defaultTaskFormValues(),
     values: initialTask ? taskDetailToFormValues(initialTask) : undefined,
@@ -77,10 +82,28 @@ export function TaskForm({
           {labels.title}
           <input {...form.register("title")} id="title" />
         </label>
-        <label>
-          {labels.matter}
-          <input {...form.register("matter_id")} id="matter_id" />
-        </label>
+        {mode === "create" ? (
+          <>
+            <MatterChoiceSelect
+              id="matter_id"
+              label={labels.matter}
+              onChange={(choice) => {
+                setMatterChoice(choice);
+                form.setValue("matter_id", choice?.id ?? "", {
+                  shouldValidate: true,
+                });
+              }}
+              purpose="task_create"
+              value={matterChoice}
+            />
+            <input {...form.register("matter_id")} type="hidden" />
+          </>
+        ) : (
+          <label>
+            {labels.matter}
+            <input {...form.register("matter_id")} id="matter_id" />
+          </label>
+        )}
         <LocalizedDateTimeInput
           id="due_at_local"
           label={labels.dueDateTime}
@@ -101,14 +124,13 @@ export function TaskForm({
       </fieldset>
       <AssignmentField
         assignmentMode={assignmentMode}
-        error={assignees.error}
-        isError={assignees.isError}
-        isLoading={assignees.isLoading}
+        assigneeChoice={assigneeChoice}
         labels={labels}
-        options={assignees.data ?? []}
+        mode={mode}
+        onAssigneeChoice={setAssigneeChoice}
         register={form.register}
+        setValue={form.setValue}
         value={assigneeId ?? ""}
-        locale={locale}
       />
       <label>
         {labels.description}
@@ -131,32 +153,28 @@ export function TaskForm({
 
 function AssignmentField({
   assignmentMode,
-  error,
-  isError,
-  isLoading,
+  assigneeChoice,
   labels,
-  locale,
-  options,
+  mode,
+  onAssigneeChoice,
   register,
+  setValue,
   value,
 }: {
   assignmentMode: TaskAssignmentMode;
-  error: Error | null;
-  isError: boolean;
-  isLoading: boolean;
+  assigneeChoice: AsyncChoice | null;
   labels: ReturnType<typeof taskText>;
-  locale: ReturnType<typeof useI18n>["locale"];
-  options: { display_name: string; id: string; role: string }[];
+  mode: TaskFormMode;
+  onAssigneeChoice: (choice: AsyncChoice | null) => void;
   register: ReturnType<typeof useForm<TaskFormValues>>["register"];
+  setValue: ReturnType<typeof useForm<TaskFormValues>>["setValue"];
   value: string;
 }) {
   if (assignmentMode === "locked") {
     return (
       <fieldset>
         <legend>{labels.assignment}</legend>
-        <p className="task-alert">
-          {labels.lockedAssignmentHelp}
-        </p>
+        <p className="task-alert">{labels.lockedAssignmentHelp}</p>
         <input {...register("assignee_id")} type="hidden" />
         <p>
           {labels.assigneeMembershipId}: {value || labels.notSelected}
@@ -168,23 +186,26 @@ function AssignmentField({
   return (
     <fieldset>
       <legend>{labels.assignment}</legend>
-      {isLoading ? <p>{labels.loadingAssignees}</p> : null}
-      {isError ? (
-        <p className="task-alert">
-          {error?.message ?? labels.assigneeUnavailable}
-        </p>
-      ) : null}
-      <label>
-        {labels.activeAssignee}
-        <select {...register("assignee_id")} id="assignee_id">
-          <option value="">{labels.selectAssignee}</option>
-          {options.map((choice) => (
-            <option key={choice.id} value={choice.id}>
-              {membershipChoiceLabel(choice, locale)}
-            </option>
-          ))}
-        </select>
-      </label>
+      {mode === "create" ? (
+        <>
+          <AssigneeChoiceSelect
+            id="assignee_id"
+            onChange={(choice) => {
+              onAssigneeChoice(choice);
+              setValue("assignee_id", choice?.id ?? "", {
+                shouldValidate: true,
+              });
+            }}
+            value={assigneeChoice}
+          />
+          <input {...register("assignee_id")} type="hidden" />
+        </>
+      ) : (
+        <label>
+          {labels.activeAssignee}
+          <input {...register("assignee_id")} id="assignee_id" />
+        </label>
+      )}
     </fieldset>
   );
 }
@@ -229,7 +250,9 @@ function validationMessage(
   message: string,
   labels: ReturnType<typeof taskText>,
 ): string {
-  return labels.invalidValue === "Invalid value." ? message : labels.invalidValue;
+  return labels.invalidValue === "Invalid value."
+    ? message
+    : labels.invalidValue;
 }
 
 function formErrors(
@@ -250,7 +273,10 @@ function formErrors(
   });
 }
 
-function fieldLabel(field: string, labels: ReturnType<typeof taskText>): string {
+function fieldLabel(
+  field: string,
+  labels: ReturnType<typeof taskText>,
+): string {
   const fieldLabels: Record<string, string> = {
     assignee_id: labels.assignee,
     description: labels.description,

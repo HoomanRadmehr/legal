@@ -1,124 +1,90 @@
+import { useState } from "react";
 import type { UseFormReturn } from "react-hook-form";
 
-import { ErrorState, LoadingState } from "../../../components/standardStates";
+import type { AsyncChoice } from "../../../components/forms/AsyncChoiceSelect";
 import { TechnicalValue } from "../../../components/technicalValue";
 import { useI18n } from "../../../i18n";
 import type { NoticeFormValues } from "../schemas";
-import { useRelatedMatterChoices } from "../hooks";
-import type { RelatedMatterChoice } from "../types";
+import { RelatedMatterChoiceSelect } from "../../choices";
 import { noticeText } from "./noticeLabels";
 
 export function NoticeRelatedMatterPicker({
   form,
-  onSearch,
-  search,
+  mode,
 }: {
   form: UseFormReturn<NoticeFormValues>;
-  onSearch: (search: string) => void;
-  search: string;
+  mode: "create" | "edit";
 }) {
   const { locale } = useI18n();
   const labels = noticeText(locale);
-  const query = useRelatedMatterChoices(search);
-  const choices = query.data ?? [];
+  const [choice, setChoice] = useState<AsyncChoice | null>(null);
   const selectedIds = form.watch("related_matter_ids") ?? [];
+
+  if (mode === "edit") {
+    return <SelectedMatterIds labels={labels} selectedIds={selectedIds} />;
+  }
 
   return (
     <fieldset>
       <legend>{labels.relatedMatters}</legend>
-      <label>
-        {labels.searchRelated}
-        <input
-          aria-label={labels.searchRelatedAria}
-          onChange={(event) => onSearch(event.target.value)}
-          value={search}
-        />
-      </label>
-      <p className="notice-help">
-        {labels.permissionHelp}
-      </p>
-      {query.isLoading ? (
-        <LoadingState label={labels.loadingRelatedMatters} />
-      ) : null}
-      {query.isError ? (
-        <ErrorState
-          title={labels.relatedUnavailable}
-          message={query.error.message}
-        />
-      ) : null}
-      {choices.length === 0 && !query.isLoading ? (
-        <p>{labels.noMatches}</p>
-      ) : null}
-      <MatterChoiceGroup
-        choices={choices.filter((choice) => choice.kind === "case")}
-        form={form}
-        legend={labels.visibleCases}
+      <RelatedMatterChoiceSelect
+        id="related_matter_ids"
+        onChange={(nextChoice) => {
+          setChoice(nextChoice);
+          appendSelectedMatter(form, selectedIds, nextChoice);
+        }}
+        value={choice}
       />
-      <MatterChoiceGroup
-        choices={choices.filter((choice) => choice.kind === "contract")}
-        form={form}
-        legend={labels.visibleContracts}
-      />
+      <p className="notice-help">{labels.permissionHelp}</p>
       <SelectedMatterIds
-        choices={choices}
         labels={labels}
+        onRemove={(matterId) =>
+          removeSelectedMatter(form, selectedIds, matterId)
+        }
         selectedIds={selectedIds}
       />
     </fieldset>
   );
 }
 
-function MatterChoiceGroup({
-  choices,
-  form,
-  legend,
-}: {
-  choices: RelatedMatterChoice[];
-  form: UseFormReturn<NoticeFormValues>;
-  legend: string;
-}) {
-  if (choices.length === 0) {
-    return null;
+function appendSelectedMatter(
+  form: UseFormReturn<NoticeFormValues>,
+  selectedIds: string[],
+  choice: AsyncChoice | null,
+) {
+  if (!choice || selectedIds.includes(choice.id)) {
+    return;
   }
+  form.setValue("related_matter_ids", [...selectedIds, choice.id], {
+    shouldDirty: true,
+    shouldValidate: true,
+  });
+}
 
-  return (
-    <section className="notice-choice-group" aria-label={legend}>
-      <h3>{legend}</h3>
-      {choices.map((choice) => (
-        <label className="notice-checkbox" key={choice.id}>
-          <input
-            {...form.register("related_matter_ids")}
-            type="checkbox"
-            value={choice.id}
-          />
-          <span>
-            <TechnicalValue>{choice.reference_code}</TechnicalValue>{" "}
-            {choice.title}
-          </span>
-        </label>
-      ))}
-    </section>
+function removeSelectedMatter(
+  form: UseFormReturn<NoticeFormValues>,
+  selectedIds: string[],
+  matterId: string,
+) {
+  form.setValue(
+    "related_matter_ids",
+    selectedIds.filter((id) => id !== matterId),
+    { shouldDirty: true, shouldValidate: true },
   );
 }
 
 function SelectedMatterIds({
-  choices,
   labels,
+  onRemove,
   selectedIds,
 }: {
-  choices: RelatedMatterChoice[];
   labels: ReturnType<typeof noticeText>;
+  onRemove?: (matterId: string) => void;
   selectedIds: string[];
 }) {
   if (selectedIds.length === 0) {
     return null;
   }
-
-  const visibleChoiceIds = new Set(choices.map((choice) => choice.id));
-  const hiddenSelectedIds = selectedIds.filter(
-    (id) => !visibleChoiceIds.has(id),
-  );
-
   return (
     <section aria-label={labels.selectedRelatedMatters}>
       <h3>{labels.selectedRelatedMatters}</h3>
@@ -126,12 +92,14 @@ function SelectedMatterIds({
         {selectedIds.map((matterId) => (
           <li key={matterId}>
             <TechnicalValue>{matterId}</TechnicalValue>
+            {onRemove ? (
+              <button onClick={() => onRemove(matterId)} type="button">
+                {labels.removeRelatedMatter}
+              </button>
+            ) : null}
           </li>
         ))}
       </ul>
-      {hiddenSelectedIds.length > 0 ? (
-        <p className="notice-help">{labels.hiddenSelected}</p>
-      ) : null}
     </section>
   );
 }

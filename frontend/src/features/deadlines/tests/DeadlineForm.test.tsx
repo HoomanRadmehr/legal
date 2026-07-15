@@ -1,8 +1,11 @@
+import { QueryClientProvider } from "@tanstack/react-query";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import type { ReactNode } from "react";
 import { MemoryRouter } from "react-router-dom";
-import { expect, test, vi } from "vitest";
+import { afterEach, expect, test, vi } from "vitest";
 
+import { createAppQueryClient } from "../../../app/queryClient";
 import { I18nProvider } from "../../../i18n";
 import { DeadlineForm } from "../components/DeadlineForm";
 import type {
@@ -11,18 +14,16 @@ import type {
   DeadlineUpdateInput,
 } from "../types";
 
+afterEach(() => {
+  vi.unstubAllGlobals();
+});
+
 test("validates required deadline fields before submit", async () => {
   const user = userEvent.setup();
   const onSubmit = vi.fn(async (input: DeadlineInput | DeadlineUpdateInput) =>
     deadlineDetail(input),
   );
-  render(
-    <I18nProvider initialLocale="en">
-      <MemoryRouter>
-        <DeadlineForm mode="create" mutationError={null} onSubmit={onSubmit} />
-      </MemoryRouter>
-    </I18nProvider>,
-  );
+  renderForm(<DeadlineForm mode="create" mutationError={null} onSubmit={onSubmit} />);
 
   await user.click(screen.getByRole("button", { name: "Create deadline" }));
 
@@ -35,17 +36,12 @@ test("submits ISO due timestamp and reminder flag", async () => {
   const onSubmit = vi.fn(async (input: DeadlineInput | DeadlineUpdateInput) =>
     deadlineDetail(input),
   );
-  render(
-    <I18nProvider initialLocale="en">
-      <MemoryRouter>
-        <DeadlineForm mode="create" mutationError={null} onSubmit={onSubmit} />
-      </MemoryRouter>
-    </I18nProvider>,
-  );
+  vi.stubGlobal("fetch", vi.fn(fetchChoicePage));
+  renderForm(<DeadlineForm mode="create" mutationError={null} onSubmit={onSubmit} />);
 
   await user.type(screen.getByLabelText("Title"), "File response");
-  await user.type(screen.getByLabelText("Matter"), uuid("1"));
-  await user.type(screen.getByLabelText("Assignee membership ID"), uuid("2"));
+  await selectChoice(user, "Matter", "Northern contract");
+  await selectChoice(user, "Assignee", "Ava Counsel");
   await user.type(
     screen.getByLabelText("Due date and time"),
     "2027-07-15T12:30",
@@ -67,17 +63,12 @@ test("Persian Jalali datetime input submits ISO timestamp", async () => {
   const onSubmit = vi.fn(async (input: DeadlineInput | DeadlineUpdateInput) =>
     deadlineDetail(input),
   );
-  render(
-    <I18nProvider initialLocale="fa">
-      <MemoryRouter>
-        <DeadlineForm mode="create" mutationError={null} onSubmit={onSubmit} />
-      </MemoryRouter>
-    </I18nProvider>,
-  );
+  vi.stubGlobal("fetch", vi.fn(fetchChoicePage));
+  renderForm(<DeadlineForm mode="create" mutationError={null} onSubmit={onSubmit} />, "fa");
 
   await user.type(screen.getByLabelText("عنوان"), "مهلت پاسخ");
-  await user.type(screen.getByLabelText("رکورد"), uuid("1"));
-  await user.type(screen.getByLabelText("شناسه عضویت مسئول"), uuid("2"));
+  await selectChoice(user, "رکورد", "Northern contract");
+  await selectChoice(user, "مسئول", "Ava Counsel");
   await user.type(
     screen.getByLabelText("تاریخ و زمان سررسید"),
     "1406-01-01 09:30",
@@ -113,6 +104,64 @@ function deadlineDetail(
     updated_at: "2027-01-01T10:00:00Z",
     version: 1,
   };
+}
+
+function renderForm(children: ReactNode, locale: "en" | "fa" = "en") {
+  return render(
+    <I18nProvider initialLocale={locale}>
+      <QueryClientProvider client={createAppQueryClient()}>
+        <MemoryRouter>{children}</MemoryRouter>
+      </QueryClientProvider>
+    </I18nProvider>,
+  );
+}
+
+async function selectChoice(
+  user: ReturnType<typeof userEvent.setup>,
+  label: string,
+  option: string,
+) {
+  await user.click(screen.getByLabelText(label));
+  await user.click(await screen.findByText(option));
+}
+
+async function fetchChoicePage(input: RequestInfo | URL) {
+  const path = requestPath(input);
+  if (path === "/api/v1/matters/choices/") {
+    return Response.json({
+      has_more: false,
+      next_cursor: null,
+      results: [
+        {
+          id: uuid("1"),
+          kind: "case",
+          label: "Northern contract",
+          secondary_label: "CASE-1",
+        },
+      ],
+    });
+  }
+  if (path === "/api/v1/memberships/choices/") {
+    return Response.json({
+      has_more: false,
+      next_cursor: null,
+      results: [
+        {
+          id: uuid("2"),
+          label: "Ava Counsel",
+          role: "legal_counsel",
+          secondary_label: "ava@example.test",
+          user_id: uuid("3"),
+        },
+      ],
+    });
+  }
+  return Response.json({ detail: "Unexpected request" }, { status: 500 });
+}
+
+function requestPath(input: RequestInfo | URL): string {
+  const url = input instanceof Request ? input.url : String(input);
+  return new URL(url).pathname;
 }
 
 function uuid(suffix: string): string {

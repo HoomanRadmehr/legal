@@ -28,12 +28,9 @@ test("requires active assignee choices for create", async () => {
     route: "/",
   });
 
-  expect(await screen.findByText(/Ava Counsel/)).toBeInTheDocument();
-  expect(screen.queryByText(/Inactive User/)).not.toBeInTheDocument();
-
   await user.type(screen.getByLabelText("Title"), "Review filing");
-  await user.type(screen.getByLabelText("Matter"), uuid("1"));
-  await user.selectOptions(screen.getByLabelText("Active assignee"), uuid("2"));
+  await selectChoice(user, "Matter", "Northern contract");
+  await selectChoice(user, "Assignee", "Ava Counsel");
   await user.type(
     screen.getByLabelText("Due date and time"),
     "2027-07-15T12:30",
@@ -87,28 +84,45 @@ test("locked assignment edit omits reassignment from update payload", async () =
 });
 
 async function fetchMembershipChoices(input: RequestInfo | URL) {
-  if (requestPath(input) === "/api/v1/memberships/") {
+  if (requestPath(input) === "/api/v1/matters/choices/") {
     return Response.json({
-      count: 2,
-      next: null,
-      previous: null,
+      has_more: false,
+      next_cursor: null,
       results: [
         {
-          display_name: "Ava Counsel",
-          id: uuid("2"),
-          role: "legal_counsel",
-          status: "active",
+          id: uuid("1"),
+          kind: "case",
+          label: "Northern contract",
+          secondary_label: "CASE-1",
         },
+      ],
+    });
+  }
+  if (requestPath(input) === "/api/v1/memberships/choices/") {
+    return Response.json({
+      has_more: false,
+      next_cursor: null,
+      results: [
         {
-          display_name: "Inactive User",
-          id: uuid("3"),
+          id: uuid("2"),
+          label: "Ava Counsel",
           role: "legal_counsel",
-          status: "suspended",
+          secondary_label: "ava@example.test",
+          user_id: uuid("3"),
         },
       ],
     });
   }
   return Response.json({ detail: "Unexpected request" }, { status: 500 });
+}
+
+async function selectChoice(
+  user: ReturnType<typeof userEvent.setup>,
+  label: string,
+  option: string,
+) {
+  await user.click(screen.getByLabelText(label));
+  await user.click(await screen.findByText(option));
 }
 
 function taskDetail(input: Partial<TaskUpdateInput>): TaskDetail {

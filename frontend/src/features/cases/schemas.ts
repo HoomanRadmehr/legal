@@ -89,7 +89,7 @@ export function defaultCaseFormValues(): CaseFormValues {
     opened_on: "",
     outcome_summary: "",
     owner_id: "",
-    parties: [{ contact_summary: "", name: "", role: "client" }],
+    parties: [],
     priority: "normal",
     reference_code: "",
     status: "open",

@@ -4,15 +4,18 @@ import {
   type FieldErrors,
   type FieldPath,
 } from "react-hook-form";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ZodError } from "zod";
 
+import type { AsyncChoice } from "../../../components/forms/AsyncChoiceSelect";
 import {
   FormErrorSummary,
   type FormErrorItem,
 } from "../../../components/formErrorSummary";
 import { LocalizedDateTimeInput } from "../../../components/localizedDateInput";
 import { useI18n } from "../../../i18n";
+import { AssigneeChoiceSelect, MatterChoiceSelect } from "../../choices";
 import {
   buildDeadlineCreateInput,
   buildDeadlineUpdateInput,
@@ -45,6 +48,10 @@ export function DeadlineForm({
   const navigate = useNavigate();
   const { locale } = useI18n();
   const labels = deadlineText(locale);
+  const [assigneeChoice, setAssigneeChoice] = useState<AsyncChoice | null>(
+    null,
+  );
+  const [matterChoice, setMatterChoice] = useState<AsyncChoice | null>(null);
   const form = useForm<DeadlineFormValues>({
     defaultValues: initialDeadline ? undefined : defaultDeadlineFormValues(),
     values: initialDeadline
@@ -81,14 +88,45 @@ export function DeadlineForm({
           {labels.title}
           <input {...form.register("title")} id="title" />
         </label>
-        <label>
-          {labels.matter}
-          <input {...form.register("matter_id")} id="matter_id" />
-        </label>
-        <label>
-          {labels.assigneeMembershipId}
-          <input {...form.register("assignee_id")} id="assignee_id" />
-        </label>
+        {mode === "create" ? (
+          <>
+            <MatterChoiceSelect
+              id="matter_id"
+              label={labels.matter}
+              onChange={(choice) => {
+                setMatterChoice(choice);
+                form.setValue("matter_id", choice?.id ?? "", {
+                  shouldValidate: true,
+                });
+              }}
+              purpose="deadline_create"
+              value={matterChoice}
+            />
+            <input {...form.register("matter_id")} type="hidden" />
+            <AssigneeChoiceSelect
+              id="assignee_id"
+              onChange={(choice) => {
+                setAssigneeChoice(choice);
+                form.setValue("assignee_id", choice?.id ?? "", {
+                  shouldValidate: true,
+                });
+              }}
+              value={assigneeChoice}
+            />
+            <input {...form.register("assignee_id")} type="hidden" />
+          </>
+        ) : (
+          <>
+            <label>
+              {labels.matter}
+              <input {...form.register("matter_id")} id="matter_id" />
+            </label>
+            <label>
+              {labels.assigneeMembershipId}
+              <input {...form.register("assignee_id")} id="assignee_id" />
+            </label>
+          </>
+        )}
         <LocalizedDateTimeInput
           id="due_at_local"
           label={labels.dueDateTime}
@@ -154,7 +192,9 @@ function validationMessage(
   message: string,
   labels: ReturnType<typeof deadlineText>,
 ): string {
-  return labels.invalidValue === "Invalid value." ? message : labels.invalidValue;
+  return labels.invalidValue === "Invalid value."
+    ? message
+    : labels.invalidValue;
 }
 
 function formErrors(

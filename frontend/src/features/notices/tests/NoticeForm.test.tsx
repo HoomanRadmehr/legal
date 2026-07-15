@@ -47,11 +47,8 @@ test("submits ISO response deadline and visible related matter choices", async (
     route: "/",
   });
 
-  expect(await screen.findByText("Visible litigation")).toBeInTheDocument();
-  expect(screen.getByText("Visible NDA")).toBeInTheDocument();
-  expect(screen.queryByText("Hidden litigation")).not.toBeInTheDocument();
-
-  await user.click(screen.getByLabelText(/CASE-1/i));
+  await user.click(screen.getByLabelText("Related legal matter"));
+  await user.click(await screen.findByText("Visible litigation"));
   await fillRequiredFields(user, "2027-07-15", "2027-07-15T12:30");
   await user.click(screen.getByRole("button", { name: "Create notice" }));
 
@@ -80,50 +77,16 @@ async function fillRequiredFields(
 
 async function fetchRelatedMatterChoices(input: RequestInfo | URL) {
   const path = requestPath(input);
-  if (path === "/api/v1/cases/") {
+  if (path === "/api/v1/matters/choices/") {
     return Response.json({
-      count: 1,
-      next: null,
-      previous: null,
+      has_more: false,
+      next_cursor: null,
       results: [
         {
-          archived_at: null,
-          case_type: "litigation",
-          created_at: "2027-01-01T10:00:00Z",
           id: uuid("1"),
-          owner_id: uuid("8"),
-          priority: "normal",
-          reference_code: "CASE-1",
-          status: "open",
-          title: "Visible litigation",
-          updated_at: "2027-01-01T10:00:00Z",
-          version: 1,
-        },
-      ],
-    });
-  }
-  if (path === "/api/v1/contracts/") {
-    return Response.json({
-      count: 1,
-      next: null,
-      previous: null,
-      results: [
-        {
-          archived_at: null,
-          contract_type: "nda",
-          counterparty: "Vendor",
-          created_at: "2027-01-01T10:00:00Z",
-          effective_date: "2027-01-01",
-          expiration_date: null,
-          id: uuid("2"),
-          owner_id: uuid("8"),
-          priority: "normal",
-          reference_code: "CON-1",
-          renewal_date: null,
-          status: "active",
-          title: "Visible NDA",
-          updated_at: "2027-01-01T10:00:00Z",
-          version: 1,
+          kind: "case",
+          label: "Visible litigation",
+          secondary_label: "CASE-1",
         },
       ],
     });

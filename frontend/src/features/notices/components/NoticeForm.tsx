@@ -9,6 +9,7 @@ import { useNavigate } from "react-router-dom";
 import { ZodError } from "zod";
 
 import { isApiError } from "../../../api/errors";
+import type { AsyncChoice } from "../../../components/forms/AsyncChoiceSelect";
 import {
   FormErrorSummary,
   type FormErrorItem,
@@ -18,6 +19,7 @@ import {
   LocalizedDateTimeInput,
 } from "../../../components/localizedDateInput";
 import { useI18n } from "../../../i18n";
+import { OwnerChoiceSelect } from "../../choices";
 import {
   buildNoticeCreateInput,
   buildNoticeUpdateInput,
@@ -50,7 +52,7 @@ export function NoticeForm({
   const navigate = useNavigate();
   const { locale } = useI18n();
   const labels = noticeText(locale);
-  const [matterSearch, setMatterSearch] = useState("");
+  const [ownerChoice, setOwnerChoice] = useState<AsyncChoice | null>(null);
   const form = useForm<NoticeFormValues>({
     defaultValues: initialNotice ? undefined : defaultNoticeFormValues(),
     values: initialNotice ? noticeDetailToFormValues(initialNotice) : undefined,
@@ -102,10 +104,26 @@ export function NoticeForm({
           {labels.sender}
           <input {...form.register("sender")} id="sender" />
         </label>
-        <label>
-          {labels.ownerMembership}
-          <input {...form.register("owner_id")} id="owner_id" />
-        </label>
+        {mode === "create" ? (
+          <>
+            <OwnerChoiceSelect
+              id="owner_id"
+              onChange={(choice) => {
+                setOwnerChoice(choice);
+                form.setValue("owner_id", choice?.id ?? "", {
+                  shouldValidate: true,
+                });
+              }}
+              value={ownerChoice}
+            />
+            <input {...form.register("owner_id")} type="hidden" />
+          </>
+        ) : (
+          <label>
+            {labels.ownerMembership}
+            <input {...form.register("owner_id")} id="owner_id" />
+          </label>
+        )}
         <label>
           {labels.status}
           <select {...form.register("status")} id="status">
@@ -182,11 +200,7 @@ export function NoticeForm({
         />
         <p className="notice-help">{labels.responseDeadlineHelp}</p>
       </fieldset>
-      <NoticeRelatedMatterPicker
-        form={form}
-        onSearch={setMatterSearch}
-        search={matterSearch}
-      />
+      <NoticeRelatedMatterPicker form={form} mode={mode} />
       <label>
         {labels.description}
         <textarea {...form.register("description")} id="description" rows={4} />
@@ -234,7 +248,9 @@ function validationMessage(
   message: string,
   labels: ReturnType<typeof noticeText>,
 ): string {
-  return labels.invalidValue === "Invalid value." ? message : labels.invalidValue;
+  return labels.invalidValue === "Invalid value."
+    ? message
+    : labels.invalidValue;
 }
 
 function formErrors(
@@ -255,7 +271,10 @@ function formErrors(
   });
 }
 
-function fieldLabel(field: string, labels: ReturnType<typeof noticeText>): string {
+function fieldLabel(
+  field: string,
+  labels: ReturnType<typeof noticeText>,
+): string {
   const fieldLabels: Record<string, string> = {
     closed_on: labels.closedOn,
     description: labels.description,
