@@ -17,7 +17,7 @@ from apps.deadlines.selectors import (
     deadline_list_today,
     deadline_list_upcoming,
 )
-from apps.documents.models import Document, UploadSession
+from apps.documents.models import Document
 from apps.matters.models import Matter, MatterAccess, MatterRelation
 from apps.matters.permissions import can_view_matter
 from apps.notices.models import LegalNotice
@@ -87,7 +87,6 @@ def model_counts() -> dict[str, int]:
         LegalNotice,
         Deadline,
         Task,
-        UploadSession,
         Document,
         NotificationPreference,
         Notification,

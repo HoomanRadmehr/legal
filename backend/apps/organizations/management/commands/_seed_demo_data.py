@@ -16,9 +16,7 @@ from apps.deadlines.models import PRIORITY_HIGH, Deadline
 from apps.deadlines.services import deadline_create
 from apps.documents.models import (
     DOCUMENT_STATUS_AVAILABLE,
-    UPLOAD_STATUS_AVAILABLE,
     Document,
-    UploadSession,
 )
 from apps.matters.models import (
     ACCESS_LEVEL_VIEW,
@@ -426,45 +424,30 @@ def ensure_task(
 def ensure_demo_document(*, membership: Membership, matter: Matter) -> Document:
     object_key = f"demo/{matter.organization_id}/{matter.id}/synthetic-case-summary.pdf"
     now = timezone.now()
-    upload, _ = UploadSession.objects.update_or_create(
-        object_key=object_key,
-        defaults={
-            "organization": matter.organization,
-            "matter": matter,
-            "requested_by": membership,
-            "original_filename": "synthetic-case-summary.pdf",
-            "expected_size": 1024,
-            "expected_content_type": "application/pdf",
-            "expected_checksum": "",
-            "description": "Synthetic document metadata for local demos.",
-            "status": UPLOAD_STATUS_AVAILABLE,
-            "expires_at": now + dt.timedelta(minutes=15),
-            "completed_at": now,
-            "failure_code": "",
-        },
-    )
     document, _ = Document.objects.update_or_create(
         object_key=object_key,
-        defaults=document_defaults(upload=upload, membership=membership),
+        defaults=document_defaults(matter=matter, membership=membership, now=now),
     )
     return document
 
 
-def document_defaults(*, upload: UploadSession, membership: Membership) -> dict:
+def document_defaults(*, matter: Matter, membership: Membership, now) -> dict:
     return {
-        "organization": upload.organization,
-        "matter": upload.matter,
-        "upload_session": upload,
-        "original_filename": upload.original_filename,
-        "content_type": upload.expected_content_type,
-        "size": upload.expected_size,
-        "checksum": upload.expected_checksum,
+        "organization": matter.organization,
+        "matter": matter,
+        "original_filename": "synthetic-case-summary.pdf",
+        "content_type": "application/pdf",
+        "expected_size": 1024,
+        "actual_size": 1024,
+        "expected_checksum": "",
+        "actual_checksum": "",
+        "etag": "",
         "status": DOCUMENT_STATUS_AVAILABLE,
-        "description": upload.description,
+        "description": "Synthetic document metadata for local demos.",
         "uploaded_by": membership,
-        "available_at": timezone.now(),
-        "revoked_at": None,
-        "revoked_by": None,
+        "upload_expires_at": now + dt.timedelta(minutes=15),
+        "uploaded_at": now,
+        "failure_code": "",
     }
 
 

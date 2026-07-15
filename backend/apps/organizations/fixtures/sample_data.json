@@ -7,13 +7,13 @@
       "last_login": null,
       "is_superuser": false,
       "username": "sample-admin",
-      "first_name": "Sample",
-      "last_name": "Admin",
+      "first_name": "آرمان",
+      "last_name": "مدیر",
       "email": "sample-admin@example.test",
       "is_staff": false,
       "is_active": true,
       "date_joined": "2026-01-01T09:00:00Z",
-      "preferred_language": "en",
+      "preferred_language": "fa",
       "updated_at": "2026-01-01T09:00:00Z",
       "groups": [],
       "user_permissions": []
@@ -27,14 +27,74 @@
       "last_login": null,
       "is_superuser": false,
       "username": "sample-counsel",
-      "first_name": "Sample",
-      "last_name": "Counsel",
+      "first_name": "سارا",
+      "last_name": "وکیل",
       "email": "sample-counsel@example.test",
       "is_staff": false,
       "is_active": true,
       "date_joined": "2026-01-01T09:05:00Z",
-      "preferred_language": "en",
+      "preferred_language": "fa",
       "updated_at": "2026-01-01T09:05:00Z",
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": "10000000-0000-0000-0000-000000000003",
+    "fields": {
+      "password": "!sample-fixture-login-disabled",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "sample-manager",
+      "first_name": "نرگس",
+      "last_name": "مدیرحقوقی",
+      "email": "sample-manager@example.test",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2026-01-01T09:10:00Z",
+      "preferred_language": "fa",
+      "updated_at": "2026-01-01T09:10:00Z",
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": "10000000-0000-0000-0000-000000000004",
+    "fields": {
+      "password": "!sample-fixture-login-disabled",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "sample-viewer",
+      "first_name": "رضا",
+      "last_name": "مشاهده‌گر",
+      "email": "sample-viewer@example.test",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2026-01-01T09:15:00Z",
+      "preferred_language": "fa",
+      "updated_at": "2026-01-01T09:15:00Z",
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": "10000000-0000-0000-0000-000000000005",
+    "fields": {
+      "password": "!sample-fixture-login-disabled",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "sample-paralegal",
+      "first_name": "لیلا",
+      "last_name": "کارشناس",
+      "email": "sample-paralegal@example.test",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2026-01-01T09:20:00Z",
+      "preferred_language": "fa",
+      "updated_at": "2026-01-01T09:20:00Z",
       "groups": [],
       "user_permissions": []
     }
@@ -45,9 +105,9 @@
     "fields": {
       "created_at": "2026-01-01T09:10:00Z",
       "updated_at": "2026-01-01T09:10:00Z",
-      "name": "Sample Legal Organization",
-      "timezone": "UTC",
-      "default_language": "en",
+      "name": "واحد حقوقی نمونه پارس",
+      "timezone": "Asia/Tehran",
+      "default_language": "fa",
       "is_active": true
     }
   },
@@ -55,13 +115,13 @@
     "model": "organizations.membership",
     "pk": "30000000-0000-0000-0000-000000000001",
     "fields": {
-      "created_at": "2026-01-01T09:15:00Z",
-      "updated_at": "2026-01-01T09:15:00Z",
+      "created_at": "2026-01-01T09:25:00Z",
+      "updated_at": "2026-01-01T09:25:00Z",
       "organization": "20000000-0000-0000-0000-000000000001",
       "user": "10000000-0000-0000-0000-000000000001",
       "role": "legal_admin",
       "status": "active",
-      "joined_at": "2026-01-01T09:15:00Z",
+      "joined_at": "2026-01-01T09:25:00Z",
       "offboarded_at": null
     }
   },
@@ -69,13 +129,55 @@
     "model": "organizations.membership",
     "pk": "30000000-0000-0000-0000-000000000002",
     "fields": {
-      "created_at": "2026-01-01T09:20:00Z",
-      "updated_at": "2026-01-01T09:20:00Z",
+      "created_at": "2026-01-01T09:30:00Z",
+      "updated_at": "2026-01-01T09:30:00Z",
       "organization": "20000000-0000-0000-0000-000000000001",
       "user": "10000000-0000-0000-0000-000000000002",
       "role": "legal_counsel",
       "status": "active",
-      "joined_at": "2026-01-01T09:20:00Z",
+      "joined_at": "2026-01-01T09:30:00Z",
+      "offboarded_at": null
+    }
+  },
+  {
+    "model": "organizations.membership",
+    "pk": "30000000-0000-0000-0000-000000000003",
+    "fields": {
+      "created_at": "2026-01-01T09:35:00Z",
+      "updated_at": "2026-01-01T09:35:00Z",
+      "organization": "20000000-0000-0000-0000-000000000001",
+      "user": "10000000-0000-0000-0000-000000000003",
+      "role": "legal_manager",
+      "status": "active",
+      "joined_at": "2026-01-01T09:35:00Z",
+      "offboarded_at": null
+    }
+  },
+  {
+    "model": "organizations.membership",
+    "pk": "30000000-0000-0000-0000-000000000004",
+    "fields": {
+      "created_at": "2026-01-01T09:40:00Z",
+      "updated_at": "2026-01-01T09:40:00Z",
+      "organization": "20000000-0000-0000-0000-000000000001",
+      "user": "10000000-0000-0000-0000-000000000004",
+      "role": "viewer",
+      "status": "active",
+      "joined_at": "2026-01-01T09:40:00Z",
+      "offboarded_at": null
+    }
+  },
+  {
+    "model": "organizations.membership",
+    "pk": "30000000-0000-0000-0000-000000000005",
+    "fields": {
+      "created_at": "2026-01-01T09:45:00Z",
+      "updated_at": "2026-01-01T09:45:00Z",
+      "organization": "20000000-0000-0000-0000-000000000001",
+      "user": "10000000-0000-0000-0000-000000000005",
+      "role": "legal_counsel",
+      "status": "active",
+      "joined_at": "2026-01-01T09:45:00Z",
       "offboarded_at": null
     }
   },
@@ -87,13 +189,101 @@
       "updated_at": "2026-01-02T09:00:00Z",
       "organization": "20000000-0000-0000-0000-000000000001",
       "kind": "case",
-      "title": "Sample employment dispute",
+      "title": "پرونده مطالبه وجه قرارداد تامین",
       "reference_code": "SAMPLE-CASE-001",
       "status": "open",
       "priority": "normal",
       "owner": "30000000-0000-0000-0000-000000000002",
-      "description": "Sample matter for local review and UI smoke checks.",
+      "description": "پرونده نمونه برای بررسی محلی فهرست پرونده‌ها، جزئیات و خط زمانی.",
       "opened_on": "2026-01-02",
+      "closed_on": null,
+      "version": 1,
+      "archived_at": null,
+      "archived_by": null,
+      "created_by": "30000000-0000-0000-0000-000000000001"
+    }
+  },
+  {
+    "model": "matters.matter",
+    "pk": "40000000-0000-0000-0000-000000000004",
+    "fields": {
+      "created_at": "2026-01-03T09:00:00Z",
+      "updated_at": "2026-01-03T09:00:00Z",
+      "organization": "20000000-0000-0000-0000-000000000001",
+      "kind": "case",
+      "title": "پرونده اختلاف استخدامی مدیر فروش",
+      "reference_code": "SAMPLE-CASE-002",
+      "status": "pending",
+      "priority": "high",
+      "owner": "30000000-0000-0000-0000-000000000003",
+      "description": "پرونده نمونه برای مرور اسناد استخدامی و مکاتبات طرفین.",
+      "opened_on": "2026-01-08",
+      "closed_on": null,
+      "version": 1,
+      "archived_at": null,
+      "archived_by": null,
+      "created_by": "30000000-0000-0000-0000-000000000001"
+    }
+  },
+  {
+    "model": "matters.matter",
+    "pk": "40000000-0000-0000-0000-000000000005",
+    "fields": {
+      "created_at": "2026-01-04T09:00:00Z",
+      "updated_at": "2026-01-04T09:00:00Z",
+      "organization": "20000000-0000-0000-0000-000000000001",
+      "kind": "case",
+      "title": "پرونده مطالبه خسارت حمل کالا",
+      "reference_code": "SAMPLE-CASE-003",
+      "status": "open",
+      "priority": "critical",
+      "owner": "30000000-0000-0000-0000-000000000002",
+      "description": "پرونده نمونه با اولویت بالا برای پیگیری خسارت قراردادی.",
+      "opened_on": "2026-01-14",
+      "closed_on": null,
+      "version": 1,
+      "archived_at": null,
+      "archived_by": null,
+      "created_by": "30000000-0000-0000-0000-000000000001"
+    }
+  },
+  {
+    "model": "matters.matter",
+    "pk": "40000000-0000-0000-0000-000000000006",
+    "fields": {
+      "created_at": "2026-01-05T09:00:00Z",
+      "updated_at": "2026-01-05T09:00:00Z",
+      "organization": "20000000-0000-0000-0000-000000000001",
+      "kind": "case",
+      "title": "پرونده رسیدگی تعزیراتی شعبه شمال",
+      "reference_code": "SAMPLE-CASE-004",
+      "status": "on_hold",
+      "priority": "normal",
+      "owner": "30000000-0000-0000-0000-000000000005",
+      "description": "پرونده نمونه برای بررسی وضعیت توقف موقت رسیدگی.",
+      "opened_on": "2026-01-20",
+      "closed_on": null,
+      "version": 1,
+      "archived_at": null,
+      "archived_by": null,
+      "created_by": "30000000-0000-0000-0000-000000000001"
+    }
+  },
+  {
+    "model": "matters.matter",
+    "pk": "40000000-0000-0000-0000-000000000007",
+    "fields": {
+      "created_at": "2026-01-06T09:00:00Z",
+      "updated_at": "2026-01-06T09:00:00Z",
+      "organization": "20000000-0000-0000-0000-000000000001",
+      "kind": "case",
+      "title": "پرونده داوری قرارداد نرم‌افزار",
+      "reference_code": "SAMPLE-CASE-005",
+      "status": "open",
+      "priority": "high",
+      "owner": "30000000-0000-0000-0000-000000000003",
+      "description": "پرونده نمونه برای نمایش مسیر داوری و اقدامات بعدی.",
+      "opened_on": "2026-01-26",
       "closed_on": null,
       "version": 1,
       "archived_at": null,
@@ -105,17 +295,105 @@
     "model": "matters.matter",
     "pk": "40000000-0000-0000-0000-000000000002",
     "fields": {
-      "created_at": "2026-01-03T09:00:00Z",
-      "updated_at": "2026-01-03T09:00:00Z",
+      "created_at": "2026-01-02T09:00:00Z",
+      "updated_at": "2026-01-02T09:00:00Z",
       "organization": "20000000-0000-0000-0000-000000000001",
       "kind": "contract",
-      "title": "Sample vendor agreement",
+      "title": "قرارداد تامین تجهیزات اداری",
       "reference_code": "SAMPLE-CON-001",
       "status": "active",
       "priority": "high",
       "owner": "30000000-0000-0000-0000-000000000001",
-      "description": "Sample contract matter for local review.",
+      "description": "قرارداد نمونه برای بررسی تاریخ‌های موثر، تمدید و شرایط کلیدی.",
       "opened_on": "2026-01-03",
+      "closed_on": null,
+      "version": 1,
+      "archived_at": null,
+      "archived_by": null,
+      "created_by": "30000000-0000-0000-0000-000000000001"
+    }
+  },
+  {
+    "model": "matters.matter",
+    "pk": "40000000-0000-0000-0000-000000000008",
+    "fields": {
+      "created_at": "2026-01-03T09:00:00Z",
+      "updated_at": "2026-01-03T09:00:00Z",
+      "organization": "20000000-0000-0000-0000-000000000001",
+      "kind": "contract",
+      "title": "قرارداد خدمات پشتیبانی سامانه",
+      "reference_code": "SAMPLE-CON-002",
+      "status": "active",
+      "priority": "normal",
+      "owner": "30000000-0000-0000-0000-000000000003",
+      "description": "قرارداد نمونه خدمات برای بررسی تعهدات پشتیبانی.",
+      "opened_on": "2026-02-01",
+      "closed_on": null,
+      "version": 1,
+      "archived_at": null,
+      "archived_by": null,
+      "created_by": "30000000-0000-0000-0000-000000000001"
+    }
+  },
+  {
+    "model": "matters.matter",
+    "pk": "40000000-0000-0000-0000-000000000009",
+    "fields": {
+      "created_at": "2026-01-04T09:00:00Z",
+      "updated_at": "2026-01-04T09:00:00Z",
+      "organization": "20000000-0000-0000-0000-000000000001",
+      "kind": "contract",
+      "title": "توافق‌نامه محرمانگی پروژه توسعه",
+      "reference_code": "SAMPLE-CON-003",
+      "status": "draft",
+      "priority": "normal",
+      "owner": "30000000-0000-0000-0000-000000000002",
+      "description": "نمونه NDA برای مرور محرمانگی و دسترسی محدود.",
+      "opened_on": "2026-02-05",
+      "closed_on": null,
+      "version": 1,
+      "archived_at": null,
+      "archived_by": null,
+      "created_by": "30000000-0000-0000-0000-000000000001"
+    }
+  },
+  {
+    "model": "matters.matter",
+    "pk": "40000000-0000-0000-0000-000000000010",
+    "fields": {
+      "created_at": "2026-01-05T09:00:00Z",
+      "updated_at": "2026-01-05T09:00:00Z",
+      "organization": "20000000-0000-0000-0000-000000000001",
+      "kind": "contract",
+      "title": "قرارداد استخدام مشاور حقوقی",
+      "reference_code": "SAMPLE-CON-004",
+      "status": "active",
+      "priority": "low",
+      "owner": "30000000-0000-0000-0000-000000000001",
+      "description": "قرارداد نمونه استخدامی با تاریخ تمدید مشخص.",
+      "opened_on": "2026-02-10",
+      "closed_on": null,
+      "version": 1,
+      "archived_at": null,
+      "archived_by": null,
+      "created_by": "30000000-0000-0000-0000-000000000001"
+    }
+  },
+  {
+    "model": "matters.matter",
+    "pk": "40000000-0000-0000-0000-000000000011",
+    "fields": {
+      "created_at": "2026-01-06T09:00:00Z",
+      "updated_at": "2026-01-06T09:00:00Z",
+      "organization": "20000000-0000-0000-0000-000000000001",
+      "kind": "contract",
+      "title": "قرارداد فروش حق بهره‌برداری نرم‌افزار",
+      "reference_code": "SAMPLE-CON-005",
+      "status": "active",
+      "priority": "critical",
+      "owner": "30000000-0000-0000-0000-000000000003",
+      "description": "قرارداد نمونه فروش با تعهدات تحویل و فسخ.",
+      "opened_on": "2026-02-15",
       "closed_on": null,
       "version": 1,
       "archived_at": null,
@@ -127,16 +405,16 @@
     "model": "matters.matter",
     "pk": "40000000-0000-0000-0000-000000000003",
     "fields": {
-      "created_at": "2026-01-04T09:00:00Z",
-      "updated_at": "2026-01-04T09:00:00Z",
+      "created_at": "2026-01-02T09:00:00Z",
+      "updated_at": "2026-01-02T09:00:00Z",
       "organization": "20000000-0000-0000-0000-000000000001",
       "kind": "notice",
-      "title": "Sample regulator notice",
+      "title": "اخطار پاسخ به سازمان تنظیم مقررات",
       "reference_code": "SAMPLE-NOT-001",
       "status": "response_due",
       "priority": "critical",
       "owner": "30000000-0000-0000-0000-000000000002",
-      "description": "Sample notice matter with a linked response deadline.",
+      "description": "اخطار نمونه با مهلت پاسخ متصل برای بررسی جریان اعلان و سررسید.",
       "opened_on": "2026-01-04",
       "closed_on": null,
       "version": 1,
@@ -146,12 +424,270 @@
     }
   },
   {
+    "model": "matters.matter",
+    "pk": "40000000-0000-0000-0000-000000000012",
+    "fields": {
+      "created_at": "2026-01-03T09:00:00Z",
+      "updated_at": "2026-01-03T09:00:00Z",
+      "organization": "20000000-0000-0000-0000-000000000001",
+      "kind": "notice",
+      "title": "اظهارنامه مطالبه تعهدات پیمانکار",
+      "reference_code": "SAMPLE-NOT-002",
+      "status": "received",
+      "priority": "high",
+      "owner": "30000000-0000-0000-0000-000000000003",
+      "description": "اخطار نمونه برای پیگیری پاسخ رسمی به پیمانکار.",
+      "opened_on": "2026-03-01",
+      "closed_on": null,
+      "version": 1,
+      "archived_at": null,
+      "archived_by": null,
+      "created_by": "30000000-0000-0000-0000-000000000001"
+    }
+  },
+  {
+    "model": "matters.matter",
+    "pk": "40000000-0000-0000-0000-000000000013",
+    "fields": {
+      "created_at": "2026-01-04T09:00:00Z",
+      "updated_at": "2026-01-04T09:00:00Z",
+      "organization": "20000000-0000-0000-0000-000000000001",
+      "kind": "notice",
+      "title": "ابلاغیه مالیاتی دوره زمستان",
+      "reference_code": "SAMPLE-NOT-003",
+      "status": "under_review",
+      "priority": "critical",
+      "owner": "30000000-0000-0000-0000-000000000001",
+      "description": "ابلاغیه نمونه برای بررسی مهلت اعتراض مالیاتی.",
+      "opened_on": "2026-03-06",
+      "closed_on": null,
+      "version": 1,
+      "archived_at": null,
+      "archived_by": null,
+      "created_by": "30000000-0000-0000-0000-000000000001"
+    }
+  },
+  {
+    "model": "matters.matter",
+    "pk": "40000000-0000-0000-0000-000000000014",
+    "fields": {
+      "created_at": "2026-01-05T09:00:00Z",
+      "updated_at": "2026-01-05T09:00:00Z",
+      "organization": "20000000-0000-0000-0000-000000000001",
+      "kind": "notice",
+      "title": "اخطار نقض محرمانگی شریک تجاری",
+      "reference_code": "SAMPLE-NOT-004",
+      "status": "response_due",
+      "priority": "high",
+      "owner": "30000000-0000-0000-0000-000000000002",
+      "description": "اخطار نمونه برای بررسی تعهد محرمانگی و پاسخ حقوقی.",
+      "opened_on": "2026-03-11",
+      "closed_on": null,
+      "version": 1,
+      "archived_at": null,
+      "archived_by": null,
+      "created_by": "30000000-0000-0000-0000-000000000001"
+    }
+  },
+  {
+    "model": "matters.matter",
+    "pk": "40000000-0000-0000-0000-000000000015",
+    "fields": {
+      "created_at": "2026-01-06T09:00:00Z",
+      "updated_at": "2026-01-06T09:00:00Z",
+      "organization": "20000000-0000-0000-0000-000000000001",
+      "kind": "notice",
+      "title": "نامه الزام به رفع نقص قرارداد خدمات",
+      "reference_code": "SAMPLE-NOT-005",
+      "status": "received",
+      "priority": "normal",
+      "owner": "30000000-0000-0000-0000-000000000005",
+      "description": "اخطار نمونه برای تکمیل مدارک و ثبت پاسخ.",
+      "opened_on": "2026-03-16",
+      "closed_on": null,
+      "version": 1,
+      "archived_at": null,
+      "archived_by": null,
+      "created_by": "30000000-0000-0000-0000-000000000001"
+    }
+  },
+  {
+    "model": "matters.matteraccess",
+    "pk": "42000000-0000-0000-0000-000000000001",
+    "fields": {
+      "created_at": "2026-01-04T09:15:00Z",
+      "updated_at": "2026-01-04T09:15:00Z",
+      "organization": "20000000-0000-0000-0000-000000000001",
+      "matter": "40000000-0000-0000-0000-000000000002",
+      "membership": "30000000-0000-0000-0000-000000000002",
+      "level": "view",
+      "granted_by": "30000000-0000-0000-0000-000000000001",
+      "revoked_at": null
+    }
+  },
+  {
+    "model": "matters.matteraccess",
+    "pk": "42000000-0000-0000-0000-000000000002",
+    "fields": {
+      "created_at": "2026-01-04T09:15:00Z",
+      "updated_at": "2026-01-04T09:15:00Z",
+      "organization": "20000000-0000-0000-0000-000000000001",
+      "matter": "40000000-0000-0000-0000-000000000001",
+      "membership": "30000000-0000-0000-0000-000000000004",
+      "level": "view",
+      "granted_by": "30000000-0000-0000-0000-000000000001",
+      "revoked_at": null
+    }
+  },
+  {
+    "model": "matters.matteraccess",
+    "pk": "42000000-0000-0000-0000-000000000003",
+    "fields": {
+      "created_at": "2026-01-04T09:15:00Z",
+      "updated_at": "2026-01-04T09:15:00Z",
+      "organization": "20000000-0000-0000-0000-000000000001",
+      "matter": "40000000-0000-0000-0000-000000000005",
+      "membership": "30000000-0000-0000-0000-000000000005",
+      "level": "edit",
+      "granted_by": "30000000-0000-0000-0000-000000000001",
+      "revoked_at": null
+    }
+  },
+  {
+    "model": "matters.matteraccess",
+    "pk": "42000000-0000-0000-0000-000000000004",
+    "fields": {
+      "created_at": "2026-01-04T09:15:00Z",
+      "updated_at": "2026-01-04T09:15:00Z",
+      "organization": "20000000-0000-0000-0000-000000000001",
+      "matter": "40000000-0000-0000-0000-000000000013",
+      "membership": "30000000-0000-0000-0000-000000000003",
+      "level": "edit",
+      "granted_by": "30000000-0000-0000-0000-000000000001",
+      "revoked_at": null
+    }
+  },
+  {
+    "model": "matters.matteraccess",
+    "pk": "42000000-0000-0000-0000-000000000005",
+    "fields": {
+      "created_at": "2026-01-04T09:15:00Z",
+      "updated_at": "2026-01-04T09:15:00Z",
+      "organization": "20000000-0000-0000-0000-000000000001",
+      "matter": "40000000-0000-0000-0000-000000000011",
+      "membership": "30000000-0000-0000-0000-000000000002",
+      "level": "view",
+      "granted_by": "30000000-0000-0000-0000-000000000001",
+      "revoked_at": null
+    }
+  },
+  {
+    "model": "matters.matterrelation",
+    "pk": "43000000-0000-0000-0000-000000000001",
+    "fields": {
+      "created_at": "2026-01-04T09:30:00Z",
+      "updated_at": "2026-01-04T09:30:00Z",
+      "organization": "20000000-0000-0000-0000-000000000001",
+      "source": "40000000-0000-0000-0000-000000000003",
+      "target": "40000000-0000-0000-0000-000000000002",
+      "relation_type": "related"
+    }
+  },
+  {
+    "model": "matters.matterrelation",
+    "pk": "43000000-0000-0000-0000-000000000002",
+    "fields": {
+      "created_at": "2026-01-04T09:30:00Z",
+      "updated_at": "2026-01-04T09:30:00Z",
+      "organization": "20000000-0000-0000-0000-000000000001",
+      "source": "40000000-0000-0000-0000-000000000001",
+      "target": "40000000-0000-0000-0000-000000000002",
+      "relation_type": "related"
+    }
+  },
+  {
+    "model": "matters.matterrelation",
+    "pk": "43000000-0000-0000-0000-000000000003",
+    "fields": {
+      "created_at": "2026-01-04T09:30:00Z",
+      "updated_at": "2026-01-04T09:30:00Z",
+      "organization": "20000000-0000-0000-0000-000000000001",
+      "source": "40000000-0000-0000-0000-000000000013",
+      "target": "40000000-0000-0000-0000-000000000008",
+      "relation_type": "related"
+    }
+  },
+  {
+    "model": "matters.matterrelation",
+    "pk": "43000000-0000-0000-0000-000000000004",
+    "fields": {
+      "created_at": "2026-01-04T09:30:00Z",
+      "updated_at": "2026-01-04T09:30:00Z",
+      "organization": "20000000-0000-0000-0000-000000000001",
+      "source": "40000000-0000-0000-0000-000000000011",
+      "target": "40000000-0000-0000-0000-000000000009",
+      "relation_type": "depends_on"
+    }
+  },
+  {
+    "model": "matters.matterrelation",
+    "pk": "43000000-0000-0000-0000-000000000005",
+    "fields": {
+      "created_at": "2026-01-04T09:30:00Z",
+      "updated_at": "2026-01-04T09:30:00Z",
+      "organization": "20000000-0000-0000-0000-000000000001",
+      "source": "40000000-0000-0000-0000-000000000007",
+      "target": "40000000-0000-0000-0000-000000000011",
+      "relation_type": "related"
+    }
+  },
+  {
     "model": "cases.legalcase",
     "pk": "40000000-0000-0000-0000-000000000001",
     "fields": {
       "case_type": "litigation",
-      "court_or_authority": "Sample Civil Court",
+      "court_or_authority": "شعبه ۱۲ دادگاه عمومی حقوقی تهران",
       "filing_date": "2026-01-05",
+      "outcome_summary": ""
+    }
+  },
+  {
+    "model": "cases.legalcase",
+    "pk": "40000000-0000-0000-0000-000000000004",
+    "fields": {
+      "case_type": "litigation",
+      "court_or_authority": "هیات تشخیص اداره کار تهران",
+      "filing_date": "2026-01-10",
+      "outcome_summary": ""
+    }
+  },
+  {
+    "model": "cases.legalcase",
+    "pk": "40000000-0000-0000-0000-000000000005",
+    "fields": {
+      "case_type": "litigation",
+      "court_or_authority": "شعبه ۷ دادگاه حقوقی کرج",
+      "filing_date": "2026-01-16",
+      "outcome_summary": ""
+    }
+  },
+  {
+    "model": "cases.legalcase",
+    "pk": "40000000-0000-0000-0000-000000000006",
+    "fields": {
+      "case_type": "regulatory",
+      "court_or_authority": "اداره تعزیرات حکومتی شمال تهران",
+      "filing_date": "2026-01-22",
+      "outcome_summary": "در انتظار دریافت گزارش کارشناسی."
+    }
+  },
+  {
+    "model": "cases.legalcase",
+    "pk": "40000000-0000-0000-0000-000000000007",
+    "fields": {
+      "case_type": "other",
+      "court_or_authority": "مرکز داوری اتاق بازرگانی",
+      "filing_date": "2026-01-28",
       "outcome_summary": ""
     }
   },
@@ -163,9 +699,61 @@
       "updated_at": "2026-01-05T10:00:00Z",
       "organization": "20000000-0000-0000-0000-000000000001",
       "case": "40000000-0000-0000-0000-000000000001",
-      "name": "Sample Client LLC",
+      "name": "شرکت آرمان تجارت ایرانیان",
       "role": "client",
-      "contact_summary": "sample-client@example.test"
+      "contact_summary": "نماینده: خانم رضایی - legal@example.test"
+    }
+  },
+  {
+    "model": "cases.caseparty",
+    "pk": "41000000-0000-0000-0000-000000000002",
+    "fields": {
+      "created_at": "2026-01-05T10:00:00Z",
+      "updated_at": "2026-01-05T10:00:00Z",
+      "organization": "20000000-0000-0000-0000-000000000001",
+      "case": "40000000-0000-0000-0000-000000000004",
+      "name": "آقای پیمان احمدی",
+      "role": "opposing",
+      "contact_summary": "وکیل طرف مقابل: دفتر نمونه"
+    }
+  },
+  {
+    "model": "cases.caseparty",
+    "pk": "41000000-0000-0000-0000-000000000003",
+    "fields": {
+      "created_at": "2026-01-05T10:00:00Z",
+      "updated_at": "2026-01-05T10:00:00Z",
+      "organization": "20000000-0000-0000-0000-000000000001",
+      "case": "40000000-0000-0000-0000-000000000005",
+      "name": "شرکت حمل‌ونقل سپهر",
+      "role": "opposing",
+      "contact_summary": "شماره پرونده بیمه در مستندات پیوست است."
+    }
+  },
+  {
+    "model": "cases.caseparty",
+    "pk": "41000000-0000-0000-0000-000000000004",
+    "fields": {
+      "created_at": "2026-01-05T10:00:00Z",
+      "updated_at": "2026-01-05T10:00:00Z",
+      "organization": "20000000-0000-0000-0000-000000000001",
+      "case": "40000000-0000-0000-0000-000000000006",
+      "name": "اداره تعزیرات حکومتی",
+      "role": "court",
+      "contact_summary": "مرجع رسیدگی کننده پرونده تعزیراتی."
+    }
+  },
+  {
+    "model": "cases.caseparty",
+    "pk": "41000000-0000-0000-0000-000000000005",
+    "fields": {
+      "created_at": "2026-01-05T10:00:00Z",
+      "updated_at": "2026-01-05T10:00:00Z",
+      "organization": "20000000-0000-0000-0000-000000000001",
+      "case": "40000000-0000-0000-0000-000000000007",
+      "name": "داور مرضی‌الطرفین",
+      "role": "other",
+      "contact_summary": "مشخصات داور در قرارداد اصلی درج شده است."
     }
   },
   {
@@ -173,13 +761,74 @@
     "pk": "40000000-0000-0000-0000-000000000002",
     "fields": {
       "contract_type": "vendor",
-      "counterparty": "Sample Vendor LLC",
+      "counterparty": "شرکت تامین تجهیزات پارس",
       "effective_date": "2026-01-10",
       "expiration_date": "2027-01-09",
       "renewal_date": "2026-12-10",
       "key_terms": {
-        "payment_terms": "Net 30",
-        "termination_notice_days": 30
+        "payment_terms": "پرداخت سی روزه پس از دریافت فاکتور",
+        "termination_notice_days": 30,
+        "governing_law": "قانون ایران"
+      }
+    }
+  },
+  {
+    "model": "contracts.contract",
+    "pk": "40000000-0000-0000-0000-000000000008",
+    "fields": {
+      "contract_type": "service",
+      "counterparty": "شرکت داده‌پردازان سپید",
+      "effective_date": "2026-02-01",
+      "expiration_date": "2027-01-31",
+      "renewal_date": "2026-12-31",
+      "key_terms": {
+        "service_level": "پاسخ‌گویی حداکثر چهار ساعت",
+        "monthly_fee": "۱۲۰ میلیون ریال"
+      }
+    }
+  },
+  {
+    "model": "contracts.contract",
+    "pk": "40000000-0000-0000-0000-000000000009",
+    "fields": {
+      "contract_type": "nda",
+      "counterparty": "شرکت نوآوران آینده",
+      "effective_date": "2026-02-05",
+      "expiration_date": "2028-02-04",
+      "renewal_date": null,
+      "key_terms": {
+        "confidentiality_period_years": 3,
+        "permitted_use": "ارزیابی پروژه توسعه"
+      }
+    }
+  },
+  {
+    "model": "contracts.contract",
+    "pk": "40000000-0000-0000-0000-000000000010",
+    "fields": {
+      "contract_type": "employment",
+      "counterparty": "خانم مریم صادقی",
+      "effective_date": "2026-02-10",
+      "expiration_date": "2027-02-09",
+      "renewal_date": "2027-01-10",
+      "key_terms": {
+        "role": "مشاور حقوقی",
+        "probation_months": 3
+      }
+    }
+  },
+  {
+    "model": "contracts.contract",
+    "pk": "40000000-0000-0000-0000-000000000011",
+    "fields": {
+      "contract_type": "service",
+      "counterparty": "شرکت راهکار نرم‌افزار آفتاب",
+      "effective_date": "2026-02-15",
+      "expiration_date": "2027-08-14",
+      "renewal_date": "2027-07-15",
+      "key_terms": {
+        "delivery_milestones": 4,
+        "termination_notice_days": 45
       }
     }
   },
@@ -191,8 +840,8 @@
       "updated_at": "2026-01-04T10:00:00Z",
       "organization": "20000000-0000-0000-0000-000000000001",
       "matter": "40000000-0000-0000-0000-000000000003",
-      "title": "Sample notice response deadline",
-      "description": "Support deadline required by the sample notice.",
+      "title": "مهلت پاسخ به اخطار",
+      "description": "مهلت پاسخ رسمی که به اخطار نمونه متصل است.",
       "due_at": "2026-08-15T12:00:00Z",
       "assignee": "30000000-0000-0000-0000-000000000002",
       "status": "open",
@@ -206,10 +855,98 @@
     }
   },
   {
+    "model": "deadlines.deadline",
+    "pk": "50000000-0000-0000-0000-000000000002",
+    "fields": {
+      "created_at": "2026-01-04T10:00:00Z",
+      "updated_at": "2026-01-04T10:00:00Z",
+      "organization": "20000000-0000-0000-0000-000000000001",
+      "matter": "40000000-0000-0000-0000-000000000012",
+      "title": "مهلت پاسخ به اظهارنامه پیمانکار",
+      "description": "تهیه پاسخ رسمی و ارسال از مسیر ثبتی.",
+      "due_at": "2026-08-20T12:00:00Z",
+      "assignee": "30000000-0000-0000-0000-000000000003",
+      "status": "open",
+      "priority": "high",
+      "reminder_enabled": true,
+      "completed_at": null,
+      "completed_by": null,
+      "cancelled_at": null,
+      "cancelled_by": null,
+      "version": 1
+    }
+  },
+  {
+    "model": "deadlines.deadline",
+    "pk": "50000000-0000-0000-0000-000000000003",
+    "fields": {
+      "created_at": "2026-01-04T10:00:00Z",
+      "updated_at": "2026-01-04T10:00:00Z",
+      "organization": "20000000-0000-0000-0000-000000000001",
+      "matter": "40000000-0000-0000-0000-000000000013",
+      "title": "مهلت اعتراض به ابلاغیه مالیاتی",
+      "description": "جمع‌آوری مستندات و ثبت اعتراض در سامانه مالیاتی.",
+      "due_at": "2026-08-25T12:00:00Z",
+      "assignee": "30000000-0000-0000-0000-000000000001",
+      "status": "open",
+      "priority": "critical",
+      "reminder_enabled": true,
+      "completed_at": null,
+      "completed_by": null,
+      "cancelled_at": null,
+      "cancelled_by": null,
+      "version": 1
+    }
+  },
+  {
+    "model": "deadlines.deadline",
+    "pk": "50000000-0000-0000-0000-000000000004",
+    "fields": {
+      "created_at": "2026-01-04T10:00:00Z",
+      "updated_at": "2026-01-04T10:00:00Z",
+      "organization": "20000000-0000-0000-0000-000000000001",
+      "matter": "40000000-0000-0000-0000-000000000014",
+      "title": "مهلت پاسخ به نقض محرمانگی",
+      "description": "بررسی شواهد و ارسال اخطار متقابل در موعد مقرر.",
+      "due_at": "2026-08-30T12:00:00Z",
+      "assignee": "30000000-0000-0000-0000-000000000002",
+      "status": "open",
+      "priority": "high",
+      "reminder_enabled": true,
+      "completed_at": null,
+      "completed_by": null,
+      "cancelled_at": null,
+      "cancelled_by": null,
+      "version": 1
+    }
+  },
+  {
+    "model": "deadlines.deadline",
+    "pk": "50000000-0000-0000-0000-000000000005",
+    "fields": {
+      "created_at": "2026-01-04T10:00:00Z",
+      "updated_at": "2026-01-04T10:00:00Z",
+      "organization": "20000000-0000-0000-0000-000000000001",
+      "matter": "40000000-0000-0000-0000-000000000015",
+      "title": "مهلت رفع نقص قرارداد خدمات",
+      "description": "هماهنگی با واحد عملیات برای تکمیل مدارک.",
+      "due_at": "2026-09-04T12:00:00Z",
+      "assignee": "30000000-0000-0000-0000-000000000005",
+      "status": "open",
+      "priority": "normal",
+      "reminder_enabled": true,
+      "completed_at": null,
+      "completed_by": null,
+      "cancelled_at": null,
+      "cancelled_by": null,
+      "version": 1
+    }
+  },
+  {
     "model": "notices.legalnotice",
     "pk": "40000000-0000-0000-0000-000000000003",
     "fields": {
-      "sender": "Sample Regulator",
+      "sender": "سازمان تنظیم مقررات",
       "received_date": "2026-01-04",
       "response_deadline": "2026-08-15T12:00:00Z",
       "response_status": "pending",
@@ -217,24 +954,147 @@
     }
   },
   {
-    "model": "documents.uploadsession",
+    "model": "notices.legalnotice",
+    "pk": "40000000-0000-0000-0000-000000000012",
+    "fields": {
+      "sender": "شرکت پیمانکاری بهین‌ساز",
+      "received_date": "2026-03-01",
+      "response_deadline": "2026-08-20T12:00:00Z",
+      "response_status": "pending",
+      "linked_deadline": "50000000-0000-0000-0000-000000000002"
+    }
+  },
+  {
+    "model": "notices.legalnotice",
+    "pk": "40000000-0000-0000-0000-000000000013",
+    "fields": {
+      "sender": "اداره امور مالیاتی شمال تهران",
+      "received_date": "2026-03-06",
+      "response_deadline": "2026-08-25T12:00:00Z",
+      "response_status": "pending",
+      "linked_deadline": "50000000-0000-0000-0000-000000000003"
+    }
+  },
+  {
+    "model": "notices.legalnotice",
+    "pk": "40000000-0000-0000-0000-000000000014",
+    "fields": {
+      "sender": "شرکت همکاران توسعه شرق",
+      "received_date": "2026-03-11",
+      "response_deadline": "2026-08-30T12:00:00Z",
+      "response_status": "pending",
+      "linked_deadline": "50000000-0000-0000-0000-000000000004"
+    }
+  },
+  {
+    "model": "notices.legalnotice",
+    "pk": "40000000-0000-0000-0000-000000000015",
+    "fields": {
+      "sender": "کارفرمای قرارداد خدمات",
+      "received_date": "2026-03-16",
+      "response_deadline": "2026-09-04T12:00:00Z",
+      "response_status": "pending",
+      "linked_deadline": "50000000-0000-0000-0000-000000000005"
+    }
+  },
+  {
+    "model": "tasks.task",
     "pk": "60000000-0000-0000-0000-000000000001",
     "fields": {
-      "created_at": "2026-01-06T09:00:00Z",
-      "updated_at": "2026-01-06T09:00:00Z",
+      "created_at": "2026-01-06T08:30:00Z",
+      "updated_at": "2026-01-06T08:30:00Z",
       "organization": "20000000-0000-0000-0000-000000000001",
       "matter": "40000000-0000-0000-0000-000000000001",
-      "requested_by": "30000000-0000-0000-0000-000000000002",
-      "object_key": "sample-fixture/40000000-0000-0000-0000-000000000001/case-summary.pdf",
-      "original_filename": "sample-case-summary.pdf",
-      "expected_size": 2048,
-      "expected_content_type": "application/pdf",
-      "expected_checksum": "",
-      "description": "Sample document metadata only; no object bytes are stored in MinIO.",
-      "status": "available",
-      "expires_at": "2026-08-15T12:00:00Z",
-      "completed_at": "2026-01-06T09:05:00Z",
-      "failure_code": ""
+      "title": "آماده‌سازی پیش‌نویس پاسخ",
+      "description": "کار نمونه برای پیگیری اقدام بعدی پرونده در محیط محلی.",
+      "assignee": "30000000-0000-0000-0000-000000000002",
+      "due_at": "2026-08-10T12:00:00Z",
+      "status": "todo",
+      "completed_at": null,
+      "completed_by": null,
+      "cancelled_at": null,
+      "cancelled_by": null,
+      "version": 1
+    }
+  },
+  {
+    "model": "tasks.task",
+    "pk": "60000000-0000-0000-0000-000000000002",
+    "fields": {
+      "created_at": "2026-01-06T08:30:00Z",
+      "updated_at": "2026-01-06T08:30:00Z",
+      "organization": "20000000-0000-0000-0000-000000000001",
+      "matter": "40000000-0000-0000-0000-000000000004",
+      "title": "مرور قرارداد استخدامی",
+      "description": "بررسی بندهای فسخ و مستندات پرونده استخدامی.",
+      "assignee": "30000000-0000-0000-0000-000000000003",
+      "due_at": "2026-08-12T12:00:00Z",
+      "status": "in_progress",
+      "completed_at": null,
+      "completed_by": null,
+      "cancelled_at": null,
+      "cancelled_by": null,
+      "version": 1
+    }
+  },
+  {
+    "model": "tasks.task",
+    "pk": "60000000-0000-0000-0000-000000000003",
+    "fields": {
+      "created_at": "2026-01-06T08:30:00Z",
+      "updated_at": "2026-01-06T08:30:00Z",
+      "organization": "20000000-0000-0000-0000-000000000001",
+      "matter": "40000000-0000-0000-0000-000000000005",
+      "title": "جمع‌آوری اسناد خسارت",
+      "description": "دریافت بارنامه و گزارش بیمه برای پرونده حمل کالا.",
+      "assignee": "30000000-0000-0000-0000-000000000005",
+      "due_at": "2026-08-14T12:00:00Z",
+      "status": "todo",
+      "completed_at": null,
+      "completed_by": null,
+      "cancelled_at": null,
+      "cancelled_by": null,
+      "version": 1
+    }
+  },
+  {
+    "model": "tasks.task",
+    "pk": "60000000-0000-0000-0000-000000000004",
+    "fields": {
+      "created_at": "2026-01-06T08:30:00Z",
+      "updated_at": "2026-01-06T08:30:00Z",
+      "organization": "20000000-0000-0000-0000-000000000001",
+      "matter": "40000000-0000-0000-0000-000000000002",
+      "title": "بازبینی بند تمدید قرارداد تامین",
+      "description": "کنترل تاریخ تمدید و شرایط فسخ قرارداد تامین تجهیزات.",
+      "assignee": "30000000-0000-0000-0000-000000000001",
+      "due_at": "2026-08-16T12:00:00Z",
+      "status": "todo",
+      "completed_at": null,
+      "completed_by": null,
+      "cancelled_at": null,
+      "cancelled_by": null,
+      "version": 1
+    }
+  },
+  {
+    "model": "tasks.task",
+    "pk": "60000000-0000-0000-0000-000000000005",
+    "fields": {
+      "created_at": "2026-01-06T08:30:00Z",
+      "updated_at": "2026-01-06T08:30:00Z",
+      "organization": "20000000-0000-0000-0000-000000000001",
+      "matter": "40000000-0000-0000-0000-000000000013",
+      "title": "تهیه فهرست مدارک مالیاتی",
+      "description": "آماده‌سازی پیوست‌های لازم برای اعتراض مالیاتی.",
+      "assignee": "30000000-0000-0000-0000-000000000003",
+      "due_at": "2026-08-18T12:00:00Z",
+      "status": "in_progress",
+      "completed_at": null,
+      "completed_by": null,
+      "cancelled_at": null,
+      "cancelled_by": null,
+      "version": 1
     }
   },
   {
@@ -245,18 +1105,116 @@
       "updated_at": "2026-01-06T09:10:00Z",
       "organization": "20000000-0000-0000-0000-000000000001",
       "matter": "40000000-0000-0000-0000-000000000001",
-      "upload_session": "60000000-0000-0000-0000-000000000001",
       "object_key": "sample-fixture/40000000-0000-0000-0000-000000000001/case-summary.pdf",
-      "original_filename": "sample-case-summary.pdf",
+      "original_filename": "صورتجلسه-پرونده-مطالبه.pdf",
       "content_type": "application/pdf",
-      "size": 2048,
-      "checksum": "",
+      "expected_size": 2049,
+      "actual_size": 2049,
+      "expected_checksum": "",
+      "actual_checksum": "",
+      "etag": "",
       "status": "available",
-      "description": "Sample document metadata only; no object bytes are stored in MinIO.",
+      "description": "فراداده سند نمونه است و فایل واقعی در MinIO ذخیره نشده است.",
       "uploaded_by": "30000000-0000-0000-0000-000000000002",
-      "available_at": "2026-01-06T09:10:00Z",
-      "revoked_at": null,
-      "revoked_by": null
+      "upload_expires_at": "2026-09-15T12:00:00Z",
+      "uploaded_at": "2026-01-06T09:10:00Z",
+      "failure_code": ""
+    }
+  },
+  {
+    "model": "documents.document",
+    "pk": "70000000-0000-0000-0000-000000000002",
+    "fields": {
+      "created_at": "2026-01-10T09:10:00Z",
+      "updated_at": "2026-01-10T09:10:00Z",
+      "organization": "20000000-0000-0000-0000-000000000001",
+      "matter": "40000000-0000-0000-0000-000000000004",
+      "object_key": "sample-fixture/40000000-0000-0000-0000-000000000004/employment-review.pdf",
+      "original_filename": "بررسی-پرونده-استخدامی.pdf",
+      "content_type": "application/pdf",
+      "expected_size": 2050,
+      "actual_size": 2050,
+      "expected_checksum": "",
+      "actual_checksum": "",
+      "etag": "",
+      "status": "available",
+      "description": "فراداده سند نمونه برای پرونده استخدامی.",
+      "uploaded_by": "30000000-0000-0000-0000-000000000003",
+      "upload_expires_at": "2026-09-15T12:00:00Z",
+      "uploaded_at": "2026-01-10T09:10:00Z",
+      "failure_code": ""
+    }
+  },
+  {
+    "model": "documents.document",
+    "pk": "70000000-0000-0000-0000-000000000003",
+    "fields": {
+      "created_at": "2026-02-02T09:10:00Z",
+      "updated_at": "2026-02-02T09:10:00Z",
+      "organization": "20000000-0000-0000-0000-000000000001",
+      "matter": "40000000-0000-0000-0000-000000000002",
+      "object_key": "sample-fixture/40000000-0000-0000-0000-000000000002/vendor-contract.pdf",
+      "original_filename": "قرارداد-تامین-تجهیزات.pdf",
+      "content_type": "application/pdf",
+      "expected_size": 2051,
+      "actual_size": 2051,
+      "expected_checksum": "",
+      "actual_checksum": "",
+      "etag": "",
+      "status": "available",
+      "description": "فراداده سند نمونه برای قرارداد تامین.",
+      "uploaded_by": "30000000-0000-0000-0000-000000000001",
+      "upload_expires_at": "2026-09-15T12:00:00Z",
+      "uploaded_at": "2026-02-02T09:10:00Z",
+      "failure_code": ""
+    }
+  },
+  {
+    "model": "documents.document",
+    "pk": "70000000-0000-0000-0000-000000000004",
+    "fields": {
+      "created_at": "2026-03-02T09:10:00Z",
+      "updated_at": "2026-03-02T09:10:00Z",
+      "organization": "20000000-0000-0000-0000-000000000001",
+      "matter": "40000000-0000-0000-0000-000000000003",
+      "object_key": "sample-fixture/40000000-0000-0000-0000-000000000003/regulator-notice.pdf",
+      "original_filename": "اخطار-سازمان-تنظیم-مقررات.pdf",
+      "content_type": "application/pdf",
+      "expected_size": 2052,
+      "actual_size": 2052,
+      "expected_checksum": "",
+      "actual_checksum": "",
+      "etag": "",
+      "status": "available",
+      "description": "فراداده سند نمونه برای اخطار رسمی.",
+      "uploaded_by": "30000000-0000-0000-0000-000000000002",
+      "upload_expires_at": "2026-09-15T12:00:00Z",
+      "uploaded_at": "2026-03-02T09:10:00Z",
+      "failure_code": ""
+    }
+  },
+  {
+    "model": "documents.document",
+    "pk": "70000000-0000-0000-0000-000000000005",
+    "fields": {
+      "created_at": "2026-03-06T09:10:00Z",
+      "updated_at": "2026-03-06T09:10:00Z",
+      "organization": "20000000-0000-0000-0000-000000000001",
+      "matter": "40000000-0000-0000-0000-000000000011",
+      "object_key": "sample-fixture/40000000-0000-0000-0000-000000000011/software-license.pdf",
+      "original_filename": "قرارداد-حق-بهره‌برداری-نرم‌افزار.pdf",
+      "content_type": "application/pdf",
+      "expected_size": 2053,
+      "actual_size": 2053,
+      "expected_checksum": "",
+      "actual_checksum": "",
+      "etag": "",
+      "status": "available",
+      "description": "فراداده سند نمونه برای قرارداد نرم‌افزار.",
+      "uploaded_by": "30000000-0000-0000-0000-000000000003",
+      "upload_expires_at": "2026-09-15T12:00:00Z",
+      "uploaded_at": "2026-03-06T09:10:00Z",
+      "failure_code": ""
     }
   }
 ]

@@ -34,7 +34,7 @@ Do not commit `.env` or real secrets. The example lists required keys without pr
 | PostgreSQL | `POSTGRES_DB`, `POSTGRES_USER`, `POSTGRES_PASSWORD`, `DATABASE_URL` |
 | Redis | `REDIS_URL`, `CHANNEL_LAYER_REDIS_URL` |
 | RabbitMQ and Celery | `RABBITMQ_DEFAULT_USER`, `RABBITMQ_DEFAULT_PASS`, `CELERY_BROKER_URL`, `CELERY_RESULT_BACKEND` |
-| MinIO | `MINIO_ENDPOINT`, `MINIO_PUBLIC_ENDPOINT`, `MINIO_ACCESS_KEY`, `MINIO_SECRET_KEY`, `MINIO_BUCKET_DOCUMENTS`, `MINIO_USE_SSL`, upload/download TTLs, `MAX_UPLOAD_SIZE_BYTES` |
+| MinIO | `MINIO_INTERNAL_ENDPOINT`, `MINIO_ENDPOINT` compatibility alias, `MINIO_PUBLIC_ENDPOINT`, `MINIO_REGION`, `MINIO_ACCESS_KEY`, `MINIO_SECRET_KEY`, `MINIO_BUCKET_DOCUMENTS`, `MINIO_USE_SSL`, upload/download TTLs, `MAX_UPLOAD_SIZE_BYTES` |
 | JWT and cookies | `JWT_ACCESS_MINUTES`, `JWT_REFRESH_DAYS`, `JWT_REFRESH_COOKIE_NAME`, `JWT_COOKIE_DOMAIN` |
 | Email/providers | `EMAIL_HOST`, `EMAIL_PORT`, `DEFAULT_FROM_EMAIL`, optional SMS/push provider keys |
 
@@ -246,6 +246,7 @@ Key decisions:
 - Matter retrieval applies visibility before object lookup; hidden confidential records normally appear as not found.
 - Refresh tokens are not stored in browser local storage.
 - MinIO buckets are private. Upload and download URLs are short-lived and issued only after permission checks.
+- Django uses `MINIO_INTERNAL_ENDPOINT` for object checks/deletes and signs URLs for `MINIO_PUBLIC_ENDPOINT`; do not rewrite presigned hosts after signing.
 - Upload completion verifies the object at the expected key with expected metadata before creating available document metadata.
 - WebSocket access uses short-lived one-time tickets over `/ws/v1/events/?ticket=...`; clients cannot subscribe to arbitrary groups.
 - Activity logs and outbox rows are written with critical business changes.
@@ -287,7 +288,7 @@ Check that `DJANGO_CORS_ALLOWED_ORIGINS`, `DJANGO_CSRF_TRUSTED_ORIGINS`, `VITE_A
 
 ### MinIO upload errors
 
-Confirm `minio` and `minio-init` are healthy, the bucket is private, and MinIO CORS allows the frontend origin. Do not make the bucket public.
+Confirm `minio` and `minio-init` are healthy, the bucket is private, `MINIO_INTERNAL_ENDPOINT` is reachable from the API container, `MINIO_PUBLIC_ENDPOINT` is reachable by the current client, and MinIO CORS allows the frontend origin. Do not make the bucket public.
 
 ## Known Limitations
 
