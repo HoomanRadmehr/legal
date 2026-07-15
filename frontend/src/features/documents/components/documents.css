@@ -1,3 +1,8 @@
+.documents-page {
+  display: grid;
+  gap: 1rem;
+}
+
 .document-section {
   display: grid;
   gap: 1rem;
@@ -69,7 +74,7 @@
 .document-list__table td {
   border-bottom: 1px solid #e4e7ec;
   padding: 0.625rem;
-  text-align: left;
+  text-align: start;
 }
 
 .document-list__actions {

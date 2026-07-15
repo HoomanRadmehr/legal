@@ -1,4 +1,9 @@
-import { useForm, type FieldErrors, type FieldPath } from "react-hook-form";
+import {
+  useForm,
+  useWatch,
+  type FieldErrors,
+  type FieldPath,
+} from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { ZodError } from "zod";
 
@@ -7,6 +12,8 @@ import {
   FormErrorSummary,
   type FormErrorItem,
 } from "../../../components/formErrorSummary";
+import { LocalizedDateInput } from "../../../components/localizedDateInput";
+import { useI18n } from "../../../i18n";
 import {
   buildContractCreateInput,
   buildContractUpdateInput,
@@ -23,6 +30,7 @@ import type {
 import {
   contractPriorityLabel,
   contractStatusLabel,
+  contractText,
   contractTypeLabel,
 } from "./contractLabels";
 
@@ -60,6 +68,8 @@ export function ContractForm({
   onSubmit,
 }: ContractFormProps) {
   const navigate = useNavigate();
+  const { locale } = useI18n();
+  const labels = contractText(locale);
   const form = useForm<ContractFormValues>({
     defaultValues: initialContract ? undefined : defaultContractFormValues(),
     values: initialContract
@@ -80,7 +90,7 @@ export function ContractForm({
       const savedContract = await onSubmit(input);
       navigate(`/contracts/${savedContract.id}`);
     } catch (error) {
-      applyFormError(form.setError, error);
+      applyFormError(form.setError, error, labels);
     }
   }
 
@@ -90,11 +100,10 @@ export function ContractForm({
       onSubmit={form.handleSubmit(submit)}
       noValidate
     >
-      <FormErrorSummary errors={formErrors(form.formState.errors)} />
+      <FormErrorSummary errors={formErrors(form.formState.errors, labels)} />
       {conflict ? (
         <p className="contract-alert" role="alert">
-          This contract changed while you were editing. Reload before saving to
-          avoid overwriting work.
+          {labels.versionConflict}
         </p>
       ) : null}
       {isNonConflictApiError(mutationError) ? (
@@ -103,32 +112,36 @@ export function ContractForm({
         </p>
       ) : null}
       <fieldset>
-        <legend>Contract details</legend>
+        <legend>{labels.contractDetails}</legend>
         <label>
-          Title
+          {labels.title}
           <input {...form.register("title")} id="title" />
         </label>
         <label>
-          Reference code
+          {labels.referenceCode}
           <input {...form.register("reference_code")} id="reference_code" />
         </label>
         <label>
-          Counterparty
+          {labels.counterparty}
           <input {...form.register("counterparty")} id="counterparty" />
         </label>
-        <ContractSelectFields register={form.register} />
+        <ContractSelectFields
+          labels={labels}
+          locale={locale}
+          register={form.register}
+        />
         <label>
-          Owner membership ID
+          {labels.ownerMembership}
           <input {...form.register("owner_id")} id="owner_id" />
         </label>
       </fieldset>
-      <ContractDateFields register={form.register} />
+      <ContractDateFields form={form} labels={labels} />
       <label>
-        Description
+        {labels.description}
         <textarea {...form.register("description")} id="description" rows={4} />
       </label>
       <label>
-        Key terms JSON
+        {labels.keyTermsJson}
         <textarea
           {...form.register("key_terms_text")}
           id="key_terms_text"
@@ -143,7 +156,7 @@ export function ContractForm({
       ) : null}
       <div className="contract-form__actions">
         <button disabled={form.formState.isSubmitting} type="submit">
-          {mode === "create" ? "Create contract" : "Save changes"}
+          {mode === "create" ? labels.create : labels.save}
         </button>
       </div>
     </form>
@@ -151,41 +164,45 @@ export function ContractForm({
 }
 
 function ContractSelectFields({
+  labels,
+  locale,
   register,
 }: {
+  labels: ReturnType<typeof contractText>;
+  locale: ReturnType<typeof useI18n>["locale"];
   register: ReturnType<typeof useForm<ContractFormValues>>["register"];
 }) {
   return (
     <>
       <label>
-        Status
+        {labels.status}
         <select {...register("status")} id="status">
           {(
             ["active", "draft", "expired", "terminated", "archived"] as const
           ).map((status) => (
             <option key={status} value={status}>
-              {contractStatusLabel(status)}
+              {contractStatusLabel(status, locale)}
             </option>
           ))}
         </select>
       </label>
       <label>
-        Priority
+        {labels.priority}
         <select {...register("priority")} id="priority">
           {(["normal", "low", "high", "critical"] as const).map((priority) => (
             <option key={priority} value={priority}>
-              {contractPriorityLabel(priority)}
+              {contractPriorityLabel(priority, locale)}
             </option>
           ))}
         </select>
       </label>
       <label>
-        Contract type
+        {labels.contractType}
         <select {...register("contract_type")} id="contract_type">
           {(["vendor", "service", "employment", "nda", "other"] as const).map(
             (contractType) => (
               <option key={contractType} value={contractType}>
-                {contractTypeLabel(contractType)}
+                {contractTypeLabel(contractType, locale)}
               </option>
             ),
           )}
@@ -196,41 +213,62 @@ function ContractSelectFields({
 }
 
 function ContractDateFields({
-  register,
+  form,
+  labels,
 }: {
-  register: ReturnType<typeof useForm<ContractFormValues>>["register"];
+  form: ReturnType<typeof useForm<ContractFormValues>>;
+  labels: ReturnType<typeof contractText>;
 }) {
+  const effectiveDate = useWatch({
+    control: form.control,
+    name: "effective_date",
+  });
+  const expirationDate = useWatch({
+    control: form.control,
+    name: "expiration_date",
+  });
+  const renewalDate = useWatch({ control: form.control, name: "renewal_date" });
+  const openedOn = useWatch({ control: form.control, name: "opened_on" });
+  const closedOn = useWatch({ control: form.control, name: "closed_on" });
+
   return (
     <fieldset>
-      <legend>Dates</legend>
-      <label>
-        Effective date
-        <input
-          {...register("effective_date")}
-          id="effective_date"
-          type="date"
-        />
-      </label>
-      <label>
-        Expiration date
-        <input
-          {...register("expiration_date")}
-          id="expiration_date"
-          type="date"
-        />
-      </label>
-      <label>
-        Renewal date
-        <input {...register("renewal_date")} id="renewal_date" type="date" />
-      </label>
-      <label>
-        Opened on
-        <input {...register("opened_on")} id="opened_on" type="date" />
-      </label>
-      <label>
-        Closed on
-        <input {...register("closed_on")} id="closed_on" type="date" />
-      </label>
+      <legend>{labels.dates}</legend>
+      <LocalizedDateInput
+        id="effective_date"
+        label={labels.effectiveDate}
+        onValueChange={(value) => form.setValue("effective_date", value)}
+        registration={form.register("effective_date")}
+        value={effectiveDate}
+      />
+      <LocalizedDateInput
+        id="expiration_date"
+        label={labels.expirationDate}
+        onValueChange={(value) => form.setValue("expiration_date", value)}
+        registration={form.register("expiration_date")}
+        value={expirationDate}
+      />
+      <LocalizedDateInput
+        id="renewal_date"
+        label={labels.renewalDate}
+        onValueChange={(value) => form.setValue("renewal_date", value)}
+        registration={form.register("renewal_date")}
+        value={renewalDate}
+      />
+      <LocalizedDateInput
+        id="opened_on"
+        label={labels.openedOn}
+        onValueChange={(value) => form.setValue("opened_on", value)}
+        registration={form.register("opened_on")}
+        value={openedOn}
+      />
+      <LocalizedDateInput
+        id="closed_on"
+        label={labels.closedOn}
+        onValueChange={(value) => form.setValue("closed_on", value)}
+        registration={form.register("closed_on")}
+        value={closedOn}
+      />
     </fieldset>
   );
 }
@@ -238,35 +276,45 @@ function ContractDateFields({
 function applyFormError(
   setError: ReturnType<typeof useForm<ContractFormValues>>["setError"],
   error: unknown,
+  labels: ReturnType<typeof contractText>,
 ) {
   if (error instanceof ZodError) {
-    applyZodErrors(setError, error);
+    applyZodErrors(setError, error, labels);
     return;
   }
-  if (isApiError(error) && applyApiFieldErrors(setError, error)) {
+  if (isApiError(error) && applyApiFieldErrors(setError, error, labels)) {
     return;
   }
   setError("root", {
-    message: error instanceof Error ? error.message : "Save failed.",
+    message: error instanceof Error ? error.message : labels.saveFailed,
   });
 }
 
 function applyZodErrors(
   setError: ReturnType<typeof useForm<ContractFormValues>>["setError"],
   error: ZodError,
+  labels: ReturnType<typeof contractText>,
 ) {
   for (const issue of error.issues) {
     setError(issue.path.join(".") as FieldPath<ContractFormValues>, {
-      message: issue.message,
+      message: validationMessage(issue.message, labels),
     });
   }
+}
+
+function validationMessage(
+  message: string,
+  labels: ReturnType<typeof contractText>,
+): string {
+  return labels.invalidValue === "Invalid value." ? message : labels.invalidValue;
 }
 
 function applyApiFieldErrors(
   setError: ReturnType<typeof useForm<ContractFormValues>>["setError"],
   error: { code: string; details: Record<string, unknown>; message: string },
+  labels: ReturnType<typeof contractText>,
 ): boolean {
-  const mapped = applyApiDetails(setError, error.details);
+  const mapped = applyApiDetails(setError, error.details, labels);
   if (mapped) {
     return true;
   }
@@ -279,12 +327,13 @@ function applyApiFieldErrors(
 function applyApiDetails(
   setError: ReturnType<typeof useForm<ContractFormValues>>["setError"],
   details: Record<string, unknown>,
+  labels: ReturnType<typeof contractText>,
 ): boolean {
   let mapped = false;
   for (const [field, message] of Object.entries(details)) {
     if (isContractField(field)) {
       setError(field as FieldPath<ContractFormValues>, {
-        message: detailMessage(message),
+        message: detailMessage(message, labels),
       });
       mapped = true;
     }
@@ -310,7 +359,10 @@ function applyDateRuleError(
   return true;
 }
 
-function formErrors(errors: FieldErrors<ContractFormValues>): FormErrorItem[] {
+function formErrors(
+  errors: FieldErrors<ContractFormValues>,
+  labels: ReturnType<typeof contractText>,
+): FormErrorItem[] {
   return Object.entries(errors).flatMap(([field, error]) => {
     if (!error) {
       return [];
@@ -318,22 +370,44 @@ function formErrors(errors: FieldErrors<ContractFormValues>): FormErrorItem[] {
     return [
       {
         fieldId: field,
-        label: fieldLabel(field),
+        label: fieldLabel(field, labels),
         message: String(error.message),
       },
     ];
   });
 }
 
-function detailMessage(value: unknown): string {
+function detailMessage(
+  value: unknown,
+  labels: ReturnType<typeof contractText>,
+): string {
   if (Array.isArray(value)) {
-    return String(value[0] ?? "Invalid value.");
+    return String(value[0] ?? labels.invalidValue);
   }
-  return String(value || "Invalid value.");
+  return String(value || labels.invalidValue);
 }
 
-function fieldLabel(field: string): string {
-  return field.replaceAll("_", " ");
+function fieldLabel(
+  field: string,
+  labels: ReturnType<typeof contractText>,
+): string {
+  const fieldLabels: Record<string, string> = {
+    closed_on: labels.closedOn,
+    contract_type: labels.contractType,
+    counterparty: labels.counterparty,
+    description: labels.description,
+    effective_date: labels.effectiveDate,
+    expiration_date: labels.expirationDate,
+    key_terms_text: labels.keyTermsJson,
+    opened_on: labels.openedOn,
+    owner_id: labels.ownerMembership,
+    priority: labels.priority,
+    reference_code: labels.referenceCode,
+    renewal_date: labels.renewalDate,
+    status: labels.status,
+    title: labels.title,
+  };
+  return fieldLabels[field] ?? field.replaceAll("_", " ");
 }
 
 function isContractField(field: string): boolean {

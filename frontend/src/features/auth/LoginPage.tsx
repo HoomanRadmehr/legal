@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 
 import { isApiError } from "../../api/errors";
 import { useAuth } from "../../auth";
+import { useI18n } from "../../i18n";
 import "./login.css";
 
 type LocationState = {
@@ -13,6 +14,7 @@ type LocationState = {
 
 export function LoginPage() {
   const { login } = useAuth();
+  const { t } = useI18n();
   const location = useLocation();
   const navigate = useNavigate();
   const [username, setUsername] = useState("");
@@ -29,7 +31,7 @@ export function LoginPage() {
       await login({ password, username });
       navigate(redirectPath(location.state), { replace: true });
     } catch (error) {
-      setErrorMessage(formatLoginError(error));
+      setErrorMessage(formatLoginError(error, t));
     } finally {
       setIsSubmitting(false);
     }
@@ -38,11 +40,11 @@ export function LoginPage() {
   return (
     <main className="app-shell app-shell--public">
       <section className="login-panel" aria-labelledby="login-title">
-        <p className="app-kicker">Legal workspace</p>
-        <h1 id="login-title">Sign in</h1>
+        <p className="app-kicker">{t("auth.login.eyebrow")}</p>
+        <h1 id="login-title">{t("auth.login.title")}</h1>
         <form className="login-form" onSubmit={handleSubmit}>
           <label className="login-field">
-            <span>Email or username</span>
+            <span>{t("auth.login.username")}</span>
             <input
               autoComplete="username"
               name="username"
@@ -53,7 +55,7 @@ export function LoginPage() {
             />
           </label>
           <label className="login-field">
-            <span>Password</span>
+            <span>{t("auth.login.password")}</span>
             <input
               autoComplete="current-password"
               name="password"
@@ -73,7 +75,7 @@ export function LoginPage() {
             disabled={isSubmitting}
             type="submit"
           >
-            {isSubmitting ? "Signing in" : "Sign in"}
+            {isSubmitting ? t("auth.login.submitting") : t("auth.login.submit")}
           </button>
         </form>
       </section>
@@ -91,24 +93,32 @@ function redirectPath(state: unknown): string {
   return from;
 }
 
-function formatLoginError(error: unknown): string {
+function formatLoginError(
+  error: unknown,
+  t: (key: string, values?: Record<string, string | number>) => string,
+): string {
   if (!isApiError(error)) {
-    return "Unable to reach the server. Check your connection and try again.";
+    return t("auth.login.errors.network");
   }
   if (error.status === 429) {
-    return buildRateLimitMessage(error.retryAfterSeconds);
+    return buildRateLimitMessage(error.retryAfterSeconds, t);
   }
   if (error.status === 0) {
-    return "Unable to reach the server. Check your connection and try again.";
+    return t("auth.login.errors.network");
   }
 
-  return "The username or password is incorrect.";
+  return t("auth.login.errors.invalidCredentials");
 }
 
-function buildRateLimitMessage(retryAfterSeconds?: number): string {
+function buildRateLimitMessage(
+  retryAfterSeconds: number | undefined,
+  t: (key: string, values?: Record<string, string | number>) => string,
+): string {
   if (retryAfterSeconds === undefined) {
-    return "Too many sign-in attempts. Try again later.";
+    return t("auth.login.errors.rateLimited");
   }
 
-  return `Too many sign-in attempts. Try again in ${retryAfterSeconds} seconds.`;
+  return t("auth.login.errors.rateLimitedWithSeconds", {
+    seconds: retryAfterSeconds,
+  });
 }

@@ -2,6 +2,7 @@ import { useState } from "react";
 
 import { ConfirmationDialog } from "../../../components/confirmationDialog";
 import { ErrorState, LoadingState } from "../../../components/standardStates";
+import { useI18n } from "../../../i18n";
 import {
   useCancelTaskAction,
   useCompleteTaskAction,
@@ -9,6 +10,7 @@ import {
 } from "../hooks";
 import type { TaskListItem } from "../types";
 import { TaskListTable } from "./TaskListTable";
+import { taskText } from "./taskLabels";
 import { TaskMutationError } from "./TaskMutationError";
 
 const MATTER_TASK_PAGE_SIZE = 20;
@@ -25,6 +27,8 @@ export function MatterTaskSection({
   canMutate: boolean;
   matterId: string;
 }) {
+  const { locale } = useI18n();
+  const labels = taskText(locale);
   const [pendingAction, setPendingAction] = useState<PendingTaskAction>(null);
   const query = useTaskList({ matter: matterId, ordering: "due_at" });
   const completeMutation = useCompleteTaskAction();
@@ -35,15 +39,15 @@ export function MatterTaskSection({
       aria-labelledby="matter-tasks-title"
       className="task-matter-section"
     >
-      <h2 id="matter-tasks-title">Tasks</h2>
-      {query.isLoading ? <LoadingState label="Loading tasks" /> : null}
+      <h2 id="matter-tasks-title">{labels.listTitle}</h2>
+      {query.isLoading ? <LoadingState label={labels.loadingList} /> : null}
       {query.isError ? (
-        <ErrorState title="Tasks unavailable" message={query.error.message} />
+        <ErrorState title={labels.error} message={query.error.message} />
       ) : null}
       {query.data ? (
         <>
           <TaskListTable
-            caption="Matter tasks"
+            caption={labels.matterTasks}
             page={1}
             pageCount={pageCount(query.data.count)}
             rows={query.data.results}
@@ -92,6 +96,9 @@ function MatterTaskActions({
   onComplete: (action: PendingTaskAction) => void;
   tasks: TaskListItem[];
 }) {
+  const { locale } = useI18n();
+  const labels = taskText(locale);
+
   if (!canMutate) {
     return null;
   }
@@ -100,7 +107,7 @@ function MatterTaskActions({
     (task) => task.status === "todo" || task.status === "in_progress",
   );
   return (
-    <div className="task-inline-actions" aria-label="Matter task actions">
+    <div className="task-inline-actions" aria-label={labels.matterTasks}>
       {openTasks.map((task) => (
         <div key={task.id}>
           <span>{task.title}</span>
@@ -108,13 +115,13 @@ function MatterTaskActions({
             type="button"
             onClick={() => onComplete({ task, type: "complete" })}
           >
-            Complete
+            {labels.complete}
           </button>
           <button
             type="button"
             onClick={() => onCancel({ task, type: "cancel" })}
           >
-            Cancel
+            {labels.cancel}
           </button>
         </div>
       ))}
@@ -131,28 +138,31 @@ function MatterTaskConfirmation({
   onCancel: () => void;
   onConfirm: () => void;
 }) {
+  const { locale } = useI18n();
+  const labels = taskText(locale);
+
   if (action?.type === "complete") {
     return (
       <ConfirmationDialog
-        confirmLabel="Complete task"
+        confirmLabel={labels.complete}
         onCancel={onCancel}
         onConfirm={onConfirm}
         open
-        title="Complete task"
+        title={labels.complete}
       >
-        Mark this task done. Repeating the action returns the completed state.
+        {labels.completeBody}
       </ConfirmationDialog>
     );
   }
   return (
     <ConfirmationDialog
-      confirmLabel="Cancel task"
+      confirmLabel={labels.cancel}
       onCancel={onCancel}
       onConfirm={onConfirm}
       open={action?.type === "cancel"}
-      title="Cancel task"
+      title={labels.cancel}
     >
-      Cancel this task without deleting the record.
+      {labels.cancelBody}
     </ConfirmationDialog>
   );
 }

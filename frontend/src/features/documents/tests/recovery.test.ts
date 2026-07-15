@@ -16,6 +16,19 @@ test("upload status events cannot regress a final upload state", () => {
   expect(result.status).toBe("available");
 });
 
+test("upload status events for another upload are ignored", () => {
+  const session = uploadSession("processing");
+  const result = applyUploadStatusEvent(session, {
+    data: { status: "available", upload_id: "upload-2" },
+    event_id: "event-2",
+    event_type: "document.upload.status_changed",
+    occurred_at: "2027-07-14T10:01:00Z",
+    version: 1,
+  });
+
+  expect(result.status).toBe("processing");
+});
+
 function uploadSession(status: DocumentUploadSession["status"]) {
   return {
     completed_at: "2027-07-14T10:05:00Z",

@@ -23,6 +23,7 @@ const LIST_PARAMS = { page: 1, pageSize: 100 };
 
 export function AdminUserManagementPage() {
   const { logout, session } = useAuth();
+  const { t } = useI18n();
 
   if (!session) {
     return null;
@@ -34,8 +35,8 @@ export function AdminUserManagementPage() {
         <AdminUserManagementContent currentUserId={session.user.id} />
       ) : (
         <ForbiddenState
-          title="Access denied"
-          message="This administrative page is not available for your role."
+          title={t("components.standardStates.accessDenied")}
+          message={t("features.adminUsers.errors.permission")}
         />
       )}
     </AppShell>

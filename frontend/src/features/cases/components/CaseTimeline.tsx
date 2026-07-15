@@ -1,5 +1,7 @@
 import { ActivityTimeline } from "../../activity/components/ActivityTimeline";
+import { useI18n } from "../../../i18n";
 import type { CaseTimelineEvent } from "../types";
+import { caseText } from "./caseLabels";
 
 export function CaseTimeline({
   errorMessage,
@@ -12,11 +14,14 @@ export function CaseTimeline({
   isError: boolean;
   isLoading: boolean;
 }) {
+  const { locale } = useI18n();
+  const labels = caseText(locale);
+
   return (
     <ActivityTimeline
-      ariaLabel="Case timeline"
+      ariaLabel={labels.timelineAria}
       context="case"
-      emptyLabel="No timeline events yet."
+      emptyLabel={labels.timelineEmpty}
       errorMessage={errorMessage}
       events={events}
       isError={isError}

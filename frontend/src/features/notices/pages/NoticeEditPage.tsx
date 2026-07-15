@@ -10,7 +10,9 @@ import {
   LoadingState,
   NotFoundState,
 } from "../../../components/standardStates";
+import { useI18n } from "../../../i18n";
 import { NoticeForm } from "../components/NoticeForm";
+import { noticeText } from "../components/noticeLabels";
 import { useNoticeDetail, useUpdateNotice } from "../hooks";
 import type { NoticeUpdateInput } from "../types";
 import { NoticePageShell } from "./NoticePageShell";
@@ -19,17 +21,19 @@ export function NoticeEditPage() {
   const { noticeId } = useParams();
   const { session } = useAuth();
   const navigate = useNavigate();
+  const { locale } = useI18n();
+  const labels = noticeText(locale);
   const detail = useNoticeDetail(noticeId ?? "");
   const mutation = useUpdateNotice(noticeId ?? "");
   const role = session?.membership.role ?? "";
 
   if (!noticeId) {
-    return <NotFoundState title="Notice not found" />;
+    return <NotFoundState title={labels.notFound} />;
   }
   if (!canEditMatter(role)) {
     return (
       <NoticePageShell>
-        <ForbiddenState message="Viewer access is read-only." />
+        <ForbiddenState message={labels.viewerReadonly} />
       </NoticePageShell>
     );
   }
@@ -37,19 +41,21 @@ export function NoticeEditPage() {
   return (
     <NoticePageShell>
       <PageHeader
-        eyebrow="Legal notices"
-        title="Edit notice"
+        eyebrow={labels.eyebrow}
+        title={labels.edit}
         actions={
           <button
             onClick={() => navigate(`/notices/${noticeId}`)}
             type="button"
           >
-            Back to detail
+            {labels.backToDetail}
           </button>
         }
       />
-      {detail.isLoading ? <LoadingState label="Loading notice" /> : null}
-      {detail.isError ? <NoticeDetailError error={detail.error} /> : null}
+      {detail.isLoading ? <LoadingState label={labels.loading} /> : null}
+      {detail.isError ? (
+        <NoticeDetailError error={detail.error} labels={labels} />
+      ) : null}
       {detail.data ? (
         <NoticeForm
           initialNotice={detail.data}
@@ -62,14 +68,20 @@ export function NoticeEditPage() {
   );
 }
 
-function NoticeDetailError({ error }: { error: Error }) {
+function NoticeDetailError({
+  error,
+  labels,
+}: {
+  error: Error;
+  labels: ReturnType<typeof noticeText>;
+}) {
   if (isApiError(error) && error.status === 404) {
     return (
       <NotFoundState
-        title="Notice not found"
-        message="The notice could not be found."
+        title={labels.notFound}
+        message={labels.notFoundMessage}
       />
     );
   }
-  return <ErrorState title="Notice unavailable" message={error.message} />;
+  return <ErrorState title={labels.error} message={error.message} />;
 }

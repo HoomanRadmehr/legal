@@ -11,8 +11,10 @@ import {
   LoadingState,
   NotFoundState,
 } from "../../../components/standardStates";
+import { useI18n } from "../../../i18n";
 import { ContractSummary } from "../components/ContractSummary";
 import { ContractTimeline } from "../components/ContractTimeline";
+import { contractText } from "../components/contractLabels";
 import {
   useArchiveContract,
   useContractDetail,
@@ -22,6 +24,8 @@ import { ContractPageShell } from "./ContractPageShell";
 
 export function ContractDetailPage() {
   const { contractId } = useParams();
+  const { locale } = useI18n();
+  const labels = contractText(locale);
   const { session } = useAuth();
   const [archiveOpen, setArchiveOpen] = useState(false);
   const detail = useContractDetail(contractId ?? "");
@@ -30,14 +34,14 @@ export function ContractDetailPage() {
   const canMutate = canEditMatter(session?.membership.role ?? "");
 
   if (!contractId) {
-    return <NotFoundState title="Contract not found" />;
+    return <NotFoundState title={labels.notFound} />;
   }
 
   return (
     <ContractPageShell>
       <PageHeader
-        eyebrow="Contracts"
-        title={detail.data?.title ?? "Contract detail"}
+        eyebrow={labels.eyebrow}
+        title={detail.data?.title ?? labels.detail}
         actions={
           <ContractActions
             canMutate={canMutate}
@@ -46,16 +50,16 @@ export function ContractDetailPage() {
           />
         }
       />
-      {detail.isLoading ? <LoadingState label="Loading contract" /> : null}
+      {detail.isLoading ? <LoadingState label={labels.loading} /> : null}
       {detail.isError ? <ContractDetailError error={detail.error} /> : null}
       {detail.data ? (
         <>
           {session?.membership.role === "viewer" ? (
-            <p className="contract-alert">Viewer access is read-only.</p>
+            <p className="contract-alert">{labels.viewerReadonly}</p>
           ) : null}
           <ContractSummary contract={detail.data} />
           <section id="timeline" aria-labelledby="contract-timeline-title">
-            <h2 id="contract-timeline-title">Timeline</h2>
+            <h2 id="contract-timeline-title">{labels.timeline}</h2>
             <ContractTimeline
               errorMessage={timeline.error?.message}
               events={timeline.data ?? []}
@@ -64,17 +68,16 @@ export function ContractDetailPage() {
             />
           </section>
           <ConfirmationDialog
-            confirmLabel="Archive contract"
+            confirmLabel={labels.archive}
             onCancel={() => setArchiveOpen(false)}
             onConfirm={() => {
               setArchiveOpen(false);
               archiveMutation.mutate(detail.data.version);
             }}
             open={archiveOpen}
-            title="Archive contract"
+            title={labels.archive}
           >
-            Archive keeps the contract and timeline available for permitted
-            users. It is not a delete.
+            {labels.archiveBody}
           </ConfirmationDialog>
           {archiveMutation.isError ? (
             <p className="contract-alert" role="alert">
@@ -96,28 +99,34 @@ function ContractActions({
   contractId: string;
   onArchive: () => void;
 }) {
+  const { locale } = useI18n();
+  const labels = contractText(locale);
+
   if (!canMutate) {
     return null;
   }
 
   return (
     <>
-      <Link to={`/contracts/${contractId}/edit`}>Edit contract</Link>
+      <Link to={`/contracts/${contractId}/edit`}>{labels.edit}</Link>
       <button type="button" onClick={onArchive}>
-        Archive contract
+        {labels.archive}
       </button>
     </>
   );
 }
 
 function ContractDetailError({ error }: { error: Error }) {
+  const { locale } = useI18n();
+  const labels = contractText(locale);
+
   if (isApiError(error) && error.status === 404) {
     return (
       <NotFoundState
-        title="Contract not found"
-        message="The contract could not be found."
+        title={labels.notFound}
+        message={labels.notFoundMessage}
       />
     );
   }
-  return <ErrorState title="Contract unavailable" message={error.message} />;
+  return <ErrorState title={labels.error} message={error.message} />;
 }

@@ -6,6 +6,8 @@ import { MemoryRouter } from "react-router-dom";
 import { afterEach, expect, test, vi } from "vitest";
 
 import { createAppQueryClient } from "../../../app/queryClient";
+import type { AuthContextValue } from "../../../auth/context";
+import { AuthContext } from "../../../auth/context";
 import { I18nProvider } from "../../../i18n";
 import { NotificationCenterPage } from "../pages/NotificationCenterPage";
 import { NotificationPreferencesPage } from "../pages/NotificationPreferencesPage";
@@ -85,14 +87,37 @@ test("preferences save own channel choices with truthful provider messaging", as
 
 function renderWithProviders(children: ReactNode) {
   return render(
-    <I18nProvider>
-      <MemoryRouter>
-        <QueryClientProvider client={createAppQueryClient()}>
-          {children}
-        </QueryClientProvider>
-      </MemoryRouter>
+    <I18nProvider initialLocale="en">
+      <AuthContext.Provider value={authContext()}>
+        <MemoryRouter>
+          <QueryClientProvider client={createAppQueryClient()}>
+            {children}
+          </QueryClientProvider>
+        </MemoryRouter>
+      </AuthContext.Provider>
     </I18nProvider>,
   );
+}
+
+function authContext(): AuthContextValue {
+  return {
+    login: vi.fn(),
+    logout: vi.fn(),
+    session: {
+      access: "access-token",
+      membership: {
+        organization_id: "org-1",
+        organization_name: "Acme Legal",
+        role: "legal_admin",
+      },
+      user: {
+        display_name: "Ava Counsel",
+        id: "user-1",
+        preferred_language: "en",
+      },
+    },
+    status: "authenticated",
+  };
 }
 
 function notificationResponse(url: string): Response {

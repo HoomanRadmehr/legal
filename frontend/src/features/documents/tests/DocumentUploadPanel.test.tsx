@@ -12,6 +12,8 @@ import { DocumentUploadPanel } from "../components/DocumentUploadPanel";
 import { MAX_UPLOAD_SIZE_BYTES } from "../policy";
 
 afterEach(() => {
+  localStorage.clear();
+  sessionStorage.clear();
   vi.unstubAllGlobals();
   vi.restoreAllMocks();
 });
@@ -61,6 +63,16 @@ test("prechecks size before initiating upload", async () => {
 
 test("initiates then uploads bytes directly to returned storage URL", async () => {
   const user = userEvent.setup();
+  const consoleError = vi
+    .spyOn(console, "error")
+    .mockImplementation(() => undefined);
+  const consoleLog = vi
+    .spyOn(console, "log")
+    .mockImplementation(() => undefined);
+  const consoleWarn = vi
+    .spyOn(console, "warn")
+    .mockImplementation(() => undefined);
+  const storageSet = vi.spyOn(Storage.prototype, "setItem");
   const fetchImpl = vi.fn(async (input: RequestInfo | URL) => {
     if (String(input).includes("/complete/")) {
       return Response.json(uploadSession({ status: "processing" }));
@@ -88,9 +100,19 @@ test("initiates then uploads bytes directly to returned storage URL", async () =
     screen.getByText(/Server processing remains authoritative/i),
   ).toBeInTheDocument();
   expect(fetchImpl).toHaveBeenCalledWith(
+    expect.stringContaining("/api/v1/documents/uploads/upload-1/"),
+    expect.objectContaining({ method: "GET" }),
+  );
+  expect(fetchImpl).toHaveBeenCalledWith(
     expect.stringContaining("/api/v1/documents/uploads/upload-1/complete/"),
     expect.objectContaining({ method: "POST" }),
   );
+  expect(storageSet).not.toHaveBeenCalled();
+  expect(localStorage.length).toBe(0);
+  expect(sessionStorage.length).toBe(0);
+  expect(consoleOutput(consoleError)).not.toContain("minio.example.test");
+  expect(consoleOutput(consoleLog)).not.toContain("minio.example.test");
+  expect(consoleOutput(consoleWarn)).not.toContain("minio.example.test");
 });
 
 test("shows rate limit retry guidance without exposing upload URL", async () => {
@@ -135,7 +157,7 @@ function renderUploadPanel({
 
 function renderWithProviders(children: ReactNode, role: string) {
   return render(
-    <I18nProvider>
+    <I18nProvider initialLocale="en">
       <AuthContext.Provider value={authContext(role)}>
         <QueryClientProvider client={createAppQueryClient()}>
           {children}
@@ -261,4 +283,8 @@ function installFakeXhr(status: number): XhrCall[] {
 
   vi.stubGlobal("XMLHttpRequest", FakeXhr);
   return requests;
+}
+
+function consoleOutput(spy: ReturnType<typeof vi.spyOn>): string {
+  return spy.mock.calls.flat().join(" ");
 }

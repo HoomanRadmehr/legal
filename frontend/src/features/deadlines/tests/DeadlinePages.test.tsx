@@ -35,6 +35,30 @@ test("tabs send the four explicit deadline view parameters", async () => {
   });
 });
 
+test("deadline tabs are keyboard reachable and expose selected state", async () => {
+  const user = userEvent.setup();
+  vi.stubGlobal(
+    "fetch",
+    vi.fn(async () => Response.json(deadlineListResponse())),
+  );
+
+  renderDeadlineRoute({ children: <DeadlineListPage /> });
+
+  const todayTab = await screen.findByRole("tab", { name: "Today" });
+  const overdueTab = screen.getByRole("tab", { name: "Overdue" });
+  todayTab.focus();
+
+  expect(todayTab).toHaveFocus();
+  expect(todayTab).toHaveAttribute("aria-selected", "true");
+
+  await user.tab();
+  expect(overdueTab).toHaveFocus();
+  await user.keyboard("{Enter}");
+
+  expect(overdueTab).toHaveAttribute("aria-selected", "true");
+  expect(todayTab).toHaveAttribute("aria-selected", "false");
+});
+
 test("renders timezone label and does not hide returned matter id", async () => {
   vi.stubGlobal(
     "fetch",

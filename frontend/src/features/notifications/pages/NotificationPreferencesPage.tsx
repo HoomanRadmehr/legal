@@ -1,54 +1,76 @@
 import { Link } from "react-router-dom";
 
 import { isApiError } from "../../../api/errors";
+import { useAuth } from "../../../auth";
+import { AppShell } from "../../../components/layout/AppShell";
 import { PageHeader } from "../../../components/pageHeader";
 import { ErrorState, LoadingState } from "../../../components/standardStates";
+import { useI18n } from "../../../i18n";
 import { NotificationPreferenceForm } from "../components/NotificationPreferenceForm";
 import {
   useNotificationPreferences,
   useSaveNotificationPreferences,
 } from "../hooks";
+import { notificationText } from "../text";
 import "../notifications.css";
 
 export function NotificationPreferencesPage() {
+  const { logout, session } = useAuth();
+
+  if (!session) {
+    return null;
+  }
+
+  return (
+    <AppShell onLogout={logout} session={session}>
+      <NotificationPreferencesContent />
+    </AppShell>
+  );
+}
+
+function NotificationPreferencesContent() {
+  const { locale } = useI18n();
+  const labels = notificationText(locale);
   const preferences = useNotificationPreferences();
   const savePreferences = useSaveNotificationPreferences();
 
   return (
-    <main className="notification-page">
+    <section className="notification-page">
       <PageHeader
-        eyebrow="Settings"
-        title="Notification preferences"
-        description="Choose channels for your own notification events."
-        actions={<Link to="/notifications">Notification center</Link>}
+        eyebrow={labels.preferences}
+        title={labels.preferencesTitle}
+        description={labels.preferencesDescription}
+        actions={<Link to="/notifications">{labels.centerTitle}</Link>}
       />
       <p className="notification-provider-note">
-        Provider availability is enforced by the backend. SMS and push delivery
-        may be skipped safely when providers are not configured.
+        {labels.providerNote}
       </p>
       {preferences.isLoading ? (
-        <LoadingState label="Loading notification preferences" />
+        <LoadingState label={labels.loadingPreferences} />
       ) : null}
       {preferences.isError ? (
         <PreferenceError error={preferences.error} />
       ) : null}
       {preferences.data ? (
         <NotificationPreferenceForm
-          error={saveError(savePreferences.error)}
+          error={saveError(savePreferences.error, locale)}
           onSubmit={(input) => savePreferences.mutate(input)}
           preferences={preferences.data}
           saving={savePreferences.isPending}
         />
       ) : null}
-    </main>
+    </section>
   );
 }
 
 function PreferenceError({ error }: { error: Error }) {
+  const { locale } = useI18n();
+  const labels = notificationText(locale);
+
   return (
     <ErrorState
-      title="Preferences unavailable"
-      message={saveError(error) ?? "The request could not be completed."}
+      title={labels.unavailable.preferences}
+      message={saveError(error, locale) ?? labels.unavailable.request}
       retryAfterSeconds={
         isApiError(error) ? error.retryAfterSeconds : undefined
       }
@@ -56,12 +78,16 @@ function PreferenceError({ error }: { error: Error }) {
   );
 }
 
-function saveError(error: unknown): string | undefined {
+function saveError(
+  error: unknown,
+  locale: ReturnType<typeof useI18n>["locale"] = "fa",
+): string | undefined {
+  const labels = notificationText(locale);
   if (!error) {
     return undefined;
   }
   if (isApiError(error)) {
     return error.message;
   }
-  return error instanceof Error ? error.message : "The request failed.";
+  return error instanceof Error ? error.message : labels.unavailable.failed;
 }

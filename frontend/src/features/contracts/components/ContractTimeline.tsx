@@ -1,5 +1,7 @@
 import { ActivityTimeline } from "../../activity/components/ActivityTimeline";
+import { useI18n } from "../../../i18n";
 import type { ContractTimelineEvent } from "../types";
+import { contractText } from "./contractLabels";
 
 export function ContractTimeline({
   errorMessage,
@@ -12,11 +14,14 @@ export function ContractTimeline({
   isError: boolean;
   isLoading: boolean;
 }) {
+  const { locale } = useI18n();
+  const labels = contractText(locale);
+
   return (
     <ActivityTimeline
-      ariaLabel="Contract timeline"
+      ariaLabel={labels.timelineAria}
       context="contract"
-      emptyLabel="No timeline events yet."
+      emptyLabel={labels.timelineEmpty}
       errorMessage={errorMessage}
       events={events}
       isError={isError}

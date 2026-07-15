@@ -1,14 +1,8 @@
 import type { FormEvent } from "react";
 
+import { useI18n } from "../../../i18n";
 import type { TaskListParams, TaskOrdering, TaskStatus } from "../types";
-import { taskStatusLabel } from "./taskLabels";
-
-const ORDERING_OPTIONS: { label: string; value: TaskOrdering }[] = [
-  { label: "Due soonest", value: "due_at" },
-  { label: "Recently updated", value: "-updated_at" },
-  { label: "Newest created", value: "-created_at" },
-  { label: "Status", value: "status" },
-];
+import { taskStatusLabel, taskText } from "./taskLabels";
 
 export function TaskFilters({
   onSubmit,
@@ -17,6 +11,9 @@ export function TaskFilters({
   onSubmit: (params: TaskListParams) => void;
   params: TaskListParams;
 }) {
+  const { locale } = useI18n();
+  const labels = taskText(locale);
+
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     onSubmit(formDataToParams(new FormData(event.currentTarget), params.view));
@@ -24,54 +21,65 @@ export function TaskFilters({
 
   return (
     <form
-      aria-label="Task filters"
+      aria-label={labels.filters}
       className="task-filters"
       onSubmit={handleSubmit}
     >
       <label>
-        Matter ID
+        {labels.matter}
         <input defaultValue={params.matter ?? ""} name="matter" />
       </label>
       <label>
-        Assignee membership ID
+        {labels.assignee}
         <input defaultValue={params.assignee ?? ""} name="assignee" />
       </label>
       <label>
-        Status
+        {labels.status}
         <select defaultValue={params.status ?? ""} name="status">
-          <option value="">Any status</option>
+          <option value="">{labels.options.anyStatus}</option>
           {(["todo", "in_progress", "done", "cancelled"] as const).map(
             (status) => (
               <option key={status} value={status}>
-                {taskStatusLabel(status)}
+                {taskStatusLabel(status, locale)}
               </option>
             ),
           )}
         </select>
       </label>
       <DateTimeFilter
-        label="Due after"
+        label={labels.dueAfter}
         name="dueAfter"
         value={params.dueAfter}
       />
       <DateTimeFilter
-        label="Due before"
+        label={labels.dueBefore}
         name="dueBefore"
         value={params.dueBefore}
       />
       <label>
-        Ordering
+        {labels.ordering}
         <select defaultValue={params.ordering ?? "due_at"} name="ordering">
-          {ORDERING_OPTIONS.map((option) => (
+          {orderingOptions(labels).map((option) => (
             <option key={option.value} value={option.value}>
               {option.label}
             </option>
           ))}
         </select>
       </label>
-      <button type="submit">Apply filters</button>
+      <button type="submit">{labels.applyFilters}</button>
     </form>
   );
+}
+
+function orderingOptions(
+  labels: ReturnType<typeof taskText>,
+): { label: string; value: TaskOrdering }[] {
+  return [
+    { label: labels.options.dueSoonest, value: "due_at" },
+    { label: labels.options.recent, value: "-updated_at" },
+    { label: labels.options.newest, value: "-created_at" },
+    { label: labels.options.status, value: "status" },
+  ];
 }
 
 function DateTimeFilter({

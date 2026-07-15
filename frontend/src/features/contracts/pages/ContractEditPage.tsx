@@ -10,13 +10,17 @@ import {
   LoadingState,
   NotFoundState,
 } from "../../../components/standardStates";
+import { useI18n } from "../../../i18n";
 import { ContractForm } from "../components/ContractForm";
+import { contractText } from "../components/contractLabels";
 import { useContractDetail, useUpdateContract } from "../hooks";
 import type { ContractUpdateInput } from "../types";
 import { ContractPageShell } from "./ContractPageShell";
 
 export function ContractEditPage() {
   const { contractId } = useParams();
+  const { locale } = useI18n();
+  const labels = contractText(locale);
   const { session } = useAuth();
   const navigate = useNavigate();
   const detail = useContractDetail(contractId ?? "");
@@ -24,12 +28,12 @@ export function ContractEditPage() {
   const role = session?.membership.role ?? "";
 
   if (!contractId) {
-    return <NotFoundState title="Contract not found" />;
+    return <NotFoundState title={labels.notFound} />;
   }
   if (!canEditMatter(role)) {
     return (
       <ContractPageShell>
-        <ForbiddenState message="Viewer access is read-only." />
+        <ForbiddenState message={labels.viewerReadonly} />
       </ContractPageShell>
     );
   }
@@ -37,18 +41,18 @@ export function ContractEditPage() {
   return (
     <ContractPageShell>
       <PageHeader
-        eyebrow="Contracts"
-        title="Edit contract"
+        eyebrow={labels.eyebrow}
+        title={labels.edit}
         actions={
           <button
             onClick={() => navigate(`/contracts/${contractId}`)}
             type="button"
           >
-            Back to detail
+            {labels.backToDetail}
           </button>
         }
       />
-      {detail.isLoading ? <LoadingState label="Loading contract" /> : null}
+      {detail.isLoading ? <LoadingState label={labels.loading} /> : null}
       {detail.isError ? <ContractDetailError error={detail.error} /> : null}
       {detail.data ? (
         <ContractForm
@@ -65,13 +69,16 @@ export function ContractEditPage() {
 }
 
 function ContractDetailError({ error }: { error: Error }) {
+  const { locale } = useI18n();
+  const labels = contractText(locale);
+
   if (isApiError(error) && error.status === 404) {
     return (
       <NotFoundState
-        title="Contract not found"
-        message="The contract could not be found."
+        title={labels.notFound}
+        message={labels.notFoundMessage}
       />
     );
   }
-  return <ErrorState title="Contract unavailable" message={error.message} />;
+  return <ErrorState title={labels.error} message={error.message} />;
 }

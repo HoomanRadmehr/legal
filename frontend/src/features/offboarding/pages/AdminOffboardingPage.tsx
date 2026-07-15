@@ -46,7 +46,7 @@ export function AdminOffboardingPage() {
       {canRunOffboarding(session.membership.role) ? (
         <AdminOffboardingContent />
       ) : (
-        <ForbiddenState title="Access denied" message={labels.forbidden} />
+        <ForbiddenState message={labels.forbidden} />
       )}
     </AppShell>
   );
@@ -123,7 +123,7 @@ function AdminOffboardingContent() {
   return (
     <section className="offboarding-page" aria-labelledby="offboarding-title">
       <PageHeader
-        eyebrow="Administration"
+        eyebrow={labels.administration}
         title={labels.title}
         description={labels.description}
       />

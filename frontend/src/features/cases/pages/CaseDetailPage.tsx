@@ -11,13 +11,17 @@ import {
   NotFoundState,
 } from "../../../components/standardStates";
 import { isApiError } from "../../../api/errors";
+import { useI18n } from "../../../i18n";
 import { CaseSummary } from "../components/CaseSummary";
 import { CaseTimeline } from "../components/CaseTimeline";
+import { caseText } from "../components/caseLabels";
 import { useArchiveCase, useCaseDetail, useCaseTimeline } from "../hooks";
 import { CasePageShell } from "./CasePageShell";
 
 export function CaseDetailPage() {
   const { caseId } = useParams();
+  const { locale } = useI18n();
+  const labels = caseText(locale);
   const { session } = useAuth();
   const [archiveOpen, setArchiveOpen] = useState(false);
   const detail = useCaseDetail(caseId ?? "");
@@ -26,14 +30,14 @@ export function CaseDetailPage() {
   const canMutate = canEditMatter(session?.membership.role ?? "");
 
   if (!caseId) {
-    return <NotFoundState title="Case not found" />;
+    return <NotFoundState title={labels.notFound} />;
   }
 
   return (
     <CasePageShell>
       <PageHeader
-        eyebrow="Cases"
-        title={detail.data?.title ?? "Case detail"}
+        eyebrow={labels.eyebrow}
+        title={detail.data?.title ?? labels.detail}
         actions={
           <CaseActions
             caseId={caseId}
@@ -42,16 +46,16 @@ export function CaseDetailPage() {
           />
         }
       />
-      {detail.isLoading ? <LoadingState label="Loading case" /> : null}
+      {detail.isLoading ? <LoadingState label={labels.loading} /> : null}
       {detail.isError ? <CaseDetailError error={detail.error} /> : null}
       {detail.data ? (
         <>
           {session?.membership.role === "viewer" ? (
-            <p className="case-alert">Viewer access is read-only.</p>
+            <p className="case-alert">{labels.viewerReadonly}</p>
           ) : null}
           <CaseSummary legalCase={detail.data} />
           <section id="timeline" aria-labelledby="case-timeline-title">
-            <h2 id="case-timeline-title">Timeline</h2>
+            <h2 id="case-timeline-title">{labels.timeline}</h2>
             <CaseTimeline
               errorMessage={timeline.error?.message}
               events={timeline.data ?? []}
@@ -60,17 +64,16 @@ export function CaseDetailPage() {
             />
           </section>
           <ConfirmationDialog
-            confirmLabel="Archive case"
+            confirmLabel={labels.archive}
             onCancel={() => setArchiveOpen(false)}
             onConfirm={() => {
               setArchiveOpen(false);
               archiveMutation.mutate(detail.data.version);
             }}
             open={archiveOpen}
-            title="Archive case"
+            title={labels.archive}
           >
-            Archive keeps the case and timeline available for permitted users.
-            It is not a delete.
+            {labels.archiveBody}
           </ConfirmationDialog>
           {archiveMutation.isError ? (
             <p className="case-alert" role="alert">
@@ -92,28 +95,34 @@ function CaseActions({
   caseId: string;
   onArchive: () => void;
 }) {
+  const { locale } = useI18n();
+  const labels = caseText(locale);
+
   if (!canMutate) {
     return null;
   }
 
   return (
     <>
-      <Link to={`/cases/${caseId}/edit`}>Edit case</Link>
+      <Link to={`/cases/${caseId}/edit`}>{labels.edit}</Link>
       <button type="button" onClick={onArchive}>
-        Archive case
+        {labels.archive}
       </button>
     </>
   );
 }
 
 function CaseDetailError({ error }: { error: Error }) {
+  const { locale } = useI18n();
+  const labels = caseText(locale);
+
   if (isApiError(error) && error.status === 404) {
     return (
       <NotFoundState
-        title="Case not found"
-        message="The case could not be found."
+        title={labels.notFound}
+        message={labels.notFoundMessage}
       />
     );
   }
-  return <ErrorState title="Case unavailable" message={error.message} />;
+  return <ErrorState title={labels.error} message={error.message} />;
 }

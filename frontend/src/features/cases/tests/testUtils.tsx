@@ -22,7 +22,7 @@ export function renderCaseRoute({
   route?: string;
 }) {
   return render(
-    <I18nProvider>
+    <I18nProvider initialLocale="en">
       <AuthContext.Provider value={authContext(role)}>
         <QueryClientProvider client={createAppQueryClient()}>
           <MemoryRouter initialEntries={[route]}>

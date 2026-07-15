@@ -6,14 +6,12 @@ import type {
   NoticeResponseStatus,
   NoticeStatus,
 } from "../types";
-import { noticeResponseStatusLabel, noticeStatusLabel } from "./noticeLabels";
-
-const ORDERING_OPTIONS: { label: string; value: NoticeOrdering }[] = [
-  { label: "Reference A-Z", value: "reference_code" },
-  { label: "Response due soonest", value: "response_deadline" },
-  { label: "Newest received", value: "-received_date" },
-  { label: "Recently updated", value: "-updated_at" },
-];
+import { useI18n } from "../../../i18n";
+import {
+  noticeResponseStatusLabel,
+  noticeStatusLabel,
+  noticeText,
+} from "./noticeLabels";
 
 export function NoticeFilters({
   onSubmit,
@@ -22,6 +20,9 @@ export function NoticeFilters({
   onSubmit: (params: NoticeListParams) => void;
   params: NoticeListParams;
 }) {
+  const { locale } = useI18n();
+  const labels = noticeText(locale);
+
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     onSubmit(formDataToParams(new FormData(event.currentTarget)));
@@ -29,22 +30,22 @@ export function NoticeFilters({
 
   return (
     <form
-      aria-label="Notice filters"
+      aria-label={labels.filters}
       className="notice-filters"
       onSubmit={handleSubmit}
     >
       <label>
-        Search
+        {labels.search}
         <input defaultValue={params.search ?? ""} name="search" type="search" />
       </label>
       <label>
-        Sender
+        {labels.sender}
         <input defaultValue={params.sender ?? ""} name="sender" />
       </label>
       <label>
-        Status
+        {labels.status}
         <select defaultValue={params.status ?? ""} name="status">
-          <option value="">Any status</option>
+          <option value="">{labels.anyStatus}</option>
           {(
             [
               "received",
@@ -56,66 +57,77 @@ export function NoticeFilters({
             ] as const
           ).map((status) => (
             <option key={status} value={status}>
-              {noticeStatusLabel(status)}
+              {noticeStatusLabel(status, locale)}
             </option>
           ))}
         </select>
       </label>
       <label>
-        Response status
+        {labels.responseStatus}
         <select
           defaultValue={params.responseStatus ?? ""}
           name="responseStatus"
         >
-          <option value="">Any response</option>
+          <option value="">{labels.anyResponse}</option>
           {(["pending", "responded", "cancelled"] as const).map((status) => (
             <option key={status} value={status}>
-              {noticeResponseStatusLabel(status)}
+              {noticeResponseStatusLabel(status, locale)}
             </option>
           ))}
         </select>
       </label>
       <DateFilter
-        label="Received after"
+        label={labels.receivedAfter}
         name="receivedAfter"
         value={params.receivedAfter}
       />
       <DateFilter
-        label="Received before"
+        label={labels.receivedBefore}
         name="receivedBefore"
         value={params.receivedBefore}
       />
       <label>
-        Archive state
+        {labels.archiveState}
         <select defaultValue={archiveValue(params.archived)} name="archived">
-          <option value="">Active only</option>
-          <option value="true">Archived only</option>
-          <option value="all">All notices</option>
+          <option value="">{labels.activeOnly}</option>
+          <option value="true">{labels.archivedOnly}</option>
+          <option value="all">{labels.allNotices}</option>
         </select>
       </label>
       <label>
-        Overdue response
+        {labels.overdueResponse}
         <select defaultValue={overdueValue(params.overdue)} name="overdue">
-          <option value="">Any</option>
-          <option value="true">Overdue only</option>
+          <option value="">{labels.any}</option>
+          <option value="true">{labels.overdueOnly}</option>
         </select>
       </label>
       <label>
-        Ordering
+        {labels.ordering}
         <select
           defaultValue={params.ordering ?? "reference_code"}
           name="ordering"
         >
-          {ORDERING_OPTIONS.map((option) => (
+          {orderingOptions(labels).map((option) => (
             <option key={option.value} value={option.value}>
               {option.label}
             </option>
           ))}
         </select>
       </label>
-      <button type="submit">Apply filters</button>
+      <button type="submit">{labels.applyFilters}</button>
     </form>
   );
+}
+
+function orderingOptions(
+  labels: ReturnType<typeof noticeText>,
+): { label: string; value: NoticeOrdering }[] {
+  return [
+    { label: labels.options.reference, value: "reference_code" },
+    { label: labels.options.responseDueSoonest, value: "response_deadline" },
+    { label: labels.options.newestReceived, value: "-received_date" },
+    { label: labels.options.recentlyUpdated, value: "-updated_at" },
+  ];
 }
 
 function DateFilter({

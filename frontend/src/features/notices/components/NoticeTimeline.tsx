@@ -1,5 +1,7 @@
 import { ActivityTimeline } from "../../activity/components/ActivityTimeline";
+import { useI18n } from "../../../i18n";
 import type { NoticeTimelineEvent } from "../types";
+import { noticeText } from "./noticeLabels";
 
 export function NoticeTimeline({
   errorMessage,
@@ -12,11 +14,14 @@ export function NoticeTimeline({
   isError: boolean;
   isLoading: boolean;
 }) {
+  const { locale } = useI18n();
+  const labels = noticeText(locale);
+
   return (
     <ActivityTimeline
-      ariaLabel="Notice timeline"
+      ariaLabel={labels.timelineAria}
       context="notice"
-      emptyLabel="No timeline events yet."
+      emptyLabel={labels.timelineEmpty}
       errorMessage={errorMessage}
       events={events}
       isError={isError}

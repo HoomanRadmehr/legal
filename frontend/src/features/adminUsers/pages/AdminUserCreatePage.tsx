@@ -23,6 +23,7 @@ import "../adminUsers.css";
 
 export function AdminUserCreatePage() {
   const { logout, session } = useAuth();
+  const { t } = useI18n();
 
   if (!session) {
     return null;
@@ -34,8 +35,8 @@ export function AdminUserCreatePage() {
         <AdminUserCreateContent />
       ) : (
         <ForbiddenState
-          title="Access denied"
-          message="This administrative page is not available for your role."
+          title={t("components.standardStates.accessDenied")}
+          message={t("features.adminUsers.errors.permission")}
         />
       )}
     </AppShell>
@@ -111,8 +112,8 @@ function AdminUserCreateContent() {
               {...form.register("preferred_language")}
               id="preferred_language"
             >
-              <option value="en">{t("common.locale.en")}</option>
-              <option value="fa">{t("common.locale.fa")}</option>
+              <option value="en">{t("locale.en")}</option>
+              <option value="fa">{t("locale.fa")}</option>
             </select>
           </label>
         </fieldset>

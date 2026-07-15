@@ -1,8 +1,11 @@
 import { Link, useSearchParams } from "react-router-dom";
 
 import { isApiError } from "../../../api/errors";
+import { useAuth } from "../../../auth";
+import { AppShell } from "../../../components/layout/AppShell";
 import { PageHeader } from "../../../components/pageHeader";
 import { ErrorState, LoadingState } from "../../../components/standardStates";
+import { useI18n } from "../../../i18n";
 import { NotificationList } from "../components/NotificationList";
 import {
   useMarkAllNotificationsRead,
@@ -11,10 +14,27 @@ import {
   useNotificationRealtimeInvalidation,
   useUnreadNotificationCount,
 } from "../hooks";
+import { fillNotificationText, notificationText } from "../text";
 import type { NotificationListParams } from "../types";
 import "../notifications.css";
 
 export function NotificationCenterPage() {
+  const { logout, session } = useAuth();
+
+  if (!session) {
+    return null;
+  }
+
+  return (
+    <AppShell onLogout={logout} session={session}>
+      <NotificationCenterContent />
+    </AppShell>
+  );
+}
+
+function NotificationCenterContent() {
+  const { locale } = useI18n();
+  const labels = notificationText(locale);
   const [searchParams, setSearchParams] = useSearchParams();
   const params = notificationParamsFromSearch(searchParams);
   const notifications = useNotificationList(params);
@@ -24,12 +44,12 @@ export function NotificationCenterPage() {
   const realtimeStatus = useNotificationRealtimeInvalidation();
 
   return (
-    <main className="notification-page">
+    <section className="notification-page">
       <PageHeader
-        eyebrow="Notifications"
-        title="Notification center"
-        description="Review your own notifications and mark completed items read."
-        actions={<Link to="/settings/notifications">Preferences</Link>}
+        eyebrow={labels.notifications}
+        title={labels.centerTitle}
+        description={labels.centerDescription}
+        actions={<Link to="/settings/notifications">{labels.preferences}</Link>}
       />
       <NotificationToolbar
         markAllDisabled={
@@ -44,7 +64,7 @@ export function NotificationCenterPage() {
         unreadOnly={params.unread === true}
       />
       {notifications.isLoading ? (
-        <LoadingState label="Loading notifications" />
+        <LoadingState label={labels.loadingCenter} />
       ) : null}
       {notifications.isError ? (
         <NotificationError error={notifications.error} />
@@ -56,7 +76,7 @@ export function NotificationCenterPage() {
           readingId={markRead.variables}
         />
       ) : null}
-    </main>
+    </section>
   );
 }
 
@@ -75,10 +95,13 @@ function NotificationToolbar({
   unreadCount: number;
   unreadOnly: boolean;
 }) {
+  const { locale } = useI18n();
+  const labels = notificationText(locale);
+
   return (
     <div className="notification-toolbar">
       <p className="notification-badge" aria-live="polite">
-        {unreadCount} unread
+        {fillNotificationText(labels.unreadCount, { count: unreadCount })}
       </p>
       <label>
         <input
@@ -86,21 +109,26 @@ function NotificationToolbar({
           onChange={(event) => onUnreadOnly(event.target.checked)}
           type="checkbox"
         />
-        Unread only
+        {labels.unreadOnly}
       </label>
       <button disabled={markAllDisabled} onClick={onMarkAll} type="button">
-        Mark all read
+        {labels.allRead}
       </button>
-      <span className="notification-realtime">Realtime: {realtimeStatus}</span>
+      <span className="notification-realtime">
+        {fillNotificationText(labels.realtime, { status: realtimeStatus })}
+      </span>
     </div>
   );
 }
 
 function NotificationError({ error }: { error: Error }) {
+  const { locale } = useI18n();
+  const labels = notificationText(locale);
+
   return (
     <ErrorState
-      title="Notifications unavailable"
-      message={errorMessage(error)}
+      title={labels.unavailable.center}
+      message={errorMessage(error, locale)}
       retryAfterSeconds={
         isApiError(error) ? error.retryAfterSeconds : undefined
       }
@@ -140,12 +168,19 @@ function unreadCount(data: { count: number } | undefined): number {
   return data?.count ?? 0;
 }
 
-function errorMessage(error: Error): string {
+function errorMessage(
+  error: Error,
+  locale: ReturnType<typeof useI18n>["locale"],
+): string {
+  const labels = notificationText(locale);
   if (
     "retryAfterSeconds" in error &&
     typeof error.retryAfterSeconds === "number"
   ) {
-    return `${error.message} Try again in ${error.retryAfterSeconds} seconds.`;
+    return fillNotificationText(labels.retry, {
+      message: error.message,
+      seconds: error.retryAfterSeconds,
+    });
   }
   return error.message;
 }

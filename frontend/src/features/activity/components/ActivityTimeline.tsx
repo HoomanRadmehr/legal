@@ -1,6 +1,8 @@
 import { ErrorState, LoadingState } from "../../../components/standardStates";
 import { useI18n } from "../../../i18n";
+import { formatDateTime } from "../../../i18n/date";
 import { activityActionLabel, reviewedFieldLabel } from "../activityLabels";
+import { activityText } from "../text";
 import type { ActivityItem, TimelineContext } from "../types";
 import "../activity.css";
 
@@ -21,14 +23,17 @@ export function ActivityTimeline({
   isError: boolean;
   isLoading: boolean;
 }) {
+  const { locale } = useI18n();
+  const labels = activityText(locale);
+
   if (isLoading) {
-    return <LoadingState label="Loading timeline" />;
+    return <LoadingState label={labels.loadingTimeline} />;
   }
   if (isError) {
     return (
       <ErrorState
-        title="Timeline unavailable"
-        message={errorMessage ?? "The timeline could not be loaded."}
+        title={labels.timelineError}
+        message={errorMessage ?? labels.timelineErrorMessage}
       />
     );
   }
@@ -61,7 +66,7 @@ function ActivityTimelineItem({
         {activityActionLabel({ action: event.action, context, locale })}
       </strong>
       <time dateTime={event.created_at}>
-        {formatDateTime(event.created_at)}
+        {formatDateTime(event.created_at, locale)}
       </time>
       {changes.length > 0 ? (
         <dl>
@@ -98,11 +103,4 @@ function isDisplayable(value: unknown): value is boolean | number | string {
     typeof value === "number" ||
     typeof value === "boolean"
   );
-}
-
-function formatDateTime(value: string): string {
-  return new Intl.DateTimeFormat("en", {
-    dateStyle: "medium",
-    timeStyle: "short",
-  }).format(new Date(value));
 }

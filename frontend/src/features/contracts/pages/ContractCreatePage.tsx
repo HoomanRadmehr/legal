@@ -4,13 +4,17 @@ import { useAuth } from "../../../auth";
 import { canCreateMatter } from "../../../auth/permissions";
 import { PageHeader } from "../../../components/pageHeader";
 import { ForbiddenState } from "../../../components/standardStates";
+import { useI18n } from "../../../i18n";
 import { ContractForm } from "../components/ContractForm";
+import { contractText } from "../components/contractLabels";
 import { useCreateContract } from "../hooks";
 import type { ContractInput } from "../types";
 import { ContractPageShell } from "./ContractPageShell";
 
 export function ContractCreatePage() {
   const { session } = useAuth();
+  const { locale } = useI18n();
+  const labels = contractText(locale);
   const navigate = useNavigate();
   const mutation = useCreateContract();
   const role = session?.membership.role ?? "";
@@ -18,7 +22,7 @@ export function ContractCreatePage() {
   if (!canCreateMatter(role)) {
     return (
       <ContractPageShell>
-        <ForbiddenState message="Viewer access is read-only." />
+        <ForbiddenState message={labels.viewerReadonly} />
       </ContractPageShell>
     );
   }
@@ -26,12 +30,12 @@ export function ContractCreatePage() {
   return (
     <ContractPageShell>
       <PageHeader
-        eyebrow="Contracts"
-        title="Create contract"
-        description="Create a matter-linked contract with explicit renewal and expiration dates."
+        eyebrow={labels.eyebrow}
+        title={labels.create}
+        description={labels.createDescription}
         actions={
           <button onClick={() => navigate("/contracts")} type="button">
-            Back to contracts
+            {labels.backToContracts}
           </button>
         }
       />

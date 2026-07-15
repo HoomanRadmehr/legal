@@ -2,42 +2,48 @@ import { Link } from "react-router-dom";
 
 import { StatusBadge } from "../../../components/statusBadge";
 import { TechnicalValue } from "../../../components/technicalValue";
+import { useI18n } from "../../../i18n";
+import { formatDate } from "../../../i18n/date";
 import type { ContractDetail } from "../types";
 import {
   contractPriorityLabel,
   contractStatusLabel,
+  contractText,
   contractTypeLabel,
   lifecycleLabel,
   statusTone,
 } from "./contractLabels";
 
 export function ContractSummary({ contract }: { contract: ContractDetail }) {
+  const { locale } = useI18n();
+  const labels = contractText(locale);
+
   return (
     <div className="contract-detail-grid">
       <section aria-labelledby="contract-summary-title">
-        <h2 id="contract-summary-title">Summary</h2>
+        <h2 id="contract-summary-title">{labels.summary}</h2>
         <dl className="contract-definition-list">
-          <DetailItem label="Reference" value={contract.reference_code} />
+          <DetailItem label={labels.reference} value={contract.reference_code} />
           <div>
-            <dt>Status</dt>
+            <dt>{labels.status}</dt>
             <dd>
               <StatusBadge
-                label={contractStatusLabel(contract.status)}
+                label={contractStatusLabel(contract.status, locale)}
                 tone={statusTone(contract.status)}
               />
             </dd>
           </div>
           <DetailItem
-            label="Priority"
-            value={contractPriorityLabel(contract.priority)}
+            label={labels.priority}
+            value={contractPriorityLabel(contract.priority, locale)}
           />
           <DetailItem
-            label="Contract type"
-            value={contractTypeLabel(contract.contract_type)}
+            label={labels.contractType}
+            value={contractTypeLabel(contract.contract_type, locale)}
           />
-          <DetailItem label="Counterparty" value={contract.counterparty} />
+          <DetailItem label={labels.counterparty} value={contract.counterparty} />
           <div>
-            <dt>Owner</dt>
+            <dt>{labels.owner}</dt>
             <dd>
               <TechnicalValue>{contract.owner_id}</TechnicalValue>
             </dd>
@@ -45,49 +51,69 @@ export function ContractSummary({ contract }: { contract: ContractDetail }) {
         </dl>
       </section>
       <section aria-labelledby="contract-dates-title">
-        <h2 id="contract-dates-title">Dates</h2>
-        <p className="contract-date-state">{lifecycleLabel(contract)}</p>
+        <h2 id="contract-dates-title">{labels.dates}</h2>
+        <p className="contract-date-state">{lifecycleLabel(contract, locale)}</p>
         <dl className="contract-definition-list">
-          <DetailItem label="Effective" value={contract.effective_date} />
-          <DetailItem label="Expiration" value={contract.expiration_date} />
-          <DetailItem label="Renewal" value={contract.renewal_date} />
-          <DetailItem label="Opened" value={contract.opened_on} />
-          <DetailItem label="Closed" value={contract.closed_on} />
+          <DetailItem
+            label={labels.effective}
+            value={formatDate(contract.effective_date, locale)}
+          />
+          <DetailItem
+            label={labels.expiration}
+            value={formatDate(contract.expiration_date, locale)}
+          />
+          <DetailItem
+            label={labels.renewal}
+            value={formatDate(contract.renewal_date, locale)}
+          />
+          <DetailItem
+            label={labels.opened}
+            value={formatDate(contract.opened_on, locale)}
+          />
+          <DetailItem
+            label={labels.closed}
+            value={formatDate(contract.closed_on, locale)}
+          />
         </dl>
       </section>
       <section aria-labelledby="contract-description-title">
-        <h2 id="contract-description-title">Description</h2>
-        <p>{contract.description || "No description provided."}</p>
+        <h2 id="contract-description-title">{labels.description}</h2>
+        <p>{contract.description || labels.noDescription}</p>
       </section>
       <section aria-labelledby="contract-key-terms-title">
-        <h2 id="contract-key-terms-title">Key terms</h2>
-        <KeyTerms terms={contract.key_terms} />
+        <h2 id="contract-key-terms-title">{labels.keyTerms}</h2>
+        <KeyTerms labels={labels} terms={contract.key_terms} />
       </section>
       <section aria-labelledby="contract-linked-title">
-        <h2 id="contract-linked-title">Linked work</h2>
-        <p>
-          Deadlines, tasks, and documents will appear here as their screens are
-          added.
-        </p>
-        <Link to={`/contracts/${contract.id}#timeline`}>Review timeline</Link>
+        <h2 id="contract-linked-title">{labels.linked}</h2>
+        <p>{labels.linkedPlaceholder}</p>
+        <Link to={`/contracts/${contract.id}#timeline`}>
+          {labels.reviewTimeline}
+        </Link>
       </section>
     </div>
   );
 }
 
-function DetailItem({ label, value }: { label: string; value: string | null }) {
+function DetailItem({ label, value }: { label: string; value: string }) {
   return (
     <div>
       <dt>{label}</dt>
-      <dd>{value || "Not set"}</dd>
+      <dd>{value}</dd>
     </div>
   );
 }
 
-function KeyTerms({ terms }: { terms: Record<string, unknown> }) {
+function KeyTerms({
+  labels,
+  terms,
+}: {
+  labels: ReturnType<typeof contractText>;
+  terms: Record<string, unknown>;
+}) {
   const entries = Object.entries(terms);
   if (entries.length === 0) {
-    return <p>No key terms recorded.</p>;
+    return <p>{labels.noKeyTerms}</p>;
   }
   return (
     <dl className="contract-definition-list">

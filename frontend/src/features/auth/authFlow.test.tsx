@@ -37,7 +37,7 @@ describe("auth flow", () => {
     renderRoute("/");
 
     expect(
-      await screen.findByRole("heading", { name: "Sign in" }),
+      await screen.findByRole("heading", { name: "ورود" }),
     ).toBeInTheDocument();
   });
 
@@ -74,7 +74,7 @@ describe("auth flow", () => {
     await submitLoginForm();
 
     expect(await screen.findByRole("alert")).toHaveTextContent(
-      "The username or password is incorrect.",
+      "نام کاربری یا گذرواژه نادرست است.",
     );
   });
 
@@ -95,7 +95,7 @@ describe("auth flow", () => {
     await submitLoginForm();
 
     expect(await screen.findByRole("alert")).toHaveTextContent(
-      "Try again in 30 seconds.",
+      "30 ثانیه دیگر",
     );
   });
 
@@ -110,7 +110,7 @@ describe("auth flow", () => {
     await submitLoginForm();
 
     expect(await screen.findByRole("alert")).toHaveTextContent(
-      "Unable to reach the server.",
+      "ارتباط با سرور برقرار نشد.",
     );
   });
 
@@ -140,9 +140,9 @@ describe("auth flow", () => {
 });
 
 async function submitLoginForm() {
-  await userEvent.type(screen.getByLabelText("Email or username"), "ava");
-  await userEvent.type(screen.getByLabelText("Password"), "correct-password");
-  await userEvent.click(screen.getByRole("button", { name: "Sign in" }));
+  await userEvent.type(screen.getByLabelText("ایمیل یا نام کاربری"), "ava");
+  await userEvent.type(screen.getByLabelText("گذرواژه"), "correct-password");
+  await userEvent.click(screen.getByRole("button", { name: "ورود" }));
 }
 
 function renderRoute(path: string) {

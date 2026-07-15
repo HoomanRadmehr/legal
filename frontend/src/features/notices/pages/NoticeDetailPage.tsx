@@ -11,7 +11,9 @@ import {
   LoadingState,
   NotFoundState,
 } from "../../../components/standardStates";
+import { useI18n } from "../../../i18n";
 import { NoticeMutationError } from "../components/NoticeMutationError";
+import { noticeText } from "../components/noticeLabels";
 import { NoticeSummary } from "../components/NoticeSummary";
 import { NoticeTimeline } from "../components/NoticeTimeline";
 import { useArchiveNotice, useNoticeDetail, useNoticeTimeline } from "../hooks";
@@ -20,6 +22,8 @@ import { NoticePageShell } from "./NoticePageShell";
 export function NoticeDetailPage() {
   const { noticeId } = useParams();
   const { session } = useAuth();
+  const { locale } = useI18n();
+  const labels = noticeText(locale);
   const [archiveOpen, setArchiveOpen] = useState(false);
   const detail = useNoticeDetail(noticeId ?? "");
   const timeline = useNoticeTimeline(noticeId ?? "");
@@ -27,33 +31,36 @@ export function NoticeDetailPage() {
   const canMutate = canEditMatter(session?.membership.role ?? "");
 
   if (!noticeId) {
-    return <NotFoundState title="Notice not found" />;
+    return <NotFoundState title={labels.notFound} />;
   }
 
   return (
     <NoticePageShell>
       <PageHeader
-        eyebrow="Legal notices"
-        title={detail.data?.title ?? "Notice detail"}
+        eyebrow={labels.eyebrow}
+        title={detail.data?.title ?? labels.detail}
         actions={
           <NoticeActions
             canMutate={canMutate}
             isArchived={Boolean(detail.data?.archived_at)}
+            labels={labels}
             noticeId={noticeId}
             onArchive={() => setArchiveOpen(true)}
           />
         }
       />
-      {detail.isLoading ? <LoadingState label="Loading notice" /> : null}
-      {detail.isError ? <NoticeDetailError error={detail.error} /> : null}
+      {detail.isLoading ? <LoadingState label={labels.loading} /> : null}
+      {detail.isError ? (
+        <NoticeDetailError error={detail.error} labels={labels} />
+      ) : null}
       {detail.data ? (
         <>
           {session?.membership.role === "viewer" ? (
-            <p className="notice-alert">Viewer access is read-only.</p>
+            <p className="notice-alert">{labels.viewerReadonly}</p>
           ) : null}
           <NoticeSummary notice={detail.data} />
           <section id="timeline" aria-labelledby="notice-timeline-title">
-            <h2 id="notice-timeline-title">Timeline</h2>
+            <h2 id="notice-timeline-title">{labels.timeline}</h2>
             <NoticeTimeline
               errorMessage={timeline.error?.message}
               events={timeline.data ?? []}
@@ -62,17 +69,16 @@ export function NoticeDetailPage() {
             />
           </section>
           <ConfirmationDialog
-            confirmLabel="Archive notice"
+            confirmLabel={labels.archive}
             onCancel={() => setArchiveOpen(false)}
             onConfirm={() => {
               setArchiveOpen(false);
               archiveMutation.mutate(detail.data.version);
             }}
             open={archiveOpen}
-            title="Archive notice"
+            title={labels.archive}
           >
-            Archive keeps the notice and linked records available for permitted
-            users. It is not a delete.
+            {labels.archiveBody}
           </ConfirmationDialog>
           <NoticeMutationError error={archiveMutation.error} />
         </>
@@ -84,11 +90,13 @@ export function NoticeDetailPage() {
 function NoticeActions({
   canMutate,
   isArchived,
+  labels,
   noticeId,
   onArchive,
 }: {
   canMutate: boolean;
   isArchived: boolean;
+  labels: ReturnType<typeof noticeText>;
   noticeId: string;
   onArchive: () => void;
 }) {
@@ -98,22 +106,28 @@ function NoticeActions({
 
   return (
     <>
-      <Link to={`/notices/${noticeId}/edit`}>Edit notice</Link>
+      <Link to={`/notices/${noticeId}/edit`}>{labels.edit}</Link>
       <button type="button" onClick={onArchive}>
-        Archive notice
+        {labels.archive}
       </button>
     </>
   );
 }
 
-function NoticeDetailError({ error }: { error: Error }) {
+function NoticeDetailError({
+  error,
+  labels,
+}: {
+  error: Error;
+  labels: ReturnType<typeof noticeText>;
+}) {
   if (isApiError(error) && error.status === 404) {
     return (
       <NotFoundState
-        title="Notice not found"
-        message="The notice could not be found."
+        title={labels.notFound}
+        message={labels.notFoundMessage}
       />
     );
   }
-  return <ErrorState title="Notice unavailable" message={error.message} />;
+  return <ErrorState title={labels.error} message={error.message} />;
 }

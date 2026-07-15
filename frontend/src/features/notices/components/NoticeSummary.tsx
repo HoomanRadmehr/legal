@@ -2,6 +2,8 @@ import { Link } from "react-router-dom";
 
 import { StatusBadge } from "../../../components/statusBadge";
 import { TechnicalValue } from "../../../components/technicalValue";
+import { useI18n } from "../../../i18n";
+import { formatDate } from "../../../i18n/date";
 import { useDeadlineDetail } from "../../deadlines/hooks";
 import {
   deadlineStatusLabel,
@@ -14,41 +16,48 @@ import {
   noticePriorityLabel,
   noticeResponseStatusLabel,
   noticeStatusLabel,
+  noticeText,
   responseTone,
   statusTone,
 } from "./noticeLabels";
 
 export function NoticeSummary({ notice }: { notice: NoticeDetail }) {
+  const { locale } = useI18n();
+  const labels = noticeText(locale);
+
   return (
     <div className="notice-detail-grid">
       <section aria-labelledby="notice-overview-title">
-        <h2 id="notice-overview-title">Notice overview</h2>
+        <h2 id="notice-overview-title">{labels.overview}</h2>
         <dl className="notice-definition-list">
           <SummaryText
-            label="Reference"
+            label={labels.reference}
             value={notice.reference_code}
             technical
           />
-          <SummaryText label="Title" value={notice.title} />
-          <SummaryText label="Sender" value={notice.sender} />
+          <SummaryText label={labels.title} value={notice.title} />
+          <SummaryText label={labels.sender} value={notice.sender} />
           <div>
-            <dt>Status</dt>
+            <dt>{labels.status}</dt>
             <dd>
               <StatusBadge
-                label={noticeStatusLabel(notice.status)}
+                label={noticeStatusLabel(notice.status, locale)}
                 tone={statusTone(notice.status)}
               />
             </dd>
           </div>
           <SummaryText
-            label="Priority"
-            value={noticePriorityLabel(notice.priority)}
+            label={labels.priority}
+            value={noticePriorityLabel(notice.priority, locale)}
           />
           <div>
-            <dt>Response status</dt>
+            <dt>{labels.responseStatus}</dt>
             <dd>
               <StatusBadge
-                label={noticeResponseStatusLabel(notice.response_status)}
+                label={noticeResponseStatusLabel(
+                  notice.response_status,
+                  locale,
+                )}
                 tone={responseTone(notice.response_status)}
               />
             </dd>
@@ -56,85 +65,115 @@ export function NoticeSummary({ notice }: { notice: NoticeDetail }) {
         </dl>
       </section>
       <section aria-labelledby="notice-dates-title">
-        <h2 id="notice-dates-title">Dates</h2>
+        <h2 id="notice-dates-title">{labels.dates}</h2>
         <dl className="notice-definition-list">
-          <SummaryText label="Received date" value={notice.received_date} />
           <SummaryText
-            label="Response deadline"
-            value={formatDateTime(notice.response_deadline)}
+            label={labels.receivedDate}
+            value={formatDate(notice.received_date, locale)}
           />
           <SummaryText
-            label="Opened on"
-            value={notice.opened_on ?? "Not set"}
+            label={labels.responseDeadline}
+            value={formatDateTime(notice.response_deadline, locale)}
           />
           <SummaryText
-            label="Closed on"
-            value={notice.closed_on ?? "Not set"}
+            label={labels.openedOn}
+            value={formatDate(notice.opened_on, locale)}
           />
           <SummaryText
-            label="Archived at"
+            label={labels.closedOn}
+            value={formatDate(notice.closed_on, locale)}
+          />
+          <SummaryText
+            label={labels.archivedAt}
             value={
-              notice.archived_at ? formatDateTime(notice.archived_at) : "Active"
+              notice.archived_at
+                ? formatDateTime(notice.archived_at, locale)
+                : labels.active
             }
           />
         </dl>
       </section>
       <section aria-labelledby="notice-links-title">
-        <h2 id="notice-links-title">Linked records</h2>
+        <h2 id="notice-links-title">{labels.linkedRecords}</h2>
         <dl className="notice-definition-list">
           <div>
-            <dt>Linked deadline</dt>
+            <dt>{labels.linkedDeadline}</dt>
             <dd>
               <Link to={`/deadlines/${notice.linked_deadline_id}`}>
                 <TechnicalValue>{notice.linked_deadline_id}</TechnicalValue>
               </Link>
             </dd>
           </div>
-          <LinkedDeadlineState deadlineId={notice.linked_deadline_id} />
+          <LinkedDeadlineState
+            deadlineId={notice.linked_deadline_id}
+            labels={labels}
+            locale={locale}
+          />
           <div>
-            <dt>Related matters</dt>
+            <dt>{labels.relatedMatters}</dt>
             <dd>
-              <RelatedMatterLinks matterIds={notice.related_matter_ids} />
+              <RelatedMatterLinks
+                labels={labels}
+                matterIds={notice.related_matter_ids}
+              />
             </dd>
           </div>
           <SummaryText
-            label="Owner membership"
+            label={labels.ownerMembership}
             value={notice.owner_id}
             technical
           />
         </dl>
       </section>
       <section aria-labelledby="notice-description-title">
-        <h2 id="notice-description-title">Description</h2>
-        <p>{notice.description || "No description provided."}</p>
+        <h2 id="notice-description-title">{labels.description}</h2>
+        <p>{notice.description || labels.noDescription}</p>
       </section>
     </div>
   );
 }
 
-function LinkedDeadlineState({ deadlineId }: { deadlineId: string }) {
+function LinkedDeadlineState({
+  deadlineId,
+  labels,
+  locale,
+}: {
+  deadlineId: string;
+  labels: ReturnType<typeof noticeText>;
+  locale: ReturnType<typeof useI18n>["locale"];
+}) {
   const query = useDeadlineDetail(deadlineId);
 
   if (query.isLoading) {
-    return <SummaryText label="Linked deadline status" value="Loading" />;
+    return (
+      <SummaryText
+        label={labels.linkedDeadlineStatus}
+        value={labels.loading}
+      />
+    );
   }
   if (query.isError || !query.data) {
-    return <SummaryText label="Linked deadline status" value="Unavailable" />;
+    return (
+      <SummaryText
+        label={labels.linkedDeadlineStatus}
+        value={labels.unavailableValue}
+      />
+    );
   }
 
   return (
     <>
       <div>
-        <dt>Linked deadline status</dt>
+        <dt>{labels.linkedDeadlineStatus}</dt>
         <dd>
           <StatusBadge
-            label={deadlineStatusLabel(query.data.status)}
+            label={deadlineStatusLabel(query.data.status, locale)}
             tone={deadlineStatusTone(query.data.status)}
           />
         </dd>
       </div>
       <SummaryText
-        label="Linked deadline assignee"
+        label={labels.linkedDeadlineAssignee}
         value={query.data.assignee_id}
         technical
       />
@@ -142,17 +181,23 @@ function LinkedDeadlineState({ deadlineId }: { deadlineId: string }) {
   );
 }
 
-function RelatedMatterLinks({ matterIds }: { matterIds: string[] }) {
+function RelatedMatterLinks({
+  labels,
+  matterIds,
+}: {
+  labels: ReturnType<typeof noticeText>;
+  matterIds: string[];
+}) {
   const query = useRelatedMatterLinks(matterIds);
 
   if (matterIds.length === 0) {
-    return "None";
+    return labels.none;
   }
   if (query.isLoading) {
-    return "Loading related matters";
+    return labels.loadingRelatedMatters;
   }
   if (query.isError || !query.data || query.data.length === 0) {
-    return "Related matters are not visible.";
+    return labels.relatedNotVisible;
   }
 
   return (

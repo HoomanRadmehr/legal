@@ -4,8 +4,10 @@ import { useAuth } from "../../../auth";
 import { canCreateMatter } from "../../../auth/permissions";
 import { PageHeader } from "../../../components/pageHeader";
 import { ErrorState, LoadingState } from "../../../components/standardStates";
+import { useI18n } from "../../../i18n";
 import { NoticeFilters } from "../components/NoticeFilters";
 import { NoticeListTable } from "../components/NoticeListTable";
+import { noticeText } from "../components/noticeLabels";
 import { useNoticeList } from "../hooks";
 import type {
   NoticeListParams,
@@ -20,6 +22,8 @@ const DEFAULT_PAGE_SIZE = 20;
 export function NoticeListPage() {
   const { session } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
+  const { locale } = useI18n();
+  const labels = noticeText(locale);
   const params = noticeListParamsFromSearch(searchParams);
   const query = useNoticeList(params);
   const canCreate = canCreateMatter(session?.membership.role ?? "");
@@ -27,20 +31,20 @@ export function NoticeListPage() {
   return (
     <NoticePageShell>
       <PageHeader
-        eyebrow="Legal notices"
-        title="Notices"
-        description="Track notice intake, response dates, and linked deadline status."
+        eyebrow={labels.eyebrow}
+        title={labels.listTitle}
+        description={labels.listDescription}
         actions={
-          canCreate ? <Link to="/notices/new">Create notice</Link> : null
+          canCreate ? <Link to="/notices/new">{labels.create}</Link> : null
         }
       />
       <NoticeFilters
         params={params}
         onSubmit={(nextParams) => setSearchParams(paramsToSearch(nextParams))}
       />
-      {query.isLoading ? <LoadingState label="Loading notices" /> : null}
+      {query.isLoading ? <LoadingState label={labels.loadingList} /> : null}
       {query.isError ? (
-        <ErrorState title="Notices unavailable" message={query.error.message} />
+        <ErrorState title={labels.unavailable} message={query.error.message} />
       ) : null}
       {query.data ? (
         <NoticeListTable

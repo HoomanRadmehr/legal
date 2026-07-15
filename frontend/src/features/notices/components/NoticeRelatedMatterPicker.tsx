@@ -2,9 +2,11 @@ import type { UseFormReturn } from "react-hook-form";
 
 import { ErrorState, LoadingState } from "../../../components/standardStates";
 import { TechnicalValue } from "../../../components/technicalValue";
+import { useI18n } from "../../../i18n";
 import type { NoticeFormValues } from "../schemas";
 import { useRelatedMatterChoices } from "../hooks";
 import type { RelatedMatterChoice } from "../types";
+import { noticeText } from "./noticeLabels";
 
 export function NoticeRelatedMatterPicker({
   form,
@@ -15,48 +17,53 @@ export function NoticeRelatedMatterPicker({
   onSearch: (search: string) => void;
   search: string;
 }) {
+  const { locale } = useI18n();
+  const labels = noticeText(locale);
   const query = useRelatedMatterChoices(search);
   const choices = query.data ?? [];
   const selectedIds = form.watch("related_matter_ids") ?? [];
 
   return (
     <fieldset>
-      <legend>Related matters</legend>
+      <legend>{labels.relatedMatters}</legend>
       <label>
-        Search visible cases and contracts
+        {labels.searchRelated}
         <input
-          aria-label="Search visible related matters"
+          aria-label={labels.searchRelatedAria}
           onChange={(event) => onSearch(event.target.value)}
           value={search}
         />
       </label>
       <p className="notice-help">
-        Only matters returned by permission-scoped case and contract searches
-        can be selected.
+        {labels.permissionHelp}
       </p>
       {query.isLoading ? (
-        <LoadingState label="Loading related matters" />
+        <LoadingState label={labels.loadingRelatedMatters} />
       ) : null}
       {query.isError ? (
         <ErrorState
-          title="Related matters unavailable"
+          title={labels.relatedUnavailable}
           message={query.error.message}
         />
       ) : null}
       {choices.length === 0 && !query.isLoading ? (
-        <p>No visible cases or contracts match this search.</p>
+        <p>{labels.noMatches}</p>
       ) : null}
       <MatterChoiceGroup
         choices={choices.filter((choice) => choice.kind === "case")}
         form={form}
-        legend="Visible cases"
+        legend={labels.visibleCases}
       />
       <MatterChoiceGroup
         choices={choices.filter((choice) => choice.kind === "contract")}
         form={form}
-        legend="Visible contracts"
+        legend={labels.visibleContracts}
       />
-      <SelectedMatterIds choices={choices} selectedIds={selectedIds} />
+      <SelectedMatterIds
+        choices={choices}
+        labels={labels}
+        selectedIds={selectedIds}
+      />
     </fieldset>
   );
 }
@@ -96,9 +103,11 @@ function MatterChoiceGroup({
 
 function SelectedMatterIds({
   choices,
+  labels,
   selectedIds,
 }: {
   choices: RelatedMatterChoice[];
+  labels: ReturnType<typeof noticeText>;
   selectedIds: string[];
 }) {
   if (selectedIds.length === 0) {
@@ -111,8 +120,8 @@ function SelectedMatterIds({
   );
 
   return (
-    <section aria-label="Selected related matters">
-      <h3>Selected related matters</h3>
+    <section aria-label={labels.selectedRelatedMatters}>
+      <h3>{labels.selectedRelatedMatters}</h3>
       <ul className="notice-related-id-list">
         {selectedIds.map((matterId) => (
           <li key={matterId}>
@@ -121,9 +130,7 @@ function SelectedMatterIds({
         ))}
       </ul>
       {hiddenSelectedIds.length > 0 ? (
-        <p className="notice-help">
-          Some selected matters are not in the current search results.
-        </p>
+        <p className="notice-help">{labels.hiddenSelected}</p>
       ) : null}
     </section>
   );

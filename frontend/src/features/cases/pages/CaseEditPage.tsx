@@ -10,13 +10,17 @@ import {
   NotFoundState,
 } from "../../../components/standardStates";
 import { isApiError } from "../../../api/errors";
+import { useI18n } from "../../../i18n";
 import { CaseForm } from "../components/CaseForm";
+import { caseText } from "../components/caseLabels";
 import { useCaseDetail, useUpdateCase } from "../hooks";
 import type { CaseUpdateInput } from "../types";
 import { CasePageShell } from "./CasePageShell";
 
 export function CaseEditPage() {
   const { caseId } = useParams();
+  const { locale } = useI18n();
+  const labels = caseText(locale);
   const { session } = useAuth();
   const navigate = useNavigate();
   const detail = useCaseDetail(caseId ?? "");
@@ -24,12 +28,12 @@ export function CaseEditPage() {
   const role = session?.membership.role ?? "";
 
   if (!caseId) {
-    return <NotFoundState title="Case not found" />;
+    return <NotFoundState title={labels.notFound} />;
   }
   if (!canEditMatter(role)) {
     return (
       <CasePageShell>
-        <ForbiddenState message="Viewer access is read-only." />
+        <ForbiddenState message={labels.viewerReadonly} />
       </CasePageShell>
     );
   }
@@ -37,15 +41,15 @@ export function CaseEditPage() {
   return (
     <CasePageShell>
       <PageHeader
-        eyebrow="Cases"
-        title="Edit case"
+        eyebrow={labels.eyebrow}
+        title={labels.edit}
         actions={
           <button onClick={() => navigate(`/cases/${caseId}`)} type="button">
-            Back to detail
+            {labels.backToDetail}
           </button>
         }
       />
-      {detail.isLoading ? <LoadingState label="Loading case" /> : null}
+      {detail.isLoading ? <LoadingState label={labels.loading} /> : null}
       {detail.isError ? <CaseDetailError error={detail.error} /> : null}
       {detail.data ? (
         <CaseForm
@@ -60,13 +64,16 @@ export function CaseEditPage() {
 }
 
 function CaseDetailError({ error }: { error: Error }) {
+  const { locale } = useI18n();
+  const labels = caseText(locale);
+
   if (isApiError(error) && error.status === 404) {
     return (
       <NotFoundState
-        title="Case not found"
-        message="The case could not be found."
+        title={labels.notFound}
+        message={labels.notFoundMessage}
       />
     );
   }
-  return <ErrorState title="Case unavailable" message={error.message} />;
+  return <ErrorState title={labels.error} message={error.message} />;
 }

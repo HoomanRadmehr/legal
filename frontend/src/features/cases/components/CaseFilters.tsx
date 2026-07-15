@@ -1,5 +1,6 @@
 import type { FormEvent } from "react";
 
+import { useI18n } from "../../../i18n";
 import type {
   CaseListParams,
   CaseOrdering,
@@ -10,6 +11,7 @@ import type {
 import {
   casePriorityLabel,
   caseStatusLabel,
+  caseText,
   caseTypeLabel,
 } from "./caseLabels";
 
@@ -18,14 +20,10 @@ type CaseFiltersProps = {
   params: CaseListParams;
 };
 
-const ORDERING_OPTIONS: { label: string; value: CaseOrdering }[] = [
-  { label: "Reference A-Z", value: "reference_code" },
-  { label: "Newest created", value: "-created_at" },
-  { label: "Recently updated", value: "-updated_at" },
-  { label: "Priority", value: "priority" },
-];
-
 export function CaseFilters({ onSubmit, params }: CaseFiltersProps) {
+  const { locale } = useI18n();
+  const labels = caseText(locale);
+
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     onSubmit(formDataToParams(new FormData(event.currentTarget)));
@@ -34,56 +32,56 @@ export function CaseFilters({ onSubmit, params }: CaseFiltersProps) {
   return (
     <form
       className="case-filters"
-      aria-label="Case filters"
+      aria-label={labels.filters}
       onSubmit={handleSubmit}
     >
       <label>
-        Search
+        {labels.search}
         <input defaultValue={params.search ?? ""} name="search" type="search" />
       </label>
       <label>
-        Status
+        {labels.status}
         <select defaultValue={params.status ?? ""} name="status">
-          <option value="">Any status</option>
+          <option value="">{labels.options.anyStatus}</option>
           {(["open", "pending", "on_hold", "closed", "archived"] as const).map(
             (status) => (
               <option key={status} value={status}>
-                {caseStatusLabel(status)}
+                {caseStatusLabel(status, locale)}
               </option>
             ),
           )}
         </select>
       </label>
       <label>
-        Priority
+        {labels.priority}
         <select defaultValue={params.priority ?? ""} name="priority">
-          <option value="">Any priority</option>
+          <option value="">{labels.options.anyPriority}</option>
           {(["normal", "low", "high", "critical"] as const).map((priority) => (
             <option key={priority} value={priority}>
-              {casePriorityLabel(priority)}
+              {casePriorityLabel(priority, locale)}
             </option>
           ))}
         </select>
       </label>
       <label>
-        Case type
+        {labels.caseType}
         <select defaultValue={params.caseType ?? ""} name="caseType">
-          <option value="">Any type</option>
+          <option value="">{labels.options.anyType}</option>
           {(["litigation", "regulatory", "internal", "other"] as const).map(
             (caseType) => (
               <option key={caseType} value={caseType}>
-                {caseTypeLabel(caseType)}
+                {caseTypeLabel(caseType, locale)}
               </option>
             ),
           )}
         </select>
       </label>
       <label>
-        Owner ID
+        {labels.ownerId}
         <input defaultValue={params.owner ?? ""} name="owner" />
       </label>
       <label>
-        Opened after
+        {labels.openedAfter}
         <input
           defaultValue={params.openedAfter ?? ""}
           name="openedAfter"
@@ -91,7 +89,7 @@ export function CaseFilters({ onSubmit, params }: CaseFiltersProps) {
         />
       </label>
       <label>
-        Opened before
+        {labels.openedBefore}
         <input
           defaultValue={params.openedBefore ?? ""}
           name="openedBefore"
@@ -99,29 +97,40 @@ export function CaseFilters({ onSubmit, params }: CaseFiltersProps) {
         />
       </label>
       <label>
-        Archive state
+        {labels.archiveState}
         <select defaultValue={archiveValue(params.archived)} name="archived">
-          <option value="">Active only</option>
-          <option value="true">Archived only</option>
-          <option value="all">All cases</option>
+          <option value="">{labels.activeOnly}</option>
+          <option value="true">{labels.archiveOnly}</option>
+          <option value="all">{labels.archiveAll}</option>
         </select>
       </label>
       <label>
-        Ordering
+        {labels.ordering}
         <select
           defaultValue={params.ordering ?? "reference_code"}
           name="ordering"
         >
-          {ORDERING_OPTIONS.map((option) => (
+          {orderingOptions(labels).map((option) => (
             <option key={option.value} value={option.value}>
               {option.label}
             </option>
           ))}
         </select>
       </label>
-      <button type="submit">Apply filters</button>
+      <button type="submit">{labels.applyFilters}</button>
     </form>
   );
+}
+
+function orderingOptions(
+  labels: ReturnType<typeof caseText>,
+): { label: string; value: CaseOrdering }[] {
+  return [
+    { label: labels.options.reference, value: "reference_code" },
+    { label: labels.options.newest, value: "-created_at" },
+    { label: labels.options.recent, value: "-updated_at" },
+    { label: labels.options.priority, value: "priority" },
+  ];
 }
 
 function formDataToParams(formData: FormData): CaseListParams {

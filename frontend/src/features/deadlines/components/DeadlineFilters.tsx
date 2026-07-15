@@ -1,5 +1,6 @@
 import type { FormEvent } from "react";
 
+import { useI18n } from "../../../i18n";
 import type {
   DeadlineListParams,
   DeadlineOrdering,
@@ -7,14 +8,11 @@ import type {
   DeadlineStatus,
   DeadlineView,
 } from "../types";
-import { deadlinePriorityLabel, deadlineStatusLabel } from "./deadlineLabels";
-
-const ORDERING_OPTIONS: { label: string; value: DeadlineOrdering }[] = [
-  { label: "Due soonest", value: "due_at" },
-  { label: "Due latest", value: "-due_at" },
-  { label: "Priority", value: "priority" },
-  { label: "Recently updated", value: "-updated_at" },
-];
+import {
+  deadlinePriorityLabel,
+  deadlineStatusLabel,
+  deadlineText,
+} from "./deadlineLabels";
 
 export function DeadlineFilters({
   onSubmit,
@@ -23,6 +21,9 @@ export function DeadlineFilters({
   onSubmit: (params: DeadlineListParams) => void;
   params: DeadlineListParams;
 }) {
+  const { locale } = useI18n();
+  const labels = deadlineText(locale);
+
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     onSubmit(formDataToParams(new FormData(event.currentTarget), params.view));
@@ -30,42 +31,42 @@ export function DeadlineFilters({
 
   return (
     <form
-      aria-label="Deadline filters"
+      aria-label={labels.filters}
       className="deadline-filters"
       onSubmit={handleSubmit}
     >
       <label>
-        Matter ID
+        {labels.matter}
         <input defaultValue={params.matter ?? ""} name="matter" />
       </label>
       <label>
-        Assignee ID
+        {labels.assignee}
         <input defaultValue={params.assignee ?? ""} name="assignee" />
       </label>
       <label>
-        Status
+        {labels.status}
         <select defaultValue={params.status ?? ""} name="status">
-          <option value="">Open deadlines</option>
+          <option value="">{labels.openOnly}</option>
           {(["open", "completed", "cancelled"] as const).map((status) => (
             <option key={status} value={status}>
-              {deadlineStatusLabel(status)}
+              {deadlineStatusLabel(status, locale)}
             </option>
           ))}
         </select>
       </label>
       <label>
-        Priority
+        {labels.priority}
         <select defaultValue={params.priority ?? ""} name="priority">
-          <option value="">Any priority</option>
+          <option value="">{labels.options.anyPriority}</option>
           {(["normal", "low", "high", "critical"] as const).map((priority) => (
             <option key={priority} value={priority}>
-              {deadlinePriorityLabel(priority)}
+              {deadlinePriorityLabel(priority, locale)}
             </option>
           ))}
         </select>
       </label>
       <label>
-        Due after
+        {labels.dueAfter}
         <input
           defaultValue={params.dueAfter ?? ""}
           name="dueAfter"
@@ -73,7 +74,7 @@ export function DeadlineFilters({
         />
       </label>
       <label>
-        Due before
+        {labels.dueBefore}
         <input
           defaultValue={params.dueBefore ?? ""}
           name="dueBefore"
@@ -81,18 +82,29 @@ export function DeadlineFilters({
         />
       </label>
       <label>
-        Ordering
+        {labels.ordering}
         <select defaultValue={params.ordering ?? "due_at"} name="ordering">
-          {ORDERING_OPTIONS.map((option) => (
+          {orderingOptions(labels).map((option) => (
             <option key={option.value} value={option.value}>
               {option.label}
             </option>
           ))}
         </select>
       </label>
-      <button type="submit">Apply filters</button>
+      <button type="submit">{labels.applyFilters}</button>
     </form>
   );
+}
+
+function orderingOptions(
+  labels: ReturnType<typeof deadlineText>,
+): { label: string; value: DeadlineOrdering }[] {
+  return [
+    { label: labels.options.dueSoonest, value: "due_at" },
+    { label: labels.options.dueLatest, value: "-due_at" },
+    { label: labels.options.priority, value: "priority" },
+    { label: labels.options.recent, value: "-updated_at" },
+  ];
 }
 
 function formDataToParams(

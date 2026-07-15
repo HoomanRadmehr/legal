@@ -1,6 +1,7 @@
+import { useI18n } from "../../../i18n";
 import type { DeadlineView } from "../types";
 import { DEADLINE_VIEWS } from "../deadlineViews";
-import { deadlineViewLabel } from "./deadlineLabels";
+import { deadlineText, deadlineViewLabel } from "./deadlineLabels";
 
 export function DeadlineViewTabs({
   activeView,
@@ -9,8 +10,11 @@ export function DeadlineViewTabs({
   activeView: DeadlineView;
   onChange: (view: DeadlineView) => void;
 }) {
+  const { locale } = useI18n();
+  const labels = deadlineText(locale);
+
   return (
-    <div className="deadline-tabs" role="tablist" aria-label="Deadline views">
+    <div className="deadline-tabs" role="tablist" aria-label={labels.viewTabs}>
       {DEADLINE_VIEWS.map((view) => (
         <button
           key={view}
@@ -20,7 +24,7 @@ export function DeadlineViewTabs({
           role="tab"
           type="button"
         >
-          {deadlineViewLabel(view)}
+          {deadlineViewLabel(view, locale)}
         </button>
       ))}
     </div>

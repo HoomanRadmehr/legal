@@ -1,5 +1,6 @@
 import type { FormEvent } from "react";
 
+import { useI18n } from "../../../i18n";
 import type {
   ContractListParams,
   ContractOrdering,
@@ -10,6 +11,7 @@ import type {
 import {
   contractPriorityLabel,
   contractStatusLabel,
+  contractText,
   contractTypeLabel,
 } from "./contractLabels";
 
@@ -18,15 +20,10 @@ type ContractFiltersProps = {
   params: ContractListParams;
 };
 
-const ORDERING_OPTIONS: { label: string; value: ContractOrdering }[] = [
-  { label: "Reference A-Z", value: "reference_code" },
-  { label: "Newest created", value: "-created_at" },
-  { label: "Effective soonest", value: "effective_date" },
-  { label: "Expiration soonest", value: "expiration_date" },
-  { label: "Renewal soonest", value: "renewal_date" },
-];
-
 export function ContractFilters({ onSubmit, params }: ContractFiltersProps) {
+  const { locale } = useI18n();
+  const labels = contractText(locale);
+
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     onSubmit(formDataToParams(new FormData(event.currentTarget)));
@@ -35,128 +32,154 @@ export function ContractFilters({ onSubmit, params }: ContractFiltersProps) {
   return (
     <form
       className="contract-filters"
-      aria-label="Contract filters"
+      aria-label={labels.filters}
       onSubmit={handleSubmit}
     >
       <label>
-        Search
+        {labels.search}
         <input defaultValue={params.search ?? ""} name="search" type="search" />
       </label>
       <label>
-        Counterparty
+        {labels.counterparty}
         <input defaultValue={params.counterparty ?? ""} name="counterparty" />
       </label>
-      <ContractSelects params={params} />
-      <ContractDateFilters params={params} />
+      <ContractSelects labels={labels} locale={locale} params={params} />
+      <ContractDateFilters labels={labels} params={params} />
       <label>
-        Archive state
+        {labels.archiveState}
         <select defaultValue={archiveValue(params.archived)} name="archived">
-          <option value="">Active only</option>
-          <option value="true">Archived only</option>
-          <option value="all">All contracts</option>
+          <option value="">{labels.activeOnly}</option>
+          <option value="true">{labels.archiveOnly}</option>
+          <option value="all">{labels.archiveAll}</option>
         </select>
       </label>
       <label>
-        Ordering
+        {labels.ordering}
         <select
           defaultValue={params.ordering ?? "reference_code"}
           name="ordering"
         >
-          {ORDERING_OPTIONS.map((option) => (
+          {orderingOptions(labels).map((option) => (
             <option key={option.value} value={option.value}>
               {option.label}
             </option>
           ))}
         </select>
       </label>
-      <button type="submit">Apply filters</button>
+      <button type="submit">{labels.applyFilters}</button>
     </form>
   );
 }
 
-function ContractSelects({ params }: { params: ContractListParams }) {
+function ContractSelects({
+  labels,
+  locale,
+  params,
+}: {
+  labels: ReturnType<typeof contractText>;
+  locale: ReturnType<typeof useI18n>["locale"];
+  params: ContractListParams;
+}) {
   return (
     <>
       <label>
-        Status
+        {labels.status}
         <select defaultValue={params.status ?? ""} name="status">
-          <option value="">Any status</option>
+          <option value="">{labels.options.anyStatus}</option>
           {(
             ["active", "draft", "expired", "terminated", "archived"] as const
           ).map((status) => (
             <option key={status} value={status}>
-              {contractStatusLabel(status)}
+              {contractStatusLabel(status, locale)}
             </option>
           ))}
         </select>
       </label>
       <label>
-        Priority
+        {labels.priority}
         <select defaultValue={params.priority ?? ""} name="priority">
-          <option value="">Any priority</option>
+          <option value="">{labels.options.anyPriority}</option>
           {(["normal", "low", "high", "critical"] as const).map((priority) => (
             <option key={priority} value={priority}>
-              {contractPriorityLabel(priority)}
+              {contractPriorityLabel(priority, locale)}
             </option>
           ))}
         </select>
       </label>
       <label>
-        Contract type
+        {labels.contractType}
         <select defaultValue={params.contractType ?? ""} name="contractType">
-          <option value="">Any type</option>
+          <option value="">{labels.options.anyType}</option>
           {(["vendor", "service", "employment", "nda", "other"] as const).map(
             (contractType) => (
               <option key={contractType} value={contractType}>
-                {contractTypeLabel(contractType)}
+                {contractTypeLabel(contractType, locale)}
               </option>
             ),
           )}
         </select>
       </label>
       <label>
-        Owner ID
+        {labels.ownerId}
         <input defaultValue={params.owner ?? ""} name="owner" />
       </label>
     </>
   );
 }
 
-function ContractDateFilters({ params }: { params: ContractListParams }) {
+function ContractDateFilters({
+  labels,
+  params,
+}: {
+  labels: ReturnType<typeof contractText>;
+  params: ContractListParams;
+}) {
   return (
     <>
       <DateInput
-        label="Effective after"
+        label={labels.effectiveAfter}
         name="effectiveAfter"
         value={params.effectiveAfter}
       />
       <DateInput
-        label="Effective before"
+        label={labels.effectiveBefore}
         name="effectiveBefore"
         value={params.effectiveBefore}
       />
       <DateInput
-        label="Expiration after"
+        label={labels.expirationAfter}
         name="expirationAfter"
         value={params.expirationAfter}
       />
       <DateInput
-        label="Expiration before"
+        label={labels.expirationBefore}
         name="expirationBefore"
         value={params.expirationBefore}
       />
       <DateInput
-        label="Renewal after"
+        label={labels.renewalAfter}
         name="renewalAfter"
         value={params.renewalAfter}
       />
       <DateInput
-        label="Renewal before"
+        label={labels.renewalBefore}
         name="renewalBefore"
         value={params.renewalBefore}
       />
     </>
   );
+}
+
+function orderingOptions(
+  labels: ReturnType<typeof contractText>,
+): { label: string; value: ContractOrdering }[] {
+  return [
+    { label: labels.options.reference, value: "reference_code" },
+    { label: labels.options.newest, value: "-created_at" },
+    { label: labels.options.effective, value: "effective_date" },
+    { label: labels.options.expiration, value: "expiration_date" },
+    { label: labels.options.renewal, value: "renewal_date" },
+  ];
 }
 
 function DateInput({

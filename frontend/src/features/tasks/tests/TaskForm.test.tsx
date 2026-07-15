@@ -32,7 +32,7 @@ test("requires active assignee choices for create", async () => {
   expect(screen.queryByText(/Inactive User/)).not.toBeInTheDocument();
 
   await user.type(screen.getByLabelText("Title"), "Review filing");
-  await user.type(screen.getByLabelText("Matter ID"), uuid("1"));
+  await user.type(screen.getByLabelText("Matter"), uuid("1"));
   await user.selectOptions(screen.getByLabelText("Active assignee"), uuid("2"));
   await user.type(
     screen.getByLabelText("Due date and time"),

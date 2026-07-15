@@ -54,11 +54,8 @@ export type PaginatedResponse<TItem> = {
 
 export type PreferenceOption = {
   eventType: NotificationEventType;
-  label: string;
 };
 
 export type ChannelOption = {
   channel: NotificationChannel;
-  label: string;
-  status: string;
 };

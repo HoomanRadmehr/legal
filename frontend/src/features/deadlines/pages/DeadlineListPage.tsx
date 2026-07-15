@@ -4,9 +4,11 @@ import { useAuth } from "../../../auth";
 import { canCreateMatter } from "../../../auth/permissions";
 import { PageHeader } from "../../../components/pageHeader";
 import { ErrorState, LoadingState } from "../../../components/standardStates";
+import { useI18n } from "../../../i18n";
 import { DeadlineFilters } from "../components/DeadlineFilters";
 import { DeadlineListTable } from "../components/DeadlineListTable";
 import { DeadlineViewTabs } from "../components/DeadlineViewTabs";
+import { deadlineText } from "../components/deadlineLabels";
 import { DEADLINE_VIEWS } from "../deadlineViews";
 import { useDeadlineList } from "../hooks";
 import type {
@@ -22,6 +24,8 @@ const DEFAULT_PAGE_SIZE = 20;
 
 export function DeadlineListPage() {
   const { session } = useAuth();
+  const { locale } = useI18n();
+  const labels = deadlineText(locale);
   const [searchParams, setSearchParams] = useSearchParams();
   const params = deadlineListParamsFromSearch(searchParams);
   const query = useDeadlineList(params);
@@ -30,16 +34,14 @@ export function DeadlineListPage() {
   return (
     <DeadlinePageShell>
       <PageHeader
-        eyebrow="Deadlines"
-        title="Deadlines"
-        description="Review deadline views classified by the backend using the organization timezone."
+        eyebrow={labels.listTitle}
+        title={labels.listTitle}
+        description={labels.listDescription}
         actions={
-          canCreate ? <Link to="/deadlines/new">Create deadline</Link> : null
+          canCreate ? <Link to="/deadlines/new">{labels.create}</Link> : null
         }
       />
-      <p className="deadline-timezone">
-        Organization timezone: server classified
-      </p>
+      <p className="deadline-timezone">{labels.timezone}</p>
       <DeadlineViewTabs
         activeView={params.view}
         onChange={(view) =>
@@ -50,7 +52,7 @@ export function DeadlineListPage() {
         params={params}
         onSubmit={(nextParams) => setSearchParams(paramsToSearch(nextParams))}
       />
-      {query.isLoading ? <LoadingState label="Loading deadlines" /> : null}
+      {query.isLoading ? <LoadingState label={labels.loadingList} /> : null}
       {query.isError ? <DeadlineListError error={query.error} /> : null}
       {query.data ? (
         <DeadlineListTable
@@ -64,10 +66,13 @@ export function DeadlineListPage() {
 }
 
 function DeadlineListError({ error }: { error: Error }) {
+  const { locale } = useI18n();
+  const labels = deadlineText(locale);
+
   return (
     <ErrorState
-      title="Deadlines unavailable"
-      message={deadlineErrorMessage(error)}
+      title={labels.error}
+      message={deadlineErrorMessage(error, labels)}
     />
   );
 }
@@ -126,12 +131,19 @@ function pageCount(count: number): number {
   return Math.max(1, Math.ceil(count / DEFAULT_PAGE_SIZE));
 }
 
-function deadlineErrorMessage(error: Error): string {
+function deadlineErrorMessage(
+  error: Error,
+  labels: ReturnType<typeof deadlineText>,
+): string {
   if (
     "retryAfterSeconds" in error &&
     typeof error.retryAfterSeconds === "number"
   ) {
-    return `${error.message} Try again in ${error.retryAfterSeconds} seconds.`;
+    const suffix = labels.retrySuffix.replace(
+      "{{seconds}}",
+      String(error.retryAfterSeconds),
+    );
+    return labels.rateLimited.replace("{{suffix}}", suffix);
   }
   return error.message;
 }

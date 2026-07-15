@@ -1,4 +1,9 @@
-import { useForm, type FieldErrors, type FieldPath } from "react-hook-form";
+import {
+  useForm,
+  useWatch,
+  type FieldErrors,
+  type FieldPath,
+} from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { ZodError } from "zod";
 
@@ -6,6 +11,8 @@ import {
   FormErrorSummary,
   type FormErrorItem,
 } from "../../../components/formErrorSummary";
+import { LocalizedDateTimeInput } from "../../../components/localizedDateInput";
+import { useI18n } from "../../../i18n";
 import {
   buildDeadlineCreateInput,
   buildDeadlineUpdateInput,
@@ -19,7 +26,7 @@ import type {
   DeadlineInput,
   DeadlineUpdateInput,
 } from "../types";
-import { deadlinePriorityLabel } from "./deadlineLabels";
+import { deadlinePriorityLabel, deadlineText } from "./deadlineLabels";
 import { DeadlineMutationError } from "./DeadlineMutationError";
 
 export function DeadlineForm({
@@ -36,12 +43,15 @@ export function DeadlineForm({
   ) => Promise<DeadlineDetail>;
 }) {
   const navigate = useNavigate();
+  const { locale } = useI18n();
+  const labels = deadlineText(locale);
   const form = useForm<DeadlineFormValues>({
     defaultValues: initialDeadline ? undefined : defaultDeadlineFormValues(),
     values: initialDeadline
       ? deadlineDetailToFormValues(initialDeadline)
       : undefined,
   });
+  const dueAtLocal = useWatch({ control: form.control, name: "due_at_local" });
 
   async function submit(values: DeadlineFormValues) {
     form.clearErrors();
@@ -53,7 +63,7 @@ export function DeadlineForm({
       const savedDeadline = await onSubmit(input);
       navigate(`/deadlines/${savedDeadline.id}`);
     } catch (error) {
-      applyFormError(form.setError, error);
+      applyFormError(form.setError, error, labels);
     }
   }
 
@@ -63,37 +73,36 @@ export function DeadlineForm({
       onSubmit={form.handleSubmit(submit)}
       noValidate
     >
-      <FormErrorSummary errors={formErrors(form.formState.errors)} />
+      <FormErrorSummary errors={formErrors(form.formState.errors, labels)} />
       <DeadlineMutationError error={mutationError} />
       <fieldset>
-        <legend>Deadline details</legend>
+        <legend>{labels.details}</legend>
         <label>
-          Title
+          {labels.title}
           <input {...form.register("title")} id="title" />
         </label>
         <label>
-          Matter ID
+          {labels.matter}
           <input {...form.register("matter_id")} id="matter_id" />
         </label>
         <label>
-          Assignee membership ID
+          {labels.assigneeMembershipId}
           <input {...form.register("assignee_id")} id="assignee_id" />
         </label>
+        <LocalizedDateTimeInput
+          id="due_at_local"
+          label={labels.dueDateTime}
+          onValueChange={(value) => form.setValue("due_at_local", value)}
+          registration={form.register("due_at_local")}
+          value={dueAtLocal}
+        />
         <label>
-          Due date and time
-          <input
-            {...form.register("due_at_local")}
-            id="due_at_local"
-            type="datetime-local"
-          />
-        </label>
-        <label>
-          Priority
+          {labels.priority}
           <select {...form.register("priority")} id="priority">
             {(["normal", "low", "high", "critical"] as const).map(
               (priority) => (
                 <option key={priority} value={priority}>
-                  {deadlinePriorityLabel(priority)}
+                  {deadlinePriorityLabel(priority, locale)}
                 </option>
               ),
             )}
@@ -101,11 +110,11 @@ export function DeadlineForm({
         </label>
         <label className="deadline-checkbox">
           <input {...form.register("reminder_enabled")} type="checkbox" />
-          Reminder enabled
+          {labels.reminder}
         </label>
       </fieldset>
       <label>
-        Description
+        {labels.description}
         <textarea {...form.register("description")} id="description" rows={4} />
       </label>
       {mode === "edit" ? (
@@ -116,7 +125,7 @@ export function DeadlineForm({
       ) : null}
       <div className="deadline-form__actions">
         <button disabled={form.formState.isSubmitting} type="submit">
-          {mode === "create" ? "Create deadline" : "Save changes"}
+          {mode === "create" ? labels.create : labels.save}
         </button>
       </div>
     </form>
@@ -126,21 +135,32 @@ export function DeadlineForm({
 function applyFormError(
   setError: ReturnType<typeof useForm<DeadlineFormValues>>["setError"],
   error: unknown,
+  labels: ReturnType<typeof deadlineText>,
 ) {
   if (error instanceof ZodError) {
     for (const issue of error.issues) {
       setError(issue.path.join(".") as FieldPath<DeadlineFormValues>, {
-        message: issue.message,
+        message: validationMessage(issue.message, labels),
       });
     }
     return;
   }
   setError("root", {
-    message: error instanceof Error ? error.message : "Save failed.",
+    message: error instanceof Error ? error.message : labels.saveFailed,
   });
 }
 
-function formErrors(errors: FieldErrors<DeadlineFormValues>): FormErrorItem[] {
+function validationMessage(
+  message: string,
+  labels: ReturnType<typeof deadlineText>,
+): string {
+  return labels.invalidValue === "Invalid value." ? message : labels.invalidValue;
+}
+
+function formErrors(
+  errors: FieldErrors<DeadlineFormValues>,
+  labels: ReturnType<typeof deadlineText>,
+): FormErrorItem[] {
   return Object.entries(errors).flatMap(([field, error]) => {
     if (!error) {
       return [];
@@ -148,13 +168,25 @@ function formErrors(errors: FieldErrors<DeadlineFormValues>): FormErrorItem[] {
     return [
       {
         fieldId: field,
-        label: fieldLabel(field),
+        label: fieldLabel(field, labels),
         message: String(error.message),
       },
     ];
   });
 }
 
-function fieldLabel(field: string): string {
-  return field.replaceAll("_", " ");
+function fieldLabel(
+  field: string,
+  labels: ReturnType<typeof deadlineText>,
+): string {
+  const fieldLabels: Record<string, string> = {
+    assignee_id: labels.assigneeMembershipId,
+    description: labels.description,
+    due_at_local: labels.dueDateTime,
+    matter_id: labels.matter,
+    priority: labels.priority,
+    reminder_enabled: labels.reminder,
+    title: labels.title,
+  };
+  return fieldLabels[field] ?? field.replaceAll("_", " ");
 }

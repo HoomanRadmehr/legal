@@ -3,6 +3,7 @@ import type { SupportedLocale } from "../../i18n";
 const english = {
   accessGrants: "Access grants to revoke",
   active: "Active",
+  administration: "Administration",
   completed:
     "Offboarding completed. The departing membership is now offboarded.",
   confirmHelp: "Type OFFBOARD to execute this transfer.",
@@ -47,6 +48,7 @@ const english = {
 const persian: typeof english = {
   accessGrants: "دسترسی‌هایی که لغو می‌شوند",
   active: "فعال",
+  administration: "مدیریت",
   completed: "خروج کاربر تکمیل شد. عضویت خروجی اکنون غیرفعال است.",
   confirmHelp: "برای اجرای انتقال، OFFBOARD را وارد کنید.",
   confirmation: "تایید",

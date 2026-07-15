@@ -53,6 +53,21 @@ const contextFallbacks = {
   notice: { en: "Notice activity", fa: "فعالیت ابلاغ" },
 } as const;
 
+const contextActionLabels = {
+  case: {
+    en: { "matter.archived": "Case archived" },
+    fa: { "matter.archived": "پرونده بایگانی شد" },
+  },
+  contract: {
+    en: { "matter.archived": "Contract archived" },
+    fa: { "matter.archived": "قرارداد بایگانی شد" },
+  },
+  notice: {
+    en: { "matter.archived": "Notice archived" },
+    fa: { "matter.archived": "ابلاغ بایگانی شد" },
+  },
+} as const;
+
 const fieldLabels = {
   en: {
     assignee_id: "Assignee",
@@ -93,9 +108,32 @@ export function activityActionLabel({
   context: TimelineContext;
   locale: SupportedLocale;
 }): string {
+  const contextLabel = contextSpecificActionLabel({ action, context, locale });
+  if (contextLabel) {
+    return contextLabel;
+  }
   return (
     actionLabels[locale][action as keyof typeof actionLabels.en] ??
     contextFallbacks[context][locale]
+  );
+}
+
+function contextSpecificActionLabel({
+  action,
+  context,
+  locale,
+}: {
+  action: string;
+  context: TimelineContext;
+  locale: SupportedLocale;
+}): string | null {
+  if (context === "activity") {
+    return null;
+  }
+  return (
+    contextActionLabels[context][locale][
+      action as keyof (typeof contextActionLabels)[typeof context]["en"]
+    ] ?? null
   );
 }
 

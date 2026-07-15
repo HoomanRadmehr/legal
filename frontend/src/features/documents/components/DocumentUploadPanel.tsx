@@ -8,11 +8,15 @@ import {
   useDocumentUpload,
   useDocumentUploadStatus,
 } from "../hooks";
+import { useI18n } from "../../../i18n";
 import { allowedUploadTypes, filePolicyError } from "../policy";
+import { documentText, fillDocumentText } from "../text";
 import "./documents.css";
 
 export function DocumentUploadPanel({ matterId }: { matterId: string }) {
   const { session } = useAuth();
+  const { locale } = useI18n();
+  const labels = documentText(locale);
   const inputId = useId();
   const upload = useDocumentUpload(matterId);
   const [localError, setLocalError] = useState("");
@@ -35,13 +39,11 @@ export function DocumentUploadPanel({ matterId }: { matterId: string }) {
       aria-labelledby="document-upload-title"
     >
       <div>
-        <h2 id="document-upload-title">Upload document</h2>
-        <p>
-          Files upload directly to private storage after backend authorization.
-        </p>
+        <h2 id="document-upload-title">{labels.upload}</h2>
+        <p>{labels.uploadDescription}</p>
       </div>
       <label className="document-upload__dropzone" htmlFor={inputId}>
-        <span>Select document</span>
+        <span>{labels.select}</span>
         <input
           accept={allowedUploadTypes()}
           id={inputId}
@@ -50,6 +52,7 @@ export function DocumentUploadPanel({ matterId }: { matterId: string }) {
             if (file) {
               startFileUpload({
                 file,
+                locale,
                 setLocalError,
                 startUpload: upload.startUpload,
               });
@@ -67,22 +70,24 @@ export function DocumentUploadPanel({ matterId }: { matterId: string }) {
           if (file) {
             startFileUpload({
               file,
+              locale,
               setLocalError,
               startUpload: upload.startUpload,
             });
           }
         }}
       >
-        Drop document here
+        {labels.dropHere}
       </div>
       <UploadProgress
+        locale={locale}
         state={upload.attempt.state}
         progress={upload.attempt.progress}
         serverStatus={serverStatus}
       />
       {isActiveUploadStatus(serverStatus) ? (
         <p className="document-upload__status">
-          Byte upload complete. Server processing remains authoritative.
+          {labels.processing}
         </p>
       ) : null}
       {localError ? (
@@ -90,21 +95,25 @@ export function DocumentUploadPanel({ matterId }: { matterId: string }) {
           {localError}
         </p>
       ) : null}
-      {upload.isError ? <UploadError error={upload.error} /> : null}
+      {upload.isError ? (
+        <UploadError error={upload.error} locale={locale} />
+      ) : null}
     </section>
   );
 }
 
 function startFileUpload({
   file,
+  locale,
   setLocalError,
   startUpload,
 }: {
   file: File;
+  locale: ReturnType<typeof useI18n>["locale"];
   setLocalError: (message: string) => void;
   startUpload: (file: File) => void;
 }) {
-  const policyError = filePolicyError(file);
+  const policyError = filePolicyError(file, locale);
   if (policyError) {
     setLocalError(policyError);
     return;
@@ -115,10 +124,12 @@ function startFileUpload({
 
 function UploadProgress({
   progress,
+  locale,
   serverStatus,
   state,
 }: {
   progress: number;
+  locale: ReturnType<typeof useI18n>["locale"];
   serverStatus: string;
   state: string;
 }) {
@@ -127,8 +138,12 @@ function UploadProgress({
   }
   return (
     <div className="document-upload__progress" aria-live="polite">
-      <progress aria-label="Upload progress" max={100} value={progress} />
-      <span>{uploadStateLabel(state, progress, serverStatus)}</span>
+      <progress
+        aria-label={documentText(locale).uploadProgress}
+        max={100}
+        value={progress}
+      />
+      <span>{uploadStateLabel(state, progress, serverStatus, locale)}</span>
     </div>
   );
 }
@@ -137,41 +152,53 @@ function uploadStateLabel(
   state: string,
   progress: number,
   serverStatus: string,
+  locale: ReturnType<typeof useI18n>["locale"],
 ): string {
+  const labels = documentText(locale);
   if (state === "initiating") {
-    return "Requesting upload authorization";
+    return labels.initiating;
   }
   if (state === "uploading") {
-    return `Uploading ${progress}%`;
+    return fillDocumentText(labels.uploading, { progress });
   }
   if (state === "completing") {
-    return "Confirming upload with server";
+    return labels.completing;
   }
   if (state === "completed" && serverStatus) {
-    return `Server status: ${serverStatus}`;
+    return fillDocumentText(labels.serverStatus, { status: serverStatus });
   }
-  return "File selected";
+  return labels.fileSelected;
 }
 
-function UploadError({ error }: { error: unknown }) {
+function UploadError({
+  error,
+  locale,
+}: {
+  error: unknown;
+  locale: ReturnType<typeof useI18n>["locale"];
+}) {
   return (
     <p className="document-upload__alert" role="alert">
-      {uploadErrorMessage(error)}
+      {uploadErrorMessage(error, locale)}
     </p>
   );
 }
 
-function uploadErrorMessage(error: unknown): string {
+function uploadErrorMessage(
+  error: unknown,
+  locale: ReturnType<typeof useI18n>["locale"],
+): string {
+  const labels = documentText(locale);
   if (isApiError(error) && error.status === 429 && error.retryAfterSeconds) {
-    return `Too many uploads. Try again in ${error.retryAfterSeconds} seconds.`;
+    return fillDocumentText(labels.rateLimited, {
+      seconds: error.retryAfterSeconds,
+    });
   }
   if (isApiError(error) && error.status === 413) {
-    return "The selected file is larger than the upload limit.";
+    return labels.tooLarge;
   }
   if (isApiError(error) && error.status === 422) {
     return error.message;
   }
-  return error instanceof Error
-    ? error.message
-    : "The upload could not be started.";
+  return error instanceof Error ? error.message : labels.uploadFailed;
 }

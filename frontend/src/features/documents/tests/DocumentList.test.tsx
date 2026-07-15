@@ -64,7 +64,7 @@ function renderDocumentList({ role = "legal_admin" }: { role?: string } = {}) {
 
 function renderWithProviders(children: ReactNode, role: string) {
   return render(
-    <I18nProvider>
+    <I18nProvider initialLocale="en">
       <AuthContext.Provider value={authContext(role)}>
         <QueryClientProvider client={createAppQueryClient()}>
           {children}

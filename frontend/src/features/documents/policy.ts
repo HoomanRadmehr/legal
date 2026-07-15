@@ -1,3 +1,7 @@
+import type { SupportedLocale } from "../../i18n";
+
+import { documentText } from "./text";
+
 export const MAX_UPLOAD_SIZE_BYTES = 26_214_400;
 
 const ALLOWED_CONTENT_TYPES = new Set([
@@ -15,15 +19,19 @@ export function allowedUploadTypes(): string {
   return Array.from(ALLOWED_CONTENT_TYPES).join(",");
 }
 
-export function filePolicyError(file: File): string {
+export function filePolicyError(
+  file: File,
+  locale: SupportedLocale = "en",
+): string {
+  const labels = documentText(locale);
   if (file.size <= 0) {
-    return "Select a non-empty file.";
+    return labels.emptyFile;
   }
   if (file.size > MAX_UPLOAD_SIZE_BYTES) {
-    return "The selected file is larger than the upload limit.";
+    return labels.tooLarge;
   }
   if (!ALLOWED_CONTENT_TYPES.has(file.type)) {
-    return "This file type is not allowed.";
+    return labels.uploadType;
   }
   return "";
 }

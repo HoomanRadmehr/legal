@@ -3,6 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
 import { expect, test, vi } from "vitest";
 
+import { I18nProvider } from "../../../i18n";
 import { DeadlineForm } from "../components/DeadlineForm";
 import type {
   DeadlineDetail,
@@ -16,14 +17,16 @@ test("validates required deadline fields before submit", async () => {
     deadlineDetail(input),
   );
   render(
-    <MemoryRouter>
-      <DeadlineForm mode="create" mutationError={null} onSubmit={onSubmit} />
-    </MemoryRouter>,
+    <I18nProvider initialLocale="en">
+      <MemoryRouter>
+        <DeadlineForm mode="create" mutationError={null} onSubmit={onSubmit} />
+      </MemoryRouter>
+    </I18nProvider>,
   );
 
   await user.click(screen.getByRole("button", { name: "Create deadline" }));
 
-  expect(await screen.findByRole("alert")).toHaveTextContent("title");
+  expect(await screen.findByRole("alert")).toHaveTextContent("Title");
   expect(onSubmit).not.toHaveBeenCalled();
 });
 
@@ -33,19 +36,21 @@ test("submits ISO due timestamp and reminder flag", async () => {
     deadlineDetail(input),
   );
   render(
-    <MemoryRouter>
-      <DeadlineForm mode="create" mutationError={null} onSubmit={onSubmit} />
-    </MemoryRouter>,
+    <I18nProvider initialLocale="en">
+      <MemoryRouter>
+        <DeadlineForm mode="create" mutationError={null} onSubmit={onSubmit} />
+      </MemoryRouter>
+    </I18nProvider>,
   );
 
   await user.type(screen.getByLabelText("Title"), "File response");
-  await user.type(screen.getByLabelText("Matter ID"), uuid("1"));
+  await user.type(screen.getByLabelText("Matter"), uuid("1"));
   await user.type(screen.getByLabelText("Assignee membership ID"), uuid("2"));
   await user.type(
     screen.getByLabelText("Due date and time"),
     "2027-07-15T12:30",
   );
-  await user.click(screen.getByLabelText("Reminder enabled"));
+  await user.click(screen.getByLabelText("Reminder"));
   await user.click(screen.getByRole("button", { name: "Create deadline" }));
 
   expect(onSubmit).toHaveBeenCalledWith(
@@ -53,6 +58,36 @@ test("submits ISO due timestamp and reminder flag", async () => {
       due_at: expect.stringContaining("2027-07-15T"),
       reminder_enabled: false,
       title: "File response",
+    }),
+  );
+});
+
+test("Persian Jalali datetime input submits ISO timestamp", async () => {
+  const user = userEvent.setup();
+  const onSubmit = vi.fn(async (input: DeadlineInput | DeadlineUpdateInput) =>
+    deadlineDetail(input),
+  );
+  render(
+    <I18nProvider initialLocale="fa">
+      <MemoryRouter>
+        <DeadlineForm mode="create" mutationError={null} onSubmit={onSubmit} />
+      </MemoryRouter>
+    </I18nProvider>,
+  );
+
+  await user.type(screen.getByLabelText("عنوان"), "مهلت پاسخ");
+  await user.type(screen.getByLabelText("رکورد"), uuid("1"));
+  await user.type(screen.getByLabelText("شناسه عضویت مسئول"), uuid("2"));
+  await user.type(
+    screen.getByLabelText("تاریخ و زمان سررسید"),
+    "1406-01-01 09:30",
+  );
+  await user.click(screen.getByRole("button", { name: "ایجاد مهلت" }));
+
+  expect(onSubmit).toHaveBeenCalledWith(
+    expect.objectContaining({
+      due_at: expect.stringContaining("2027-03-21T"),
+      title: "مهلت پاسخ",
     }),
   );
 });

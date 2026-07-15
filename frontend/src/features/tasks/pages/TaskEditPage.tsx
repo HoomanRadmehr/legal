@@ -10,13 +10,17 @@ import {
   LoadingState,
   NotFoundState,
 } from "../../../components/standardStates";
+import { useI18n } from "../../../i18n";
 import { TaskForm } from "../components/TaskForm";
+import { taskText } from "../components/taskLabels";
 import { useTaskDetail, useUpdateTask } from "../hooks";
 import type { TaskUpdateInput } from "../types";
 import { TaskPageShell } from "./TaskPageShell";
 
 export function TaskEditPage() {
   const { taskId } = useParams();
+  const { locale } = useI18n();
+  const labels = taskText(locale);
   const { session } = useAuth();
   const navigate = useNavigate();
   const detail = useTaskDetail(taskId ?? "");
@@ -24,12 +28,12 @@ export function TaskEditPage() {
   const role = session?.membership.role ?? "";
 
   if (!taskId) {
-    return <NotFoundState title="Task not found" />;
+    return <NotFoundState title={labels.notFound} />;
   }
   if (!canEditMatter(role)) {
     return (
       <TaskPageShell>
-        <ForbiddenState message="Viewer access is read-only." />
+        <ForbiddenState message={labels.viewerReadonly} />
       </TaskPageShell>
     );
   }
@@ -37,15 +41,15 @@ export function TaskEditPage() {
   return (
     <TaskPageShell>
       <PageHeader
-        eyebrow="Tasks"
-        title="Edit task"
+        eyebrow={labels.listTitle}
+        title={labels.edit}
         actions={
           <button onClick={() => navigate(`/tasks/${taskId}`)} type="button">
-            Back to detail
+            {labels.backToDetail}
           </button>
         }
       />
-      {detail.isLoading ? <LoadingState label="Loading task" /> : null}
+      {detail.isLoading ? <LoadingState label={labels.loading} /> : null}
       {detail.isError ? <TaskDetailError error={detail.error} /> : null}
       {detail.data ? (
         <TaskForm
@@ -61,13 +65,16 @@ export function TaskEditPage() {
 }
 
 function TaskDetailError({ error }: { error: Error }) {
+  const { locale } = useI18n();
+  const labels = taskText(locale);
+
   if (isApiError(error) && error.status === 404) {
     return (
       <NotFoundState
-        title="Task not found"
-        message="The task could not be found."
+        title={labels.notFound}
+        message={labels.notFoundMessage}
       />
     );
   }
-  return <ErrorState title="Task unavailable" message={error.message} />;
+  return <ErrorState title={labels.error} message={error.message} />;
 }

@@ -145,7 +145,7 @@ test("matter task section filters by matter and exposes permitted actions", asyn
     await screen.findByRole("table", { name: "Matter tasks" }),
   ).toBeInTheDocument();
   expect(requestMatters(fetchImpl)).toContain(uuid("1"));
-  await user.click(screen.getByRole("button", { name: "Complete" }));
+  await user.click(screen.getByRole("button", { name: "Complete task" }));
   await user.click(
     within(screen.getByRole("dialog", { name: "Complete task" })).getByRole(
       "button",

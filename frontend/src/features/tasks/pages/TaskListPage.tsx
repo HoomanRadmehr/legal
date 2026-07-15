@@ -5,8 +5,10 @@ import { useAuth } from "../../../auth";
 import { canCreateMatter } from "../../../auth/permissions";
 import { PageHeader } from "../../../components/pageHeader";
 import { ErrorState, LoadingState } from "../../../components/standardStates";
+import { useI18n } from "../../../i18n";
 import { TaskFilters } from "../components/TaskFilters";
 import { TaskListTable } from "../components/TaskListTable";
+import { taskText } from "../components/taskLabels";
 import { useTaskList } from "../hooks";
 import type {
   TaskListParams,
@@ -20,6 +22,8 @@ const DEFAULT_PAGE_SIZE = 20;
 
 export function TaskListPage() {
   const { session } = useAuth();
+  const { locale } = useI18n();
+  const labels = taskText(locale);
   const [searchParams, setSearchParams] = useSearchParams();
   const role = session?.membership.role ?? "";
   const params = taskListParamsFromSearch(searchParams, role);
@@ -29,19 +33,19 @@ export function TaskListPage() {
   return (
     <TaskPageShell>
       <PageHeader
-        eyebrow="Tasks"
-        title="Tasks"
-        description="Review matter work, assignment, due dates, and final states."
-        actions={canCreate ? <Link to="/tasks/new">Create task</Link> : null}
+        eyebrow={labels.listTitle}
+        title={labels.listTitle}
+        description={labels.listDescription}
+        actions={canCreate ? <Link to="/tasks/new">{labels.create}</Link> : null}
       />
       {params.view === "assigned_to_me" ? (
-        <p className="task-alert">Showing tasks assigned to me.</p>
+        <p className="task-alert">{labels.assignedNotice}</p>
       ) : null}
       <TaskFilters
         params={params}
         onSubmit={(nextParams) => setSearchParams(paramsToSearch(nextParams))}
       />
-      {query.isLoading ? <LoadingState label="Loading tasks" /> : null}
+      {query.isLoading ? <LoadingState label={labels.loadingList} /> : null}
       {query.isError ? <TaskListError error={query.error} /> : null}
       {query.data ? (
         <TaskListTable
@@ -55,10 +59,13 @@ export function TaskListPage() {
 }
 
 function TaskListError({ error }: { error: Error }) {
+  const { locale } = useI18n();
+  const labels = taskText(locale);
+
   return (
     <ErrorState
-      title="Tasks unavailable"
-      message={taskErrorMessage(error)}
+      title={labels.error}
+      message={taskErrorMessage(error, labels)}
       retryAfterSeconds={
         isApiError(error) ? error.retryAfterSeconds : undefined
       }
@@ -123,12 +130,19 @@ function pageCount(count: number): number {
   return Math.max(1, Math.ceil(count / DEFAULT_PAGE_SIZE));
 }
 
-function taskErrorMessage(error: Error): string {
+function taskErrorMessage(
+  error: Error,
+  labels: ReturnType<typeof taskText>,
+): string {
   if (
     "retryAfterSeconds" in error &&
     typeof error.retryAfterSeconds === "number"
   ) {
-    return `${error.message} Try again in ${error.retryAfterSeconds} seconds.`;
+    const suffix = labels.retrySuffix.replace(
+      "{{seconds}}",
+      String(error.retryAfterSeconds),
+    );
+    return labels.rateLimited.replace("{{suffix}}", suffix);
   }
   return error.message;
 }

@@ -1,6 +1,8 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
+import { useI18n } from "../../../i18n";
 import { NOTIFICATION_CHANNELS, NOTIFICATION_EVENTS } from "../options";
+import { notificationText } from "../text";
 import type {
   NotificationChannel,
   NotificationPreference,
@@ -21,13 +23,31 @@ export function NotificationPreferenceForm({
   preferences: NotificationPreference[];
   saving: boolean;
 }) {
-  const [state, setState] = useState<PreferenceState>(() =>
-    initialPreferenceState(preferences),
+  return (
+    <NotificationPreferenceStateForm
+      key={preferenceStateKey(preferences)}
+      error={error}
+      initialState={initialPreferenceState(preferences)}
+      onSubmit={onSubmit}
+      saving={saving}
+    />
   );
+}
 
-  useEffect(() => {
-    setState(initialPreferenceState(preferences));
-  }, [preferences]);
+function NotificationPreferenceStateForm({
+  error,
+  initialState,
+  onSubmit,
+  saving,
+}: {
+  error?: string;
+  initialState: PreferenceState;
+  onSubmit: (preferences: NotificationPreferenceInput[]) => void;
+  saving: boolean;
+}) {
+  const { locale } = useI18n();
+  const labels = notificationText(locale);
+  const [state, setState] = useState<PreferenceState>(() => initialState);
 
   return (
     <form
@@ -46,6 +66,7 @@ export function NotificationPreferenceForm({
         <PreferenceGroup
           eventOption={eventOption}
           key={eventOption.eventType}
+          locale={locale}
           onToggle={(channel, enabled) =>
             setState((current) =>
               updatePreference(
@@ -60,7 +81,7 @@ export function NotificationPreferenceForm({
         />
       ))}
       <button disabled={saving} type="submit">
-        {saving ? "Saving" : "Save preferences"}
+        {saving ? labels.saving : labels.save}
       </button>
     </form>
   );
@@ -68,16 +89,20 @@ export function NotificationPreferenceForm({
 
 function PreferenceGroup({
   eventOption,
+  locale,
   onToggle,
   state,
 }: {
   eventOption: PreferenceOption;
+  locale: ReturnType<typeof useI18n>["locale"];
   onToggle: (channel: NotificationChannel, enabled: boolean) => void;
   state: PreferenceState;
 }) {
+  const labels = notificationText(locale);
+
   return (
     <fieldset className="notification-preferences__group">
-      <legend>{eventOption.label}</legend>
+      <legend>{eventOptionLabel(eventOption.eventType, labels)}</legend>
       {NOTIFICATION_CHANNELS.map((channelOption) => (
         <label
           className="notification-preferences__option"
@@ -96,13 +121,29 @@ function PreferenceGroup({
             type="checkbox"
           />
           <span>
-            <strong>{channelOption.label}</strong>
-            <small>{channelOption.status}</small>
+            <strong>{labels.channels[channelOption.channel].label}</strong>
+            <small>{labels.channels[channelOption.channel].status}</small>
           </span>
         </label>
       ))}
     </fieldset>
   );
+}
+
+function eventOptionLabel(
+  eventType: string,
+  labels: ReturnType<typeof notificationText>,
+): string {
+  if (eventType === "deadline.reminder.created") {
+    return labels.events.deadline;
+  }
+  if (eventType === "document.upload.status_changed") {
+    return labels.events.document;
+  }
+  if (eventType === "offboarding.status_changed") {
+    return labels.events.offboarding;
+  }
+  return labels.events.notification;
 }
 
 function initialPreferenceState(
@@ -174,4 +215,17 @@ function preferenceKey(
   channel: NotificationChannel,
 ): string {
   return `${eventType}:${channel}`;
+}
+
+function preferenceStateKey(preferences: NotificationPreference[]): string {
+  return preferences
+    .map((preference) =>
+      [
+        preference.event_type,
+        preference.channel,
+        preference.reminder_offset_minutes,
+        preference.enabled ? "1" : "0",
+      ].join(":"),
+    )
+    .join("|");
 }

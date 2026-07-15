@@ -4,7 +4,9 @@ import { useAuth } from "../../../auth";
 import { canCreateMatter } from "../../../auth/permissions";
 import { PageHeader } from "../../../components/pageHeader";
 import { ForbiddenState } from "../../../components/standardStates";
+import { useI18n } from "../../../i18n";
 import { DeadlineForm } from "../components/DeadlineForm";
+import { deadlineText } from "../components/deadlineLabels";
 import { useCreateDeadline } from "../hooks";
 import type { DeadlineInput } from "../types";
 import { DeadlinePageShell } from "./DeadlinePageShell";
@@ -12,13 +14,15 @@ import { DeadlinePageShell } from "./DeadlinePageShell";
 export function DeadlineCreatePage() {
   const { session } = useAuth();
   const navigate = useNavigate();
+  const { locale } = useI18n();
+  const labels = deadlineText(locale);
   const mutation = useCreateDeadline();
   const role = session?.membership.role ?? "";
 
   if (!canCreateMatter(role)) {
     return (
       <DeadlinePageShell>
-        <ForbiddenState message="Viewer access is read-only." />
+        <ForbiddenState message={labels.viewerReadonly} />
       </DeadlinePageShell>
     );
   }
@@ -26,12 +30,12 @@ export function DeadlineCreatePage() {
   return (
     <DeadlinePageShell>
       <PageHeader
-        eyebrow="Deadlines"
-        title="Create deadline"
-        description="Create a matter-linked deadline with an explicit assignee."
+        eyebrow={labels.listTitle}
+        title={labels.create}
+        description={labels.createDescription}
         actions={
           <button onClick={() => navigate("/deadlines")} type="button">
-            Back to deadlines
+            {labels.backToDeadlines}
           </button>
         }
       />

@@ -38,7 +38,7 @@ test("public route renders without an authenticated session", async () => {
   );
 
   expect(
-    await screen.findByRole("heading", { name: "Accept invitation" }),
+    await screen.findByRole("heading", { name: "پذیرش دعوت‌نامه" }),
   ).toBeInTheDocument();
 });
 

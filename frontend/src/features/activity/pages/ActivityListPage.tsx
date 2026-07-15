@@ -45,7 +45,7 @@ function ActivityListContent() {
   return (
     <section className="activity-page" aria-labelledby="activity-title">
       <PageHeader
-        eyebrow="Audit trail"
+        eyebrow={labels.eyebrow}
         title={labels.title}
         description={labels.description}
       />

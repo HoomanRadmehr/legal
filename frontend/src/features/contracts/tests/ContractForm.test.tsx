@@ -3,6 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
 import { expect, test, vi } from "vitest";
 
+import { I18nProvider } from "../../../i18n";
 import { ContractForm } from "../components/ContractForm";
 import type {
   ContractDetail,
@@ -16,9 +17,11 @@ test("validates local date order before submit", async () => {
     contractDetail(input),
   );
   render(
-    <MemoryRouter>
-      <ContractForm mode="create" mutationError={null} onSubmit={onSubmit} />
-    </MemoryRouter>,
+    <I18nProvider initialLocale="en">
+      <MemoryRouter>
+        <ContractForm mode="create" mutationError={null} onSubmit={onSubmit} />
+      </MemoryRouter>
+    </I18nProvider>,
   );
 
   await fillRequiredFields(user);
@@ -45,9 +48,11 @@ test("maps backend contract date errors to visible fields", async () => {
     );
   });
   render(
-    <MemoryRouter>
-      <ContractForm mode="create" mutationError={null} onSubmit={onSubmit} />
-    </MemoryRouter>,
+    <I18nProvider initialLocale="en">
+      <MemoryRouter>
+        <ContractForm mode="create" mutationError={null} onSubmit={onSubmit} />
+      </MemoryRouter>
+    </I18nProvider>,
   );
 
   await fillRequiredFields(user);
@@ -56,7 +61,7 @@ test("maps backend contract date errors to visible fields", async () => {
   await user.type(screen.getByLabelText("Renewal date"), "2027-11-30");
   await user.click(screen.getByRole("button", { name: "Create contract" }));
 
-  expect(await screen.findByRole("alert")).toHaveTextContent("renewal date");
+  expect(await screen.findByRole("alert")).toHaveTextContent("Renewal date");
   expect(screen.getByRole("alert")).toHaveTextContent(
     "Renewal date cannot be after expiration date.",
   );

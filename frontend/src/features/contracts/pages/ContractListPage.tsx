@@ -4,8 +4,10 @@ import { useAuth } from "../../../auth";
 import { canCreateMatter } from "../../../auth/permissions";
 import { PageHeader } from "../../../components/pageHeader";
 import { ErrorState, LoadingState } from "../../../components/standardStates";
+import { useI18n } from "../../../i18n";
 import { ContractFilters } from "../components/ContractFilters";
 import { ContractListTable } from "../components/ContractListTable";
+import { contractText } from "../components/contractLabels";
 import { useContractList } from "../hooks";
 import type {
   ContractListParams,
@@ -20,6 +22,8 @@ const DEFAULT_PAGE_SIZE = 20;
 
 export function ContractListPage() {
   const { session } = useAuth();
+  const { locale } = useI18n();
+  const labels = contractText(locale);
   const [searchParams, setSearchParams] = useSearchParams();
   const params = contractListParamsFromSearch(searchParams);
   const query = useContractList(params);
@@ -28,23 +32,20 @@ export function ContractListPage() {
   return (
     <ContractPageShell>
       <PageHeader
-        eyebrow="Contracts"
-        title="Contracts"
-        description="Review contract status, counterparties, renewal dates, and expiration risk."
+        eyebrow={labels.eyebrow}
+        title={labels.listTitle}
+        description={labels.listDescription}
         actions={
-          canCreate ? <Link to="/contracts/new">Create contract</Link> : null
+          canCreate ? <Link to="/contracts/new">{labels.create}</Link> : null
         }
       />
       <ContractFilters
         params={params}
         onSubmit={(nextParams) => setSearchParams(paramsToSearch(nextParams))}
       />
-      {query.isLoading ? <LoadingState label="Loading contracts" /> : null}
+      {query.isLoading ? <LoadingState label={labels.loadingList} /> : null}
       {query.isError ? (
-        <ErrorState
-          title="Contracts unavailable"
-          message={query.error.message}
-        />
+        <ErrorState title={labels.error} message={query.error.message} />
       ) : null}
       {query.data ? (
         <ContractListTable

@@ -6,57 +6,17 @@ import {
 } from "../../../components/paginatedTable";
 import { StatusBadge } from "../../../components/statusBadge";
 import { TechnicalValue } from "../../../components/technicalValue";
+import { useI18n } from "../../../i18n";
+import type { SupportedLocale } from "../../../i18n";
 import type { NoticeListItem } from "../types";
 import {
   formatDateTime,
   noticeResponseStatusLabel,
   noticeStatusLabel,
+  noticeText,
   responseTone,
   statusTone,
 } from "./noticeLabels";
-
-const NOTICE_COLUMNS: TableColumn<NoticeListItem>[] = [
-  {
-    header: "Reference",
-    key: "reference",
-    render: (row) => (
-      <Link to={`/notices/${row.id}`}>
-        <TechnicalValue>{row.reference_code}</TechnicalValue>
-      </Link>
-    ),
-  },
-  { header: "Title", key: "title", render: (row) => row.title },
-  { header: "Sender", key: "sender", render: (row) => row.sender },
-  {
-    header: "Status",
-    key: "status",
-    render: (row) => (
-      <StatusBadge
-        label={noticeStatusLabel(row.status)}
-        tone={statusTone(row.status)}
-      />
-    ),
-  },
-  {
-    header: "Response",
-    key: "response",
-    render: (row) => (
-      <StatusBadge
-        label={noticeResponseStatusLabel(row.response_status)}
-        tone={responseTone(row.response_status)}
-      />
-    ),
-  },
-  {
-    header: "Response deadline",
-    key: "response-deadline",
-    render: (row) => (
-      <time dateTime={row.response_deadline}>
-        {formatDateTime(row.response_deadline)}
-      </time>
-    ),
-  },
-];
 
 export function NoticeListTable({
   page,
@@ -67,14 +27,65 @@ export function NoticeListTable({
   pageCount: number;
   rows: NoticeListItem[];
 }) {
+  const { locale } = useI18n();
+  const labels = noticeText(locale);
+
   return (
     <PaginatedTable
-      caption="Legal notices"
-      columns={NOTICE_COLUMNS}
-      emptyLabel="No notices match the current filters."
+      caption={labels.caption}
+      columns={noticeColumns(locale, labels)}
+      emptyLabel={labels.empty}
       getRowKey={(row) => row.id}
       pagination={{ page, pageCount }}
       rows={rows}
     />
   );
+}
+
+function noticeColumns(
+  locale: SupportedLocale,
+  labels: ReturnType<typeof noticeText>,
+): TableColumn<NoticeListItem>[] {
+  return [
+    {
+      header: labels.reference,
+      key: "reference",
+      render: (row) => (
+        <Link to={`/notices/${row.id}`}>
+          <TechnicalValue>{row.reference_code}</TechnicalValue>
+        </Link>
+      ),
+    },
+    { header: labels.title, key: "title", render: (row) => row.title },
+    { header: labels.sender, key: "sender", render: (row) => row.sender },
+    {
+      header: labels.status,
+      key: "status",
+      render: (row) => (
+        <StatusBadge
+          label={noticeStatusLabel(row.status, locale)}
+          tone={statusTone(row.status)}
+        />
+      ),
+    },
+    {
+      header: labels.response,
+      key: "response",
+      render: (row) => (
+        <StatusBadge
+          label={noticeResponseStatusLabel(row.response_status, locale)}
+          tone={responseTone(row.response_status)}
+        />
+      ),
+    },
+    {
+      header: labels.responseDeadline,
+      key: "response-deadline",
+      render: (row) => (
+        <time dateTime={row.response_deadline}>
+          {formatDateTime(row.response_deadline, locale)}
+        </time>
+      ),
+    },
+  ];
 }

@@ -4,8 +4,10 @@ import { canCreateMatter } from "../../../auth/permissions";
 import { PageHeader } from "../../../components/pageHeader";
 import { ErrorState, LoadingState } from "../../../components/standardStates";
 import { useAuth } from "../../../auth";
+import { useI18n } from "../../../i18n";
 import { CaseFilters } from "../components/CaseFilters";
 import { CaseListTable } from "../components/CaseListTable";
+import { caseText } from "../components/caseLabels";
 import { useCaseList } from "../hooks";
 import type {
   CaseListParams,
@@ -20,6 +22,8 @@ const DEFAULT_PAGE_SIZE = 20;
 
 export function CaseListPage() {
   const { session } = useAuth();
+  const { locale } = useI18n();
+  const labels = caseText(locale);
   const [searchParams, setSearchParams] = useSearchParams();
   const params = caseListParamsFromSearch(searchParams);
   const query = useCaseList(params);
@@ -28,18 +32,18 @@ export function CaseListPage() {
   return (
     <CasePageShell>
       <PageHeader
-        eyebrow="Cases"
-        title="Legal cases"
-        description="Review active matters, filter by case metadata, and open permitted records."
-        actions={canCreate ? <Link to="/cases/new">Create case</Link> : null}
+        eyebrow={labels.eyebrow}
+        title={labels.listTitle}
+        description={labels.listDescription}
+        actions={canCreate ? <Link to="/cases/new">{labels.create}</Link> : null}
       />
       <CaseFilters
         params={params}
         onSubmit={(nextParams) => setSearchParams(paramsToSearch(nextParams))}
       />
-      {query.isLoading ? <LoadingState label="Loading cases" /> : null}
+      {query.isLoading ? <LoadingState label={labels.loadingList} /> : null}
       {query.isError ? (
-        <ErrorState title="Cases unavailable" message={query.error.message} />
+        <ErrorState title={labels.error} message={query.error.message} />
       ) : null}
       {query.data ? (
         <CaseListTable
