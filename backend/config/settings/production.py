@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from django.core.exceptions import ImproperlyConfigured
+
 from config import env
 
 from .base import *  # noqa: F403
@@ -35,12 +37,19 @@ CHANNEL_LAYERS = {
 CELERY_BROKER_URL = env.required_value("CELERY_BROKER_URL")
 CELERY_RESULT_BACKEND = env.required_value("CELERY_RESULT_BACKEND")
 
-MINIO_ENDPOINT = env.required_value("MINIO_ENDPOINT")
+MINIO_INTERNAL_ENDPOINT = env.value(
+    "MINIO_INTERNAL_ENDPOINT",
+    default=env.value("MINIO_ENDPOINT"),
+)
+if not MINIO_INTERNAL_ENDPOINT:
+    raise ImproperlyConfigured("Missing required environment variable: MINIO_INTERNAL_ENDPOINT")
+MINIO_ENDPOINT = MINIO_INTERNAL_ENDPOINT
 MINIO_PUBLIC_ENDPOINT = env.required_value("MINIO_PUBLIC_ENDPOINT")
 env.require_https_origins("MINIO_PUBLIC_ENDPOINT", [MINIO_PUBLIC_ENDPOINT])
 MINIO_ACCESS_KEY = env.required_value("MINIO_ACCESS_KEY")
 MINIO_SECRET_KEY = env.required_value("MINIO_SECRET_KEY")
 MINIO_BUCKET_DOCUMENTS = env.required_value("MINIO_BUCKET_DOCUMENTS")
+MINIO_REGION = env.required_value("MINIO_REGION")
 
 SECURE_SSL_REDIRECT = True
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")

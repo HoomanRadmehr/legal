@@ -13,8 +13,8 @@ x-backend-environment: &backend-environment
   DJANGO_SETTINGS_MODULE: ${DJANGO_SETTINGS_MODULE:-config.settings.development}
   DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY:-development-only-secret-key-change-me}
   DJANGO_ALLOWED_HOSTS: ${DJANGO_ALLOWED_HOSTS:-localhost,127.0.0.1,api}
-  DJANGO_CORS_ALLOWED_ORIGINS: ${DJANGO_CORS_ALLOWED_ORIGINS:-http://localhost:5173,http://127.0.0.1:5173}
-  DJANGO_CSRF_TRUSTED_ORIGINS: ${DJANGO_CSRF_TRUSTED_ORIGINS:-http://localhost:5173,http://127.0.0.1:5173}
+  DJANGO_CORS_ALLOWED_ORIGINS: ${DJANGO_CORS_ALLOWED_ORIGINS:-http://localhost:5173,http://127.0.0.1:5173,http://0.0.0.0:5173,http://localhost:4173,http://127.0.0.1:4173,http://0.0.0.0:4173}
+  DJANGO_CSRF_TRUSTED_ORIGINS: ${DJANGO_CSRF_TRUSTED_ORIGINS:-http://localhost:5173,http://127.0.0.1:5173,http://0.0.0.0:5173,http://localhost:4173,http://127.0.0.1:4173,http://0.0.0.0:4173}
   DJANGO_LANGUAGE_CODE: ${DJANGO_LANGUAGE_CODE:-en}
   DJANGO_TIME_ZONE: ${DJANGO_TIME_ZONE:-UTC}
   DATABASE_URL: postgresql://${POSTGRES_USER:-legal_management}:${POSTGRES_PASSWORD:-legal_management_dev_password}@postgres:5432/${POSTGRES_DB:-legal_management}
@@ -22,11 +22,13 @@ x-backend-environment: &backend-environment
   CHANNEL_LAYER_REDIS_URL: ${CHANNEL_LAYER_REDIS_URL:-redis://redis:6379/1}
   CELERY_BROKER_URL: amqp://${RABBITMQ_DEFAULT_USER:-legal_management}:${RABBITMQ_DEFAULT_PASS:-legal_management_dev_password}@rabbitmq:5672//
   CELERY_RESULT_BACKEND: ${CELERY_RESULT_BACKEND:-redis://redis:6379/2}
-  MINIO_ENDPOINT: ${MINIO_ENDPOINT:-minio:9000}
+  MINIO_INTERNAL_ENDPOINT: ${MINIO_INTERNAL_ENDPOINT:-${MINIO_ENDPOINT:-minio:9000}}
+  MINIO_ENDPOINT: ${MINIO_INTERNAL_ENDPOINT:-${MINIO_ENDPOINT:-minio:9000}}
   MINIO_PUBLIC_ENDPOINT: ${MINIO_PUBLIC_ENDPOINT:-http://localhost:9000}
   MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY:-legal_management}
   MINIO_SECRET_KEY: ${MINIO_SECRET_KEY:-legal_management_dev_password}
   MINIO_BUCKET_DOCUMENTS: ${MINIO_BUCKET_DOCUMENTS:-legal-documents}
+  MINIO_REGION: ${MINIO_REGION:-us-east-1}
   MINIO_USE_SSL: ${MINIO_USE_SSL:-false}
   MINIO_PRESIGNED_UPLOAD_TTL_SECONDS: ${MINIO_PRESIGNED_UPLOAD_TTL_SECONDS:-900}
   MINIO_PRESIGNED_DOWNLOAD_TTL_SECONDS: ${MINIO_PRESIGNED_DOWNLOAD_TTL_SECONDS:-300}
@@ -99,7 +101,7 @@ services:
 
   api:
     <<: *backend-service
-    command: ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+    command: ["daphne", "-b", "0.0.0.0", "-p", "8000", "config.asgi:application"]
     healthcheck:
       test:
         [
@@ -122,6 +124,7 @@ services:
       <<: *backend-environment
       DJANGO_SETTINGS_MODULE: ${DJANGO_TEST_SETTINGS_MODULE:-config.settings.development}
       INTEGRATION_API_BASE_URL: ${INTEGRATION_API_BASE_URL:-http://api:8000}
+      MINIO_PUBLIC_ENDPOINT: ${MINIO_TEST_PUBLIC_ENDPOINT:-http://minio:9000}
     networks:
       - backend
     depends_on:
@@ -238,7 +241,7 @@ services:
   minio-init:
     image: minio/mc:RELEASE.2024-07-15T17-46-06Z-cpuv1
     environment:
-      MINIO_ENDPOINT: ${MINIO_ENDPOINT:-minio:9000}
+      MINIO_ENDPOINT: ${MINIO_INTERNAL_ENDPOINT:-${MINIO_ENDPOINT:-minio:9000}}
       MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY:-legal_management}
       MINIO_SECRET_KEY: ${MINIO_SECRET_KEY:-legal_management_dev_password}
       MINIO_BUCKET_DOCUMENTS: ${MINIO_BUCKET_DOCUMENTS:-legal-documents}

@@ -17,10 +17,13 @@ VALID_PRODUCTION_ENV = {
     "CHANNEL_LAYER_REDIS_URL": "redis://redis:6379/1",
     "CELERY_BROKER_URL": "amqp://legal:secret-broker-password@rabbitmq:5672//",
     "CELERY_RESULT_BACKEND": "redis://redis:6379/2",
+    "MINIO_INTERNAL_ENDPOINT": "minio:9000",
     "MINIO_ENDPOINT": "minio:9000",
+    "MINIO_PUBLIC_ENDPOINT": "https://files.legal.example.com",
     "MINIO_ACCESS_KEY": "secret-access-key",
     "MINIO_SECRET_KEY": "secret-minio-key",
     "MINIO_BUCKET_DOCUMENTS": "legal-documents",
+    "MINIO_REGION": "us-east-1",
 }
 
 
@@ -90,6 +93,8 @@ def test_development_settings_are_local_and_relaxed() -> None:
     assert development.SECURE_SSL_REDIRECT is False
     assert development.SESSION_COOKIE_SECURE is False
     assert development.EMAIL_BACKEND == "django.core.mail.backends.console.EmailBackend"
+    assert development.MINIO_ENDPOINT == development.MINIO_INTERNAL_ENDPOINT
+    assert development.MINIO_REGION == "us-east-1"
 
 
 def test_cors_middleware_is_enabled_before_common_middleware() -> None:
@@ -97,6 +102,9 @@ def test_cors_middleware_is_enabled_before_common_middleware() -> None:
 
     assert "corsheaders" in base.INSTALLED_APPS
     assert base.CORS_ALLOW_CREDENTIALS is True
+    assert "authorization" in base.CORS_ALLOW_HEADERS
+    assert "content-type" in base.CORS_ALLOW_HEADERS
+    assert "idempotency-key" in base.CORS_ALLOW_HEADERS
     assert base.MIDDLEWARE.index("corsheaders.middleware.CorsMiddleware") < base.MIDDLEWARE.index(
         "django.middleware.common.CommonMiddleware",
     )

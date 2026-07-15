@@ -18,13 +18,11 @@ COPY backend/pyproject.toml backend/uv.lock ./
 
 FROM builder-base AS builder
 
-RUN uv sync --frozen --no-dev \
-    && uv pip install --python /opt/venv/bin/python daphne==4.1.2
+RUN uv sync --frozen --no-dev
 
 FROM builder-base AS test-builder
 
-RUN uv sync --frozen --no-dev --group test \
-    && uv pip install --python /opt/venv/bin/python daphne==4.1.2
+RUN uv sync --frozen --no-dev --group test
 
 FROM python:3.12-slim AS app-base
 
