@@ -1,3 +1,6 @@
+import { Link } from "react-router-dom";
+
+import { canUploadDocument } from "../../../auth/permissions";
 import { useAuth } from "../../../auth";
 import { AppShell } from "../../../components/layout/AppShell";
 import { PageHeader } from "../../../components/pageHeader";
@@ -23,6 +26,11 @@ export function DocumentsPage() {
           eyebrow={labels.pageEyebrow}
           title={labels.listTitle}
           description={labels.pageDescription}
+          actions={
+            canUploadDocument(session.membership.role) ? (
+              <Link to="/documents/new">{labels.upload}</Link>
+            ) : null
+          }
         />
         <DocumentRealtimeNotice />
         <DocumentList />
@@ -40,9 +48,5 @@ function DocumentRealtimeNotice() {
     return null;
   }
 
-  return (
-    <p className="document-upload__status">
-      {labels.realtimeList}
-    </p>
-  );
+  return <p className="document-upload__status">{labels.realtimeList}</p>;
 }

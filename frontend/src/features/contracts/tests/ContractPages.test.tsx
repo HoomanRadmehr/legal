@@ -31,6 +31,7 @@ test("renders list filters and accessible renewal state", async () => {
 });
 
 test("viewer detail is read-only and timeline uses safe labels", async () => {
+  vi.stubGlobal("WebSocket", undefined);
   vi.stubGlobal("fetch", vi.fn(fetchContractDetailAndTimeline));
 
   renderContractRoute({
@@ -49,6 +50,9 @@ test("viewer detail is read-only and timeline uses safe labels", async () => {
   expect(
     screen.queryByRole("button", { name: "Archive contract" }),
   ).not.toBeInTheDocument();
+  expect(
+    screen.queryByRole("heading", { name: "Upload document" }),
+  ).not.toBeInTheDocument();
   expect(await screen.findByText("Contract created")).toBeInTheDocument();
   expect(screen.queryByText("contract.created")).not.toBeInTheDocument();
 });
@@ -56,6 +60,7 @@ test("viewer detail is read-only and timeline uses safe labels", async () => {
 test("archive requires confirmation and does not present delete wording", async () => {
   const user = userEvent.setup();
   const fetchImpl = vi.fn(fetchContractDetailAndTimeline);
+  vi.stubGlobal("WebSocket", undefined);
   vi.stubGlobal("fetch", fetchImpl);
 
   renderContractRoute({
@@ -64,6 +69,9 @@ test("archive requires confirmation and does not present delete wording", async 
     route: "/contracts/contract-1",
   });
 
+  expect(
+    await screen.findByRole("heading", { name: "Upload document" }),
+  ).toBeInTheDocument();
   await user.click(
     await screen.findByRole("button", { name: "Archive contract" }),
   );
@@ -125,6 +133,9 @@ async function fetchContractDetailAndTimeline(
       },
     ]);
   }
+  if (path === "/api/v1/documents/") {
+    return Response.json(emptyDocumentPage());
+  }
   if (
     path === "/api/v1/contracts/contract-1/archive/" &&
     init?.method === "POST"
@@ -166,6 +177,10 @@ function contractListResponse() {
     previous: null,
     results: [{ ...contractListItem(), renewal_date: dateOffsetFromToday(10) }],
   };
+}
+
+function emptyDocumentPage() {
+  return { count: 0, next: null, previous: null, results: [] };
 }
 
 function contractListItem() {

@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+
 import { canUploadDocument } from "../../../auth/permissions";
 import { useAuth } from "../../../auth";
 import { isApiError } from "../../../api/errors";
@@ -30,7 +32,12 @@ export function DocumentList({ matterId }: { matterId?: string }) {
       {documents.isError ? (
         <DocumentError error={documents.error} locale={locale} />
       ) : null}
-      {documents.data?.results.length === 0 ? <p>{labels.empty}</p> : null}
+      {documents.data?.results.length === 0 ? (
+        <DocumentEmptyState
+          canUpload={canUploadDocument(role)}
+          matterId={matterId}
+        />
+      ) : null}
       {documents.data?.results.length ? (
         <DocumentTable
           canRevoke={canUploadDocument(role)}
@@ -49,6 +56,27 @@ export function DocumentList({ matterId }: { matterId?: string }) {
         <DocumentError error={revoke.error} locale={locale} />
       ) : null}
     </section>
+  );
+}
+
+function DocumentEmptyState({
+  canUpload,
+  matterId,
+}: {
+  canUpload: boolean;
+  matterId?: string;
+}) {
+  const { locale } = useI18n();
+  const labels = documentText(locale);
+  const uploadPath = matterId
+    ? `/documents/new?matter_id=${encodeURIComponent(matterId)}`
+    : "/documents/new";
+
+  return (
+    <div className="document-list__empty">
+      <p>{labels.empty}</p>
+      {canUpload ? <Link to={uploadPath}>{labels.upload}</Link> : null}
+    </div>
   );
 }
 
@@ -118,11 +146,12 @@ function DocumentRow({
 }) {
   const available = document.status === "available";
   const labels = documentText(locale);
+  const displayedSize = document.size ?? document.expected_size;
   return (
     <tr>
       <td>{document.original_filename}</td>
       <td>{documentStatusLabel(document.status, locale)}</td>
-      <td>{formatSize(document.size, locale)}</td>
+      <td>{formatSize(displayedSize, locale)}</td>
       <td>
         <div className="document-list__actions">
           <button
@@ -172,7 +201,10 @@ function documentErrorMessage(
   return error instanceof Error ? error.message : labels.error;
 }
 
-function formatSize(size: number, locale: ReturnType<typeof useI18n>["locale"]) {
+function formatSize(
+  size: number,
+  locale: ReturnType<typeof useI18n>["locale"],
+) {
   const formatter = new Intl.NumberFormat(locale);
   if (size < 1024) {
     return `${formatter.format(size)} B`;

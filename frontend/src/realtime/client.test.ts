@@ -70,7 +70,7 @@ describe("realtime client", () => {
     await flushPromises();
     sockets[0]?.onmessage?.({
       data: JSON.stringify({
-        data: { status: "available", upload_id: "upload-1" },
+        data: { document_id: "document-1", status: "available" },
         event_id: "event-1",
         event_type: "document.upload.status_changed",
         occurred_at: "2027-07-14T10:00:00Z",

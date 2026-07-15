@@ -29,6 +29,7 @@ test("renders list filters and read query results", async () => {
 });
 
 test("viewer detail is read-only and timeline uses safe labels", async () => {
+  vi.stubGlobal("WebSocket", undefined);
   vi.stubGlobal("fetch", vi.fn(fetchCaseDetailAndTimeline));
 
   renderCaseRoute({
@@ -47,6 +48,9 @@ test("viewer detail is read-only and timeline uses safe labels", async () => {
   expect(
     screen.queryByRole("button", { name: "Archive case" }),
   ).not.toBeInTheDocument();
+  expect(
+    screen.queryByRole("heading", { name: "Upload document" }),
+  ).not.toBeInTheDocument();
   expect(await screen.findByText("Case created")).toBeInTheDocument();
   expect(screen.queryByText("case.created")).not.toBeInTheDocument();
 });
@@ -54,6 +58,7 @@ test("viewer detail is read-only and timeline uses safe labels", async () => {
 test("archive requires confirmation and does not present delete wording", async () => {
   const user = userEvent.setup();
   const fetchImpl = vi.fn(fetchCaseDetailAndTimeline);
+  vi.stubGlobal("WebSocket", undefined);
   vi.stubGlobal("fetch", fetchImpl);
 
   renderCaseRoute({
@@ -62,6 +67,9 @@ test("archive requires confirmation and does not present delete wording", async 
     route: "/cases/case-1",
   });
 
+  expect(
+    await screen.findByRole("heading", { name: "Upload document" }),
+  ).toBeInTheDocument();
   await user.click(await screen.findByRole("button", { name: "Archive case" }));
   const dialog = screen.getByRole("dialog", { name: "Archive case" });
   expect(dialog).toHaveTextContent("not a delete");
@@ -121,6 +129,9 @@ async function fetchCaseDetailAndTimeline(
       },
     ]);
   }
+  if (path === "/api/v1/documents/") {
+    return Response.json(emptyDocumentPage());
+  }
   if (path === "/api/v1/cases/case-1/archive/" && init?.method === "POST") {
     return Response.json({
       ...caseDetail(),
@@ -153,6 +164,10 @@ async function fetchCaseConflictFlow(
 
 function caseListResponse() {
   return { count: 1, next: null, previous: null, results: [caseListItem()] };
+}
+
+function emptyDocumentPage() {
+  return { count: 0, next: null, previous: null, results: [] };
 }
 
 function caseListItem() {

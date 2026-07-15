@@ -3,14 +3,17 @@ import { useId, useState } from "react";
 import { canUploadDocument } from "../../../auth/permissions";
 import { useAuth } from "../../../auth";
 import { isApiError } from "../../../api/errors";
+import { useI18n } from "../../../i18n";
 import {
   isActiveUploadStatus,
   useDocumentUpload,
   useDocumentUploadStatus,
 } from "../hooks";
-import { useI18n } from "../../../i18n";
 import { allowedUploadTypes, filePolicyError } from "../policy";
 import { documentText, fillDocumentText } from "../text";
+import type { DocumentStatus } from "../types";
+import { isDirectUploadError, type DirectUploadFailure } from "../upload";
+import { DocumentUploadProgress } from "./DocumentUploadProgress";
 import "./documents.css";
 
 export function DocumentUploadPanel({ matterId }: { matterId: string }) {
@@ -21,11 +24,11 @@ export function DocumentUploadPanel({ matterId }: { matterId: string }) {
   const upload = useDocumentUpload(matterId);
   const [localError, setLocalError] = useState("");
   const role = session?.membership.role ?? "";
-  const uploadId = upload.attempt.initiation?.upload.id ?? "";
+  const documentId = upload.attempt.document?.id ?? "";
   const statusQuery = useDocumentUploadStatus({
-    enabled: Boolean(uploadId),
+    documentId,
+    enabled: Boolean(documentId),
     polling: isActiveUploadStatus(upload.attempt.serverStatus),
-    uploadId,
   });
   const serverStatus = statusQuery.data?.status ?? upload.attempt.serverStatus;
 
@@ -79,16 +82,18 @@ export function DocumentUploadPanel({ matterId }: { matterId: string }) {
       >
         {labels.dropHere}
       </div>
-      <UploadProgress
-        locale={locale}
-        state={upload.attempt.state}
+      <DocumentUploadProgress
+        canCancel={upload.attempt.status === "uploading"}
+        canRetry={canRetryUpload(upload.attempt.status)}
+        onCancel={upload.cancelUpload}
+        onReset={upload.reset}
+        onRetry={upload.retry}
         progress={upload.attempt.progress}
         serverStatus={serverStatus}
+        status={upload.attempt.status}
       />
-      {isActiveUploadStatus(serverStatus) ? (
-        <p className="document-upload__status">
-          {labels.processing}
-        </p>
+      {showBackendVerification(upload.attempt.status, serverStatus) ? (
+        <p className="document-upload__status">{labels.verifying}</p>
       ) : null}
       {localError ? (
         <p className="document-upload__alert" role="alert">
@@ -122,54 +127,6 @@ function startFileUpload({
   startUpload(file);
 }
 
-function UploadProgress({
-  progress,
-  locale,
-  serverStatus,
-  state,
-}: {
-  progress: number;
-  locale: ReturnType<typeof useI18n>["locale"];
-  serverStatus: string;
-  state: string;
-}) {
-  if (state === "idle") {
-    return null;
-  }
-  return (
-    <div className="document-upload__progress" aria-live="polite">
-      <progress
-        aria-label={documentText(locale).uploadProgress}
-        max={100}
-        value={progress}
-      />
-      <span>{uploadStateLabel(state, progress, serverStatus, locale)}</span>
-    </div>
-  );
-}
-
-function uploadStateLabel(
-  state: string,
-  progress: number,
-  serverStatus: string,
-  locale: ReturnType<typeof useI18n>["locale"],
-): string {
-  const labels = documentText(locale);
-  if (state === "initiating") {
-    return labels.initiating;
-  }
-  if (state === "uploading") {
-    return fillDocumentText(labels.uploading, { progress });
-  }
-  if (state === "completing") {
-    return labels.completing;
-  }
-  if (state === "completed" && serverStatus) {
-    return fillDocumentText(labels.serverStatus, { status: serverStatus });
-  }
-  return labels.fileSelected;
-}
-
 function UploadError({
   error,
   locale,
@@ -200,5 +157,42 @@ function uploadErrorMessage(
   if (isApiError(error) && error.status === 422) {
     return error.message;
   }
+  if (isDirectUploadError(error)) {
+    return directUploadErrorMessage(error, locale);
+  }
   return error instanceof Error ? error.message : labels.uploadFailed;
+}
+
+function directUploadErrorMessage(
+  error: DirectUploadFailure,
+  locale: ReturnType<typeof useI18n>["locale"],
+): string {
+  const labels = documentText(locale);
+  if (error.code === "storage_forbidden") {
+    return labels.uploadUrlExpired;
+  }
+  if (error.code === "storage_network_error") {
+    return labels.networkFailure;
+  }
+  if (error.code === "storage_unavailable") {
+    return labels.storageUnavailable;
+  }
+  if (error.code === "upload_cancelled") {
+    return labels.cancelled;
+  }
+  return labels.storageUploadFailed;
+}
+
+function canRetryUpload(status: string): boolean {
+  return ["failed", "expired", "cancelled"].includes(status);
+}
+
+function showBackendVerification(
+  status: string,
+  serverStatus: DocumentStatus | "",
+): boolean {
+  if (["cancelled", "expired", "failed"].includes(status)) {
+    return false;
+  }
+  return isActiveUploadStatus(serverStatus);
 }

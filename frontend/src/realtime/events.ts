@@ -11,9 +11,10 @@ export type UserEventEnvelope = {
 
 export type DocumentUploadStatusEvent = UserEventEnvelope & {
   data: {
+    document_id: string;
     progress?: number;
     status: string;
-    upload_id: string;
+    upload_id?: string;
   };
   event_type: typeof DOCUMENT_UPLOAD_STATUS_CHANGED;
   version: typeof USER_EVENT_VERSION;
@@ -50,7 +51,9 @@ export function isSupportedUserEvent(
 function hasUploadStatusData(
   data: Record<string, unknown>,
 ): data is DocumentUploadStatusEvent["data"] {
-  return typeof data.upload_id === "string" && typeof data.status === "string";
+  return (
+    typeof data.document_id === "string" && typeof data.status === "string"
+  );
 }
 
 function isRecord(input: unknown): input is Record<string, unknown> {

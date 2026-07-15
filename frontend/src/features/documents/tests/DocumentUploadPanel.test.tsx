@@ -26,7 +26,7 @@ test("viewer has no upload control", () => {
   ).not.toBeInTheDocument();
 });
 
-test("prechecks file type before initiating upload", async () => {
+test("prechecks file type before requesting presign", async () => {
   const fetchImpl = vi.fn();
   vi.stubGlobal("fetch", fetchImpl);
 
@@ -45,7 +45,7 @@ test("prechecks file type before initiating upload", async () => {
   expect(fetchImpl).not.toHaveBeenCalled();
 });
 
-test("prechecks size before initiating upload", async () => {
+test("prechecks size before requesting presign", async () => {
   const user = userEvent.setup();
   const fetchImpl = vi.fn();
   vi.stubGlobal("fetch", fetchImpl);
@@ -61,23 +61,20 @@ test("prechecks size before initiating upload", async () => {
   expect(fetchImpl).not.toHaveBeenCalled();
 });
 
-test("initiates then uploads bytes directly to returned storage URL", async () => {
+test("uploads bytes to MinIO then completes and polls document state", async () => {
   const user = userEvent.setup();
-  const consoleError = vi
-    .spyOn(console, "error")
-    .mockImplementation(() => undefined);
   const consoleLog = vi
     .spyOn(console, "log")
-    .mockImplementation(() => undefined);
-  const consoleWarn = vi
-    .spyOn(console, "warn")
     .mockImplementation(() => undefined);
   const storageSet = vi.spyOn(Storage.prototype, "setItem");
   const fetchImpl = vi.fn(async (input: RequestInfo | URL) => {
     if (String(input).includes("/complete/")) {
-      return Response.json(uploadSession({ status: "processing" }));
+      return Response.json(documentSummary("verifying"));
     }
-    return Response.json(uploadInitiation());
+    if (String(input).includes("/documents/document-1/")) {
+      return Response.json(documentRecord("available"));
+    }
+    return Response.json(presignResponse());
   });
   const xhrRequests = installFakeXhr(204);
   vi.stubGlobal("fetch", fetchImpl);
@@ -86,78 +83,112 @@ test("initiates then uploads bytes directly to returned storage URL", async () =
   await user.upload(screen.getByLabelText("Select document"), pdfFile());
 
   expect(
-    await screen.findByText("Server status: processing"),
+    await screen.findByText("Server status: Available"),
   ).toBeInTheDocument();
   expect(fetchImpl).toHaveBeenCalledWith(
-    expect.stringContaining("/api/v1/documents/uploads/"),
+    expect.stringContaining("/api/v1/documents/presign/"),
+    expect.objectContaining({ method: "POST" }),
+  );
+  expect(fetchImpl).toHaveBeenCalledWith(
+    expect.stringContaining("/api/v1/documents/document-1/complete/"),
     expect.objectContaining({ method: "POST" }),
   );
   expect(xhrRequests[0]).toMatchObject({
     method: "PUT",
     url: "https://minio.example.test/presigned",
+    withCredentials: false,
   });
-  expect(
-    screen.getByText(/Server processing remains authoritative/i),
-  ).toBeInTheDocument();
-  expect(fetchImpl).toHaveBeenCalledWith(
-    expect.stringContaining("/api/v1/documents/uploads/upload-1/"),
-    expect.objectContaining({ method: "GET" }),
-  );
-  expect(fetchImpl).toHaveBeenCalledWith(
-    expect.stringContaining("/api/v1/documents/uploads/upload-1/complete/"),
-    expect.objectContaining({ method: "POST" }),
-  );
   expect(storageSet).not.toHaveBeenCalled();
   expect(localStorage.length).toBe(0);
   expect(sessionStorage.length).toBe(0);
-  expect(consoleOutput(consoleError)).not.toContain("minio.example.test");
   expect(consoleOutput(consoleLog)).not.toContain("minio.example.test");
-  expect(consoleOutput(consoleWarn)).not.toContain("minio.example.test");
 });
 
-test("shows rate limit retry guidance without exposing upload URL", async () => {
+test("does not complete when direct MinIO upload fails", async () => {
   const user = userEvent.setup();
-  vi.stubGlobal(
-    "fetch",
-    vi.fn(async () =>
-      Response.json(
-        {
-          code: "rate_limit_exceeded",
-          details: {},
-          message: "Too many uploads.",
-        },
-        { headers: { "Retry-After": "15" }, status: 429 },
-      ),
-    ),
-  );
-  const consoleLog = vi
-    .spyOn(console, "log")
-    .mockImplementation(() => undefined);
-  const storageSet = vi.spyOn(Storage.prototype, "setItem");
+  const fetchImpl = vi.fn(async () => Response.json(presignResponse()));
+  vi.stubGlobal("fetch", fetchImpl);
+  installFakeXhr(403);
 
   renderUploadPanel();
   await user.upload(screen.getByLabelText("Select document"), pdfFile());
 
-  expect(await screen.findByRole("alert")).toHaveTextContent("15 seconds");
-  expect(screen.queryByText(/minio.example.test/)).not.toBeInTheDocument();
-  expect(consoleLog).not.toHaveBeenCalled();
-  expect(storageSet).not.toHaveBeenCalled();
+  expect(await screen.findByRole("alert")).toHaveTextContent(
+    "upload URL expired",
+  );
+  expect(fetchCalls(fetchImpl).join(" ")).not.toContain("/complete/");
+});
+
+test("retries complete without re-uploading after temporary complete failure", async () => {
+  const user = userEvent.setup();
+  let completeAttempts = 0;
+  const fetchImpl = vi.fn(async (input: RequestInfo | URL) => {
+    if (String(input).includes("/complete/")) {
+      completeAttempts += 1;
+      if (completeAttempts === 1) {
+        return apiError("upload_object_missing", 409);
+      }
+      return Response.json(documentSummary("available"));
+    }
+    return Response.json(presignResponse());
+  });
+  const xhrRequests = installFakeXhr(204);
+  vi.stubGlobal("fetch", fetchImpl);
+
+  renderUploadPanel();
+  await user.upload(screen.getByLabelText("Select document"), pdfFile());
+  await screen.findByRole("alert");
+  await user.click(screen.getByRole("button", { name: "Retry" }));
+
+  expect(await screen.findByText("Available")).toBeInTheDocument();
+  expect(xhrRequests).toHaveLength(1);
+  expect(
+    fetchCalls(fetchImpl).filter((path) => path.includes("/complete/")),
+  ).toHaveLength(2);
+});
+
+test("cancels an active browser upload", async () => {
+  const user = userEvent.setup();
+  const fetchImpl = vi.fn(async () => Response.json(presignResponse()));
+  const xhrRequests = installPendingXhr();
+  vi.stubGlobal("fetch", fetchImpl);
+
+  renderUploadPanel();
+  await user.upload(screen.getByLabelText("Select document"), pdfFile());
+  await user.click(await screen.findByRole("button", { name: "Cancel" }));
+
+  expect(await screen.findByText("Cancelled")).toBeInTheDocument();
+  expect(xhrRequests[0]?.aborted).toBe(true);
+});
+
+test("renders Persian upload labels", () => {
+  renderUploadPanel({ locale: "fa" });
+
+  expect(screen.getByLabelText("انتخاب سند")).toBeInTheDocument();
+  expect(screen.getByText("بارگذاری سند")).toBeInTheDocument();
 });
 
 function renderUploadPanel({
+  locale = "en",
   role = "legal_admin",
 }: {
+  locale?: "en" | "fa";
   role?: string;
 } = {}) {
   return renderWithProviders(
     <DocumentUploadPanel matterId="11111111-1111-1111-1111-111111111111" />,
     role,
+    locale,
   );
 }
 
-function renderWithProviders(children: ReactNode, role: string) {
+function renderWithProviders(
+  children: ReactNode,
+  role: string,
+  locale: "en" | "fa",
+) {
   return render(
-    <I18nProvider initialLocale="en">
+    <I18nProvider initialLocale={locale}>
       <AuthContext.Provider value={authContext(role)}>
         <QueryClientProvider client={createAppQueryClient()}>
           {children}
@@ -194,72 +225,90 @@ function pdfFile(): File {
   });
 }
 
-function uploadInitiation() {
+function presignResponse() {
   return {
-    instructions: {
-      completion_url: "/api/v1/documents/uploads/upload-1/complete/",
-      expires_at: "2027-07-14T10:10:00Z",
-      fields: {},
-      headers: { "Content-Type": "application/pdf" },
-      method: "PUT",
-      polling_url: "/api/v1/documents/uploads/upload-1/",
-      url: "https://minio.example.test/presigned",
+    document: {
+      filename: "notice.pdf",
+      id: "document-1",
+      status: "pending_upload",
+      upload_expires_at: "2027-07-14T10:10:00Z",
     },
     upload: {
-      completed_at: null,
-      created_at: "2027-07-14T10:00:00Z",
-      description: "",
-      expected_checksum: "",
-      expected_content_type: "application/pdf",
-      expected_size: 1024,
       expires_at: "2027-07-14T10:10:00Z",
-      failure_code: "",
-      id: "upload-1",
-      matter_id: "matter-1",
-      original_filename: "notice.pdf",
-      requested_by_id: "membership-1",
-      status: "initiated",
-      updated_at: "2027-07-14T10:00:00Z",
+      headers: { "Content-Type": "application/pdf" },
+      method: "PUT",
+      url: "https://minio.example.test/presigned",
     },
   };
 }
 
-function uploadSession({ status = "initiated" } = {}) {
+function documentSummary(status = "available") {
   return {
-    completed_at: null,
+    content_type: "application/pdf",
+    filename: "notice.pdf",
+    id: "document-1",
+    size: 1024,
+    status,
+    uploaded_at: status === "available" ? "2027-07-14T10:05:00Z" : null,
+  };
+}
+
+function documentRecord(status = "available") {
+  return {
+    actual_checksum: "",
+    content_type: "application/pdf",
     created_at: "2027-07-14T10:00:00Z",
     description: "",
+    etag: "etag",
     expected_checksum: "",
-    expected_content_type: "application/pdf",
     expected_size: 1024,
-    expires_at: "2027-07-14T10:10:00Z",
     failure_code: "",
-    id: "upload-1",
+    id: "document-1",
     matter_id: "matter-1",
     original_filename: "notice.pdf",
-    requested_by_id: "membership-1",
+    size: status === "available" ? 1024 : null,
     status,
-    updated_at: "2027-07-14T10:00:00Z",
+    updated_at: "2027-07-14T10:05:00Z",
+    upload_expires_at: "2027-07-14T10:10:00Z",
+    uploaded_at: status === "available" ? "2027-07-14T10:05:00Z" : null,
+    uploaded_by_id: "membership-1",
   };
+}
+
+function apiError(code: string, status: number): Response {
+  return Response.json(
+    { code, details: {}, message: "Temporary verification failure." },
+    { status },
+  );
 }
 
 type XhrCall = {
+  aborted?: boolean;
   method: string;
   url: string;
+  withCredentials: boolean;
 };
 
 function installFakeXhr(status: number): XhrCall[] {
   const requests: XhrCall[] = [];
 
   class FakeXhr {
+    onabort: (() => void) | null = null;
+    onerror: (() => void) | null = null;
+    onload: (() => void) | null = null;
+    onloadend: (() => void) | null = null;
     status = status;
     upload: { onprogress: ((event: ProgressEvent) => void) | null } = {
       onprogress: null,
     };
     method = "";
     url = "";
-    onerror: (() => void) | null = null;
-    onload: (() => void) | null = null;
+    withCredentials = true;
+
+    abort() {
+      this.onabort?.();
+      this.onloadend?.();
+    }
 
     open(method: string, url: string) {
       this.method = method;
@@ -271,18 +320,70 @@ function installFakeXhr(status: number): XhrCall[] {
     }
 
     send() {
-      requests.push({ method: this.method, url: this.url });
-      this.upload.onprogress?.({
-        lengthComputable: true,
-        loaded: 512,
-        total: 1024,
-      } as ProgressEvent);
+      requests.push({
+        method: this.method,
+        url: this.url,
+        withCredentials: this.withCredentials,
+      });
+      this.upload.onprogress?.(progressEvent(512, 1024));
       this.onload?.();
+      this.onloadend?.();
     }
   }
 
   vi.stubGlobal("XMLHttpRequest", FakeXhr);
   return requests;
+}
+
+function installPendingXhr(): XhrCall[] {
+  const requests: XhrCall[] = [];
+
+  class FakeXhr {
+    onabort: (() => void) | null = null;
+    onloadend: (() => void) | null = null;
+    status = 0;
+    upload = { onprogress: null };
+    method = "";
+    url = "";
+    withCredentials = true;
+
+    abort() {
+      const request = requests[0];
+      if (request) {
+        request.aborted = true;
+      }
+      this.onabort?.();
+      this.onloadend?.();
+    }
+
+    open(method: string, url: string) {
+      this.method = method;
+      this.url = url;
+    }
+
+    setRequestHeader() {
+      return undefined;
+    }
+
+    send() {
+      requests.push({
+        method: this.method,
+        url: this.url,
+        withCredentials: this.withCredentials,
+      });
+    }
+  }
+
+  vi.stubGlobal("XMLHttpRequest", FakeXhr);
+  return requests;
+}
+
+function progressEvent(loaded: number, total: number): ProgressEvent {
+  return { lengthComputable: true, loaded, total } as ProgressEvent;
+}
+
+function fetchCalls(fetchImpl: ReturnType<typeof vi.fn>): string[] {
+  return fetchImpl.mock.calls.map((call) => String(call[0]));
 }
 
 function consoleOutput(spy: ReturnType<typeof vi.spyOn>): string {

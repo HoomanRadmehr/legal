@@ -12,6 +12,7 @@ import { renderNoticeRoute, resetNoticeTestState } from "./testUtils";
 afterEach(resetNoticeTestState);
 
 test("viewer notice detail is read-only", async () => {
+  vi.stubGlobal("WebSocket", undefined);
   vi.stubGlobal("fetch", vi.fn(fetchNoticeDetailTimelineAndArchive));
 
   renderNoticeRoute({
@@ -32,11 +33,15 @@ test("viewer notice detail is read-only", async () => {
   expect(
     screen.queryByRole("button", { name: "Archive notice" }),
   ).not.toBeInTheDocument();
+  expect(
+    screen.queryByRole("heading", { name: "Upload document" }),
+  ).not.toBeInTheDocument();
 });
 
 test("archive action uses confirmation and archive endpoint", async () => {
   const user = userEvent.setup();
   const fetchImpl = vi.fn(fetchNoticeDetailTimelineAndArchive);
+  vi.stubGlobal("WebSocket", undefined);
   vi.stubGlobal("fetch", fetchImpl);
 
   renderNoticeRoute({
@@ -45,6 +50,9 @@ test("archive action uses confirmation and archive endpoint", async () => {
     route: "/notices/notice-1",
   });
 
+  expect(
+    await screen.findByRole("heading", { name: "Upload document" }),
+  ).toBeInTheDocument();
   await user.click(
     await screen.findByRole("button", { name: "Archive notice" }),
   );
@@ -156,6 +164,9 @@ async function fetchNoticeDetailTimelineAndArchive(
         target_type: "notice",
       },
     ]);
+  }
+  if (path === "/api/v1/documents/") {
+    return Response.json(emptyDocumentPage());
   }
   if (path === "/api/v1/deadlines/deadline-1/") {
     return Response.json(deadlineDetail());
@@ -277,6 +288,10 @@ function noticeDetail() {
     updated_at: "2027-01-01T10:00:00Z",
     version: 1,
   };
+}
+
+function emptyDocumentPage() {
+  return { count: 0, next: null, previous: null, results: [] };
 }
 
 function deadlineDetail() {

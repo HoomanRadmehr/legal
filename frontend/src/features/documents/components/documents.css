@@ -34,6 +34,68 @@
   width: 1px;
 }
 
+.document-upload__field,
+.document-choice {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.document-upload__field input,
+.document-upload__field textarea,
+.document-choice input {
+  border: 1px solid #9aa3b2;
+  border-radius: 6px;
+  font: inherit;
+  padding: 0.625rem;
+}
+
+.document-choice__selected,
+.document-upload__file {
+  background: #f7f8fa;
+  border: 1px solid #e4e7ec;
+  border-radius: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin: 0;
+  padding: 0.75rem;
+}
+
+.document-choice__list {
+  border: 1px solid #d6d8de;
+  border-radius: 8px;
+  max-height: 14rem;
+  overflow: auto;
+  padding: 0.5rem;
+}
+
+.document-choice__list ul {
+  display: grid;
+  gap: 0.25rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.document-choice__list button {
+  align-items: flex-start;
+  background: transparent;
+  border: 0;
+  display: grid;
+  gap: 0.25rem;
+  padding: 0.5rem;
+  text-align: start;
+  width: 100%;
+}
+
+.document-upload__file dt {
+  font-weight: 700;
+}
+
+.document-upload__file dd {
+  margin: 0;
+}
+
 .document-upload__progress {
   display: grid;
   gap: 0.5rem;
@@ -41,6 +103,12 @@
 
 .document-upload__progress progress {
   width: 100%;
+}
+
+.document-upload__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
 }
 
 .document-upload__alert {
@@ -81,4 +149,10 @@
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
+}
+
+.document-list__empty,
+.document-upload__result {
+  display: grid;
+  gap: 0.75rem;
 }

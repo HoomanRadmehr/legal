@@ -12,6 +12,7 @@ import {
 } from "../../../components/standardStates";
 import { isApiError } from "../../../api/errors";
 import { useI18n } from "../../../i18n";
+import { DocumentSection } from "../../documents";
 import { CaseSummary } from "../components/CaseSummary";
 import { CaseTimeline } from "../components/CaseTimeline";
 import { caseText } from "../components/caseLabels";
@@ -63,6 +64,7 @@ export function CaseDetailPage() {
               isLoading={timeline.isLoading}
             />
           </section>
+          <DocumentSection matterId={detail.data.id} />
           <ConfirmationDialog
             confirmLabel={labels.archive}
             onCancel={() => setArchiveOpen(false)}
@@ -118,10 +120,7 @@ function CaseDetailError({ error }: { error: Error }) {
 
   if (isApiError(error) && error.status === 404) {
     return (
-      <NotFoundState
-        title={labels.notFound}
-        message={labels.notFoundMessage}
-      />
+      <NotFoundState title={labels.notFound} message={labels.notFoundMessage} />
     );
   }
   return <ErrorState title={labels.error} message={error.message} />;

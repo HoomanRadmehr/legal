@@ -1,76 +1,130 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useMemo, useState } from "react";
+import {
+  useInfiniteQuery,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
+import { useEffect, useMemo, useRef, useState } from "react";
+import type { Dispatch, SetStateAction } from "react";
 
 import { connectUserEvents } from "../../realtime";
 import type { DocumentUploadStatusEvent, RealtimeStatus } from "../../realtime";
 import {
   completeDocumentUpload,
-  getDocumentUpload,
-  initiateDocumentUpload,
+  createDocumentPresign,
+  getDocument,
+  listDocumentMatterChoices,
   listDocuments,
   requestDocumentDownloadUrl,
   revokeDocument,
-  uploadFileToStorage,
 } from "./api";
 import { documentQueryKeys } from "./queryKeys";
+import { calculateOptionalSha256, uploadFileDirectlyToMinio } from "./upload";
 import type {
+  CreateDocumentPresignInput,
+  DirectUploadState,
   DocumentListParams,
   DocumentRecord,
-  DocumentUploadInitiation,
-  DocumentUploadSession,
-  UploadStatus,
+  DocumentStatus,
+  DocumentUploadIntent,
+  DocumentUploadSummary,
+  ChoicePage,
+  MatterChoice,
 } from "./types";
 
-export type LocalUploadState =
-  "completed" | "completing" | "idle" | "initiating" | "selected" | "uploading";
-
 export type UploadAttempt = {
-  idempotencyKey: string;
-  initiation: DocumentUploadInitiation | null;
+  document:
+    DocumentUploadIntent | DocumentRecord | DocumentUploadSummary | null;
+  error: unknown;
   progress: number;
-  serverStatus: UploadStatus | "";
-  state: LocalUploadState;
+  serverStatus: DocumentStatus | "";
+  status: DirectUploadState;
 };
 
-const ACTIVE_UPLOAD_STATUSES = ["initiated", "processing", "verifying"];
-const FINAL_UPLOAD_STATUSES = ["available", "cancelled", "expired", "failed"];
+type UploadJob =
+  | { description: string; file: File; kind: "new" }
+  | { documentId: string; kind: "complete" };
+
+const ACTIVE_DOCUMENT_STATUSES: DocumentStatus[] = [
+  "pending_upload",
+  "verifying",
+];
+const FINAL_DOCUMENT_STATUSES: DocumentStatus[] = [
+  "available",
+  "cancelled",
+  "expired",
+  "failed",
+];
 
 export function useDocumentUpload(matterId: string) {
   const queryClient = useQueryClient();
+  const abortRef = useRef<AbortController | null>(null);
+  const completionDocumentIdRef = useRef("");
+  const descriptionRef = useRef("");
+  const fileRef = useRef<File | null>(null);
   const [attempt, setAttempt] = useState<UploadAttempt>(initialAttempt());
   const mutation = useMutation({
-    mutationFn: (file: File) =>
-      uploadSelectedFile({ file, matterId, queryClient, setAttempt }),
+    mutationFn: (job: UploadJob) =>
+      runUploadJob({
+        abortRef,
+        completionDocumentIdRef,
+        descriptionRef,
+        fileRef,
+        job,
+        matterId,
+        queryClient,
+        setAttempt,
+      }),
+    onError: (error) => {
+      setAttempt((current) => failedAttempt(current, error));
+    },
   });
 
   return useMemo(
     () => ({
       attempt,
-      error: mutation.error,
-      isError: mutation.isError,
-      reset: () => {
-        mutation.reset();
-        setAttempt(initialAttempt());
+      cancelUpload: () => cancelUpload({ abortRef, setAttempt }),
+      error: uploadError({ attempt, mutationError: mutation.error }),
+      isError: Boolean(uploadError({ attempt, mutationError: mutation.error })),
+      reset: () =>
+        resetUpload({
+          completionDocumentIdRef,
+          descriptionRef,
+          fileRef,
+          mutation,
+          setAttempt,
+        }),
+      retry: () =>
+        retryUpload({
+          completionDocumentIdRef,
+          descriptionRef,
+          fileRef,
+          mutation,
+        }),
+      startUpload: (file: File, description = "") => {
+        descriptionRef.current = description;
+        fileRef.current = file;
+        completionDocumentIdRef.current = "";
+        mutation.mutate({ description, file, kind: "new" });
       },
-      startUpload: (file: File) => mutation.mutate(file),
     }),
     [attempt, mutation],
   );
 }
 
 export function useDocumentUploadStatus({
+  documentId,
   enabled,
   polling,
-  uploadId,
 }: {
+  documentId: string;
   enabled: boolean;
   polling: boolean;
-  uploadId: string;
 }) {
   return useQuery({
-    enabled: enabled && Boolean(uploadId),
-    queryFn: () => getDocumentUpload(uploadId),
-    queryKey: documentQueryKeys.upload(uploadId),
+    enabled: enabled && Boolean(documentId),
+    queryFn: () => getDocument(documentId),
+    queryKey: documentQueryKeys.detail(documentId),
     refetchInterval: polling ? 5_000 : false,
   });
 }
@@ -79,6 +133,18 @@ export function useDocumentList(params: DocumentListParams = {}) {
   return useQuery({
     queryFn: () => listDocuments(params),
     queryKey: documentQueryKeys.list(params),
+  });
+}
+
+export function useDocumentMatterChoices(query: string, enabled: boolean) {
+  return useInfiniteQuery({
+    enabled,
+    getNextPageParam: (lastPage: ChoicePage<MatterChoice>) =>
+      lastPage.next_cursor ?? undefined,
+    initialPageParam: undefined as string | undefined,
+    queryFn: ({ pageParam }): Promise<ChoicePage<MatterChoice>> =>
+      listDocumentMatterChoices({ cursor: pageParam, query }),
+    queryKey: documentQueryKeys.matterChoices(query),
   });
 }
 
@@ -126,72 +192,148 @@ export function useDocumentRealtimeRecovery() {
   return status;
 }
 
-export function isActiveUploadStatus(status: UploadStatus | ""): boolean {
-  return ACTIVE_UPLOAD_STATUSES.includes(status);
+export function isActiveUploadStatus(status: DocumentStatus | ""): boolean {
+  return ACTIVE_DOCUMENT_STATUSES.includes(status as DocumentStatus);
 }
 
-export function applyUploadStatusEvent(
-  session: DocumentUploadSession,
+export function applyDocumentStatusEvent(
+  document: DocumentRecord,
   event: DocumentUploadStatusEvent,
-): DocumentUploadSession {
-  if (session.id !== event.data.upload_id) {
-    return session;
+): DocumentRecord {
+  if (document.id !== event.data.document_id) {
+    return document;
   }
-  if (isFinalStatus(session.status) && session.status !== event.data.status) {
-    return session;
+  if (isFinalStatus(document.status) && document.status !== event.data.status) {
+    return document;
   }
-  return { ...session, status: event.data.status as UploadStatus };
+  return { ...document, status: event.data.status as DocumentStatus };
 }
 
-async function uploadSelectedFile({
+async function runUploadJob({
+  abortRef,
+  completionDocumentIdRef,
+  descriptionRef,
+  fileRef,
+  job,
+  matterId,
+  queryClient,
+  setAttempt,
+}: {
+  abortRef: React.MutableRefObject<AbortController | null>;
+  completionDocumentIdRef: React.MutableRefObject<string>;
+  descriptionRef: React.MutableRefObject<string>;
+  fileRef: React.MutableRefObject<File | null>;
+  job: UploadJob;
+  matterId: string;
+  queryClient: ReturnType<typeof useQueryClient>;
+  setAttempt: Dispatch<SetStateAction<UploadAttempt>>;
+}) {
+  if (job.kind === "complete") {
+    return completeStoredDocument({
+      documentId: job.documentId,
+      queryClient,
+      setAttempt,
+    });
+  }
+  return uploadNewFile({
+    abortRef,
+    completionDocumentIdRef,
+    description: job.description,
+    descriptionRef,
+    file: job.file,
+    fileRef,
+    matterId,
+    queryClient,
+    setAttempt,
+  });
+}
+
+async function uploadNewFile({
+  abortRef,
+  completionDocumentIdRef,
+  description,
+  descriptionRef,
   file,
   matterId,
   queryClient,
   setAttempt,
 }: {
+  abortRef: React.MutableRefObject<AbortController | null>;
+  completionDocumentIdRef: React.MutableRefObject<string>;
+  description: string;
+  descriptionRef: React.MutableRefObject<string>;
   file: File;
+  fileRef: React.MutableRefObject<File | null>;
   matterId: string;
   queryClient: ReturnType<typeof useQueryClient>;
-  setAttempt: (updater: (attempt: UploadAttempt) => UploadAttempt) => void;
+  setAttempt: Dispatch<SetStateAction<UploadAttempt>>;
 }) {
   const idempotencyKey = crypto.randomUUID();
-  setAttempt(() => selectedAttempt(idempotencyKey));
-  setAttempt((attempt) => ({ ...attempt, state: "initiating" }));
-  const initiation = await initiateDocumentUpload(uploadInput(file, matterId));
-  setAttempt((attempt) => uploadStarted(attempt, initiation));
-  await uploadFileToStorage({
+  const abortController = new AbortController();
+  descriptionRef.current = description;
+  abortRef.current = abortController;
+  setAttempt(() => statusAttempt("preparing"));
+  const checksum = await calculateOptionalSha256(file);
+  setAttempt((attempt) => ({ ...attempt, status: "requesting_presign" }));
+  const presign = await createDocumentPresign(
+    uploadInput({ checksum, description, file, matterId }),
+    idempotencyKey,
+  );
+  completionDocumentIdRef.current = presign.document.id;
+  setAttempt((attempt) => uploadStarted(attempt, presign.document));
+  await uploadFileDirectlyToMinio({
     file,
-    instructions: initiation.instructions,
     onProgress: (progress) => {
       setAttempt((attempt) => ({ ...attempt, progress: progress.percent }));
     },
+    signal: abortController.signal,
+    upload: presign.upload,
   });
-  setAttempt((attempt) => ({ ...attempt, progress: 100, state: "completing" }));
-  const session = await completeDocumentUpload({
-    idempotencyKey,
-    uploadId: initiation.upload.id,
+  setAttempt((attempt) => ({
+    ...attempt,
+    progress: 100,
+    status: "uploaded_to_storage",
+  }));
+  return completeStoredDocument({
+    documentId: presign.document.id,
+    queryClient,
+    setAttempt,
   });
-  cacheUploadSession(queryClient, session);
-  setAttempt((attempt) => uploadCompleted(attempt, session));
-  return { idempotencyKey, initiation };
+}
+
+async function completeStoredDocument({
+  documentId,
+  queryClient,
+  setAttempt,
+}: {
+  documentId: string;
+  queryClient: ReturnType<typeof useQueryClient>;
+  setAttempt: Dispatch<SetStateAction<UploadAttempt>>;
+}) {
+  setAttempt((attempt) => ({ ...attempt, status: "completing" }));
+  const document = await completeDocumentUpload(documentId);
+  cacheDocumentSummary(queryClient, document);
+  setAttempt((attempt) => documentAttempt(attempt, document));
+  return document;
 }
 
 function handleUploadEvent(
   queryClient: ReturnType<typeof useQueryClient>,
   event: DocumentUploadStatusEvent,
 ): void {
-  queryClient.setQueryData<DocumentUploadSession>(
-    documentQueryKeys.upload(event.data.upload_id),
-    (session) => (session ? applyUploadStatusEvent(session, event) : session),
+  queryClient.setQueryData<DocumentRecord>(
+    documentQueryKeys.detail(event.data.document_id),
+    (document) =>
+      document ? applyDocumentStatusEvent(document, event) : document,
   );
   void queryClient.invalidateQueries({ queryKey: documentQueryKeys.all });
 }
 
-function cacheUploadSession(
+function cacheDocumentSummary(
   queryClient: ReturnType<typeof useQueryClient>,
-  session: DocumentUploadSession,
+  document: DocumentUploadSummary,
 ): void {
-  queryClient.setQueryData(documentQueryKeys.upload(session.id), session);
+  queryClient.setQueryData(documentQueryKeys.detail(document.id), document);
   void queryClient.invalidateQueries({ queryKey: documentQueryKeys.all });
 }
 
@@ -228,9 +370,21 @@ function isDocumentPage(data: unknown): data is {
   );
 }
 
-function uploadInput(file: File, matterId: string) {
+function uploadInput({
+  checksum,
+  description,
+  file,
+  matterId,
+}: {
+  checksum: string;
+  description: string;
+  file: File;
+  matterId: string;
+}): CreateDocumentPresignInput {
   return {
+    checksum_sha256: checksum,
     content_type: file.type || "application/octet-stream",
+    description: description.trim() || undefined,
     filename: file.name,
     matter_id: matterId,
     size: file.size,
@@ -239,48 +393,135 @@ function uploadInput(file: File, matterId: string) {
 
 function uploadStarted(
   attempt: UploadAttempt,
-  initiation: DocumentUploadInitiation,
+  document: DocumentUploadIntent,
 ): UploadAttempt {
   return {
     ...attempt,
-    initiation,
-    serverStatus: initiation.upload.status,
-    state: "uploading",
+    document,
+    error: null,
+    progress: 0,
+    serverStatus: document.status,
+    status: "uploading",
   };
 }
 
-function uploadCompleted(
+function documentAttempt(
   attempt: UploadAttempt,
-  session: DocumentUploadSession,
+  document: DocumentUploadSummary,
 ): UploadAttempt {
   return {
     ...attempt,
+    document,
+    error: null,
     progress: 100,
-    serverStatus: session.status,
-    state: "completed",
+    serverStatus: document.status,
+    status: uploadStateFromDocument(document.status),
+  };
+}
+
+function failedAttempt(attempt: UploadAttempt, error: unknown): UploadAttempt {
+  if (attempt.status === "cancelled") {
+    return attempt;
+  }
+  return { ...attempt, error, status: "failed" };
+}
+
+function statusAttempt(status: DirectUploadState): UploadAttempt {
+  return {
+    document: null,
+    error: null,
+    progress: 0,
+    serverStatus: "",
+    status,
   };
 }
 
 function initialAttempt(): UploadAttempt {
-  return {
-    idempotencyKey: "",
-    initiation: null,
-    progress: 0,
-    serverStatus: "",
-    state: "idle",
-  };
+  return statusAttempt("idle");
 }
 
-function selectedAttempt(idempotencyKey: string): UploadAttempt {
-  return {
-    idempotencyKey,
-    initiation: null,
-    progress: 0,
-    serverStatus: "",
-    state: "selected",
-  };
+function uploadStateFromDocument(status: DocumentStatus): DirectUploadState {
+  if (status === "pending_upload") {
+    return "verifying";
+  }
+  return status;
+}
+
+function cancelUpload({
+  abortRef,
+  setAttempt,
+}: {
+  abortRef: React.MutableRefObject<AbortController | null>;
+  setAttempt: Dispatch<SetStateAction<UploadAttempt>>;
+}) {
+  abortRef.current?.abort();
+  setAttempt((attempt) => ({ ...attempt, error: null, status: "cancelled" }));
+}
+
+function uploadError({
+  attempt,
+  mutationError,
+}: {
+  attempt: UploadAttempt;
+  mutationError: unknown;
+}): unknown {
+  if (attempt.status === "cancelled") {
+    return attempt.error;
+  }
+  return attempt.error ?? mutationError;
+}
+
+function retryUpload({
+  completionDocumentIdRef,
+  descriptionRef,
+  fileRef,
+  mutation,
+}: {
+  completionDocumentIdRef: React.MutableRefObject<string>;
+  descriptionRef: React.MutableRefObject<string>;
+  fileRef: React.MutableRefObject<File | null>;
+  mutation: ReturnType<
+    typeof useMutation<DocumentUploadSummary, Error, UploadJob>
+  >;
+}) {
+  if (completionDocumentIdRef.current) {
+    mutation.mutate({
+      documentId: completionDocumentIdRef.current,
+      kind: "complete",
+    });
+    return;
+  }
+  if (fileRef.current) {
+    mutation.mutate({
+      description: descriptionRef.current,
+      file: fileRef.current,
+      kind: "new",
+    });
+  }
+}
+
+function resetUpload({
+  completionDocumentIdRef,
+  descriptionRef,
+  fileRef,
+  mutation,
+  setAttempt,
+}: {
+  completionDocumentIdRef: React.MutableRefObject<string>;
+  descriptionRef: React.MutableRefObject<string>;
+  fileRef: React.MutableRefObject<File | null>;
+  mutation: ReturnType<
+    typeof useMutation<DocumentUploadSummary, Error, UploadJob>
+  >;
+  setAttempt: Dispatch<SetStateAction<UploadAttempt>>;
+}) {
+  completionDocumentIdRef.current = "";
+  descriptionRef.current = "";
+  fileRef.current = null;
+  mutation.reset();
+  setAttempt(initialAttempt());
 }
 
 function isFinalStatus(status: string): boolean {
-  return FINAL_UPLOAD_STATUSES.includes(status);
+  return FINAL_DOCUMENT_STATUSES.includes(status as DocumentStatus);
 }

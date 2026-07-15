@@ -1,14 +1,26 @@
-export type UploadStatus =
+export type DocumentStatus =
   | "available"
   | "cancelled"
   | "expired"
   | "failed"
-  | "initiated"
-  | "processing"
+  | "pending_upload"
   | "verifying";
 
-export type DocumentUploadInitiateInput = {
-  checksum?: string;
+export type DirectUploadState =
+  | "available"
+  | "cancelled"
+  | "completing"
+  | "expired"
+  | "failed"
+  | "idle"
+  | "preparing"
+  | "requesting_presign"
+  | "uploaded_to_storage"
+  | "uploading"
+  | "verifying";
+
+export type CreateDocumentPresignInput = {
+  checksum_sha256?: string;
   content_type: string;
   description?: string;
   filename: string;
@@ -16,68 +28,51 @@ export type DocumentUploadInitiateInput = {
   size: number;
 };
 
-export type DocumentUploadSession = {
-  completed_at: string | null;
+export type DocumentUploadIntent = {
+  filename: string;
+  id: string;
+  status: DocumentStatus;
+  upload_expires_at: string | null;
+};
+
+export type PresignedUpload = {
+  expires_at: string;
+  headers: Record<string, string>;
+  method: "PUT";
+  url: string;
+};
+
+export type CreateDocumentPresignResponse = {
+  document: DocumentUploadIntent;
+  upload: PresignedUpload;
+};
+
+export type DocumentUploadSummary = {
+  content_type: string;
+  filename: string;
+  id: string;
+  size: number | null;
+  status: DocumentStatus;
+  uploaded_at: string | null;
+};
+
+export type DocumentRecord = {
+  actual_checksum: string;
+  content_type: string;
   created_at: string;
   description: string;
+  etag: string;
   expected_checksum: string;
-  expected_content_type: string;
   expected_size: number;
-  expires_at: string;
   failure_code: string;
   id: string;
   matter_id: string;
   original_filename: string;
-  requested_by_id: string;
-  status: UploadStatus;
-  updated_at: string;
-};
-
-export type DocumentUploadInstructions = {
-  completion_url: string;
-  expires_at: string;
-  fields: Record<string, string>;
-  headers: Record<string, string>;
-  method: "POST" | "PUT";
-  polling_url: string;
-  url: string;
-};
-
-export type DocumentUploadInitiation = {
-  instructions: DocumentUploadInstructions;
-  upload: DocumentUploadSession;
-};
-
-export type UploadInitiationApiResponse =
-  | DocumentUploadInitiation
-  | {
-      completion_url: string;
-      expires_at: string;
-      fields: Record<string, string>;
-      headers: Record<string, string>;
-      id: string;
-      method: "POST" | "PUT";
-      polling_url: string;
-      status: UploadStatus;
-      url: string;
-    };
-
-export type DocumentStatus = "available" | "processing" | "revoked";
-
-export type DocumentRecord = {
-  available_at: string | null;
-  checksum: string;
-  content_type: string;
-  created_at: string;
-  description: string;
-  id: string;
-  matter_id: string;
-  original_filename: string;
-  revoked_at: string | null;
-  size: number;
+  size: number | null;
   status: DocumentStatus;
   updated_at: string;
-  upload_session_id: string;
+  upload_expires_at: string | null;
+  uploaded_at: string | null;
   uploaded_by_id: string;
 };
 
@@ -105,8 +100,15 @@ export type DirectUploadProgress = {
   total: number;
 };
 
-export type DirectUploadInput = {
-  file: File;
-  instructions: DocumentUploadInstructions;
-  onProgress: (progress: DirectUploadProgress) => void;
+export type MatterChoice = {
+  id: string;
+  kind: "case" | "contract" | "notice";
+  label: string;
+  secondary_label: string;
+};
+
+export type ChoicePage<TChoice> = {
+  has_more: boolean;
+  next_cursor: string | null;
+  results: TChoice[];
 };

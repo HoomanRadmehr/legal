@@ -12,6 +12,7 @@ import {
   NotFoundState,
 } from "../../../components/standardStates";
 import { useI18n } from "../../../i18n";
+import { DocumentSection } from "../../documents";
 import { NoticeMutationError } from "../components/NoticeMutationError";
 import { noticeText } from "../components/noticeLabels";
 import { NoticeSummary } from "../components/NoticeSummary";
@@ -68,6 +69,7 @@ export function NoticeDetailPage() {
               isLoading={timeline.isLoading}
             />
           </section>
+          <DocumentSection matterId={detail.data.id} />
           <ConfirmationDialog
             confirmLabel={labels.archive}
             onCancel={() => setArchiveOpen(false)}
@@ -123,10 +125,7 @@ function NoticeDetailError({
 }) {
   if (isApiError(error) && error.status === 404) {
     return (
-      <NotFoundState
-        title={labels.notFound}
-        message={labels.notFoundMessage}
-      />
+      <NotFoundState title={labels.notFound} message={labels.notFoundMessage} />
     );
   }
   return <ErrorState title={labels.error} message={error.message} />;

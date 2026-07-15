@@ -28,7 +28,7 @@ import {
   DeadlineListPage,
 } from "../features/deadlines/pages";
 import { DashboardPage } from "../features/dashboard";
-import { DocumentsPage } from "../features/documents";
+import { CreateDocumentPage, DocumentsPage } from "../features/documents";
 import {
   NoticeCreatePage,
   NoticeDetailPage,
@@ -72,6 +72,7 @@ export const appRoutes: RouteObject[] = [
       { path: "deadlines/:deadlineId", element: <DeadlineDetailPage /> },
       { path: "deadlines/:deadlineId/edit", element: <DeadlineEditPage /> },
       { path: "documents", element: <DocumentsPage /> },
+      { path: "documents/new", element: <CreateDocumentPage /> },
       { path: "notices", element: <NoticeListPage /> },
       { path: "notices/new", element: <NoticeCreatePage /> },
       { path: "notices/:noticeId", element: <NoticeDetailPage /> },

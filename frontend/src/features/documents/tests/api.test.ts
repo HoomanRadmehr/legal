@@ -2,61 +2,69 @@ import { afterEach, describe, expect, test, vi } from "vitest";
 
 import {
   completeDocumentUpload,
-  initiateDocumentUpload,
+  createDocumentPresign,
   requestDocumentDownloadUrl,
-  uploadFileToStorage,
 } from "../api";
-import type { DocumentUploadInstructions } from "../types";
+import { uploadFileDirectlyToMinio } from "../upload";
+import type { PresignedUpload } from "../types";
 
 afterEach(() => {
   vi.unstubAllGlobals();
 });
 
-describe("document upload API", () => {
-  test("initiates upload through Django API without retrying the write", async () => {
-    const fetchImpl = vi.fn(async () => Response.json(flatUploadInitiation()));
+describe("document direct upload API", () => {
+  test("requests presign without file bytes or client-owned storage fields", async () => {
+    const fetchImpl = vi.fn(async () => Response.json(presignResponse()));
     vi.stubGlobal("fetch", fetchImpl);
 
-    const result = await initiateDocumentUpload({
-      content_type: "application/pdf",
-      filename: "notice.pdf",
-      matter_id: "matter-1",
-      size: 1024,
-    });
-
-    expect(result.upload.id).toBe("upload-1");
-    expect(result.instructions.completion_url).toContain("/complete/");
-    expect(fetchImpl).toHaveBeenCalledWith(
-      expect.stringContaining("/api/v1/documents/uploads/"),
-      expect.objectContaining({
-        body: JSON.stringify({
-          content_type: "application/pdf",
-          filename: "notice.pdf",
-          matter_id: "matter-1",
-          size: 1024,
-        }),
-        method: "POST",
-      }),
+    const result = await createDocumentPresign(
+      {
+        checksum_sha256: "",
+        content_type: "application/pdf",
+        description: "Notice",
+        filename: "notice.pdf",
+        matter_id: "matter-1",
+        size: 1024,
+      },
+      "idem-1",
     );
-  });
 
-  test("completes upload with the stable idempotency key", async () => {
-    const fetchImpl = vi.fn(async () => Response.json(uploadSession()));
-    vi.stubGlobal("fetch", fetchImpl);
-
-    await completeDocumentUpload({
-      idempotencyKey: "idem-1",
-      uploadId: "upload-1",
-    });
-
-    const calls = fetchImpl.mock.calls as unknown as [string, RequestInit][];
-    const init = calls[0]?.[1];
-    expect(init).toBeDefined();
+    const request = firstRequestInit(fetchImpl);
+    expect(result.document.id).toBe("document-1");
     expect(fetchImpl).toHaveBeenCalledWith(
-      expect.stringContaining("/api/v1/documents/uploads/upload-1/complete/"),
+      expect.stringContaining("/api/v1/documents/presign/"),
       expect.objectContaining({ method: "POST" }),
     );
-    expect((init?.headers as Headers).get("Idempotency-Key")).toBe("idem-1");
+    expect(request.body).toBe(
+      JSON.stringify({
+        checksum_sha256: "",
+        content_type: "application/pdf",
+        description: "Notice",
+        filename: "notice.pdf",
+        matter_id: "matter-1",
+        size: 1024,
+      }),
+    );
+    expect((request.headers as Headers).get("Idempotency-Key")).toBe("idem-1");
+    expect(String(request.body)).not.toContain("object_key");
+    expect(String(request.body)).not.toContain("organization_id");
+    expect(String(request.body)).not.toContain("File");
+  });
+
+  test("completes document upload without sending object metadata", async () => {
+    const fetchImpl = vi.fn(async () => Response.json(documentSummary()));
+    vi.stubGlobal("fetch", fetchImpl);
+
+    await completeDocumentUpload("document-1");
+
+    const request = firstRequestInit(fetchImpl);
+    expect(fetchImpl).toHaveBeenCalledWith(
+      expect.stringContaining("/api/v1/documents/document-1/complete/"),
+      expect.objectContaining({ method: "POST" }),
+    );
+    expect(request.body).toBe(JSON.stringify({}));
+    expect(String(request.body)).not.toContain("object_key");
+    expect(String(request.body)).not.toContain("bucket");
   });
 
   test("requests a fresh download URL through Django API", async () => {
@@ -77,14 +85,18 @@ describe("document upload API", () => {
     );
   });
 
-  test("uploads PUT bytes to the exact presigned URL with returned headers", async () => {
+  test("uploads PUT bytes to MinIO with returned safe headers only", async () => {
     const requests = installFakeXhr(204);
     const progress: number[] = [];
 
-    await uploadFileToStorage({
+    await uploadFileDirectlyToMinio({
       file: uploadFile(),
-      instructions: uploadInstructions({ method: "PUT" }),
       onProgress: (event) => progress.push(event.percent),
+      upload: presignedPut({
+        Authorization: "Bearer should-not-leak",
+        Cookie: "refresh=secret",
+        "Content-Type": "application/pdf",
+      }),
     });
 
     expect(requests[0]).toMatchObject({
@@ -92,30 +104,50 @@ describe("document upload API", () => {
       headers: { "Content-Type": "application/pdf" },
       method: "PUT",
       url: "https://minio.example.test/presigned",
+      withCredentials: false,
     });
+    expect(requests[0]?.headers.Authorization).toBeUndefined();
+    expect(requests[0]?.headers.Cookie).toBeUndefined();
     expect(progress).toEqual([50, 100]);
   });
 
-  test("uploads POST form fields exactly as returned", async () => {
-    const requests = installFakeXhr(204);
+  test("maps MinIO 403 to a safe upload error", async () => {
+    installFakeXhr(403);
 
-    await uploadFileToStorage({
-      file: uploadFile(),
-      instructions: uploadInstructions({ method: "POST" }),
-      onProgress: vi.fn(),
+    await expect(
+      uploadFileDirectlyToMinio({
+        file: uploadFile(),
+        onProgress: vi.fn(),
+        upload: presignedPut(),
+      }),
+    ).rejects.toMatchObject({
+      code: "storage_forbidden",
     });
-
-    const body = requests[0]?.body;
-    expect(requests[0]).toMatchObject({
-      bodyType: "FormData",
-      method: "POST",
-      url: "https://minio.example.test/presigned",
-    });
-    expect(body).toBeInstanceOf(FormData);
-    expect((body as FormData).get("policy")).toBe("signed-policy");
-    expect((body as FormData).get("file")).toBeInstanceOf(File);
   });
 });
+
+function presignResponse() {
+  return {
+    document: {
+      filename: "notice.pdf",
+      id: "document-1",
+      status: "pending_upload",
+      upload_expires_at: "2027-07-14T10:10:00Z",
+    },
+    upload: presignedPut(),
+  };
+}
+
+function documentSummary() {
+  return {
+    content_type: "application/pdf",
+    filename: "notice.pdf",
+    id: "document-1",
+    size: 1024,
+    status: "available",
+    uploaded_at: "2027-07-14T10:05:00Z",
+  };
+}
 
 function uploadFile(): File {
   return new File(["x".repeat(1024)], "notice.pdf", {
@@ -123,58 +155,13 @@ function uploadFile(): File {
   });
 }
 
-function uploadInstructions(input: {
-  method: "POST" | "PUT";
-}): DocumentUploadInstructions {
+function presignedPut(headers: Record<string, string> = {}): PresignedUpload {
   return {
-    completion_url: "/api/v1/documents/uploads/upload-1/complete/",
     expires_at: "2027-07-14T10:10:00Z",
-    fields: input.method === "POST" ? { policy: "signed-policy" } : {},
-    headers: { "Content-Type": "application/pdf" },
-    method: input.method,
-    polling_url: "/api/v1/documents/uploads/upload-1/",
-    url: "https://minio.example.test/presigned",
-  };
-}
-
-function uploadInitiation() {
-  return {
-    instructions: uploadInstructions({ method: "PUT" }),
-    upload: {
-      completed_at: null,
-      created_at: "2027-07-14T10:00:00Z",
-      description: "",
-      expected_checksum: "",
-      expected_content_type: "application/pdf",
-      expected_size: 1024,
-      expires_at: "2027-07-14T10:10:00Z",
-      failure_code: "",
-      id: "upload-1",
-      matter_id: "matter-1",
-      original_filename: "notice.pdf",
-      requested_by_id: "membership-1",
-      status: "initiated",
-      updated_at: "2027-07-14T10:00:00Z",
-    },
-  };
-}
-
-function flatUploadInitiation() {
-  return {
-    completion_url: "/api/v1/documents/uploads/upload-1/complete/",
-    expires_at: "2027-07-14T10:10:00Z",
-    fields: {},
-    headers: { "Content-Type": "application/pdf" },
-    id: "upload-1",
+    headers,
     method: "PUT",
-    polling_url: "/api/v1/documents/uploads/upload-1/",
-    status: "initiated",
     url: "https://minio.example.test/presigned",
   };
-}
-
-function uploadSession() {
-  return uploadInitiation().upload;
 }
 
 type XhrCall = {
@@ -183,6 +170,7 @@ type XhrCall = {
   headers: Record<string, string>;
   method: string;
   url: string;
+  withCredentials: boolean;
 };
 
 function installFakeXhr(status: number): XhrCall[] {
@@ -191,13 +179,21 @@ function installFakeXhr(status: number): XhrCall[] {
   class FakeXhr {
     headers: Record<string, string> = {};
     method = "";
+    onabort: (() => void) | null = null;
+    onerror: (() => void) | null = null;
+    onload: (() => void) | null = null;
+    onloadend: (() => void) | null = null;
     status = status;
     upload: { onprogress: ((event: ProgressEvent) => void) | null } = {
       onprogress: null,
     };
     url = "";
-    onerror: (() => void) | null = null;
-    onload: (() => void) | null = null;
+    withCredentials = true;
+
+    abort() {
+      this.onabort?.();
+      this.onloadend?.();
+    }
 
     open(method: string, url: string) {
       this.method = method;
@@ -215,9 +211,11 @@ function installFakeXhr(status: number): XhrCall[] {
         headers: this.headers,
         method: this.method,
         url: this.url,
+        withCredentials: this.withCredentials,
       });
       this.upload.onprogress?.(progressEvent(512, 1024));
       this.onload?.();
+      this.onloadend?.();
     }
   }
 
@@ -227,4 +225,13 @@ function installFakeXhr(status: number): XhrCall[] {
 
 function progressEvent(loaded: number, total: number): ProgressEvent {
   return { lengthComputable: true, loaded, total } as ProgressEvent;
+}
+
+function firstRequestInit(fetchImpl: ReturnType<typeof vi.fn>): RequestInit {
+  const calls = fetchImpl.mock.calls as unknown as [
+    RequestInfo | URL,
+    RequestInit,
+  ][];
+  expect(calls[0]).toBeDefined();
+  return calls[0]?.[1] ?? {};
 }
