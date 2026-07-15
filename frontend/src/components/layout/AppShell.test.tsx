@@ -128,7 +128,14 @@ describe("app shell permissions", () => {
     renderShell(ROLE_LEGAL_ADMIN, "fa");
 
     const workspace = screen.getByLabelText("محیط کار");
-    expect(workspace.closest(".layout-shell")).toHaveClass("layout-shell--rtl");
+    const shell = workspace.closest(".layout-shell");
+    const main = shell?.querySelector(".layout-main");
+    expect(shell).toHaveClass("layout-shell--rtl");
+    expect(shell).toHaveAttribute("dir", "ltr");
+    expect(workspace).toHaveClass("layout-sidebar--right");
+    expect(workspace).toHaveAttribute("dir", "rtl");
+    expect(main).toHaveClass("layout-main--left");
+    expect(main).toHaveAttribute("dir", "rtl");
     expect(
       screen.getByRole("navigation", { name: "ناوبری اصلی" }),
     ).toBeInTheDocument();

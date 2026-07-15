@@ -23,20 +23,29 @@ type AppShellProps = {
 
 export function AppShell({ children, onLogout, session }: AppShellProps) {
   const { changeLocale, direction, locale, t } = useI18n();
+  const isRtl = direction === "rtl";
+  const sidebarPlacement = isRtl
+    ? "layout-sidebar--right"
+    : "layout-sidebar--left";
+  const mainPlacement = isRtl ? "layout-main--left" : "layout-main--right";
   const role = session.membership.role;
   const organizationName =
     session.membership.organization_name ?? session.membership.organization_id;
 
   return (
-    <div className={`layout-shell layout-shell--${direction}`}>
-      <aside className="layout-sidebar" aria-label={t("layout.workspace")}>
+    <div className={`layout-shell layout-shell--${direction}`} dir="ltr">
+      <aside
+        className={`layout-sidebar ${sidebarPlacement}`}
+        aria-label={t("layout.workspace")}
+        dir={direction}
+      >
         <div>
           <p className="layout-kicker">{t("layout.organization")}</p>
           <p className="layout-organization">{organizationName}</p>
         </div>
         <WorkspaceNavigation role={role} />
       </aside>
-      <div className="layout-main">
+      <div className={`layout-main ${mainPlacement}`} dir={direction}>
         <header className="layout-header">
           <div>
             <span className="layout-sr-only">

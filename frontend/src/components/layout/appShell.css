@@ -3,6 +3,7 @@
   min-height: 100vh;
   grid-template-columns: 260px minmax(0, 1fr);
   background: #f8fafc;
+  direction: ltr;
 }
 
 .layout-shell--rtl {
@@ -19,13 +20,15 @@
   text-align: start;
 }
 
-.layout-shell--rtl .layout-sidebar {
-  grid-column: 2;
+.layout-sidebar--left,
+.layout-main--left {
+  grid-column: 1;
   grid-row: 1;
 }
 
-.layout-shell--rtl .layout-main {
-  grid-column: 1;
+.layout-sidebar--right,
+.layout-main--right {
+  grid-column: 2;
   grid-row: 1;
 }
 
@@ -145,8 +148,10 @@
     grid-template-columns: 1fr;
   }
 
-  .layout-shell--rtl .layout-sidebar,
-  .layout-shell--rtl .layout-main {
+  .layout-sidebar--left,
+  .layout-sidebar--right,
+  .layout-main--left,
+  .layout-main--right {
     grid-column: auto;
     grid-row: auto;
   }
