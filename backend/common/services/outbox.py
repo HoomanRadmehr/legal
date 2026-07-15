@@ -6,6 +6,11 @@ from django.db import transaction
 from django.utils import timezone
 
 from apps.activity.models import OutboxEvent
+from common.realtime.publisher import (
+    EVENT_DOCUMENT_UPLOAD_STATUS_CHANGED,
+    MISSING_EVENT_PAYLOAD,
+    publish_upload_status_from_payload,
+)
 
 MAX_OUTBOX_ATTEMPTS = 3
 ERROR_DISPATCH_FAILED = "dispatch_failed"
@@ -21,14 +26,18 @@ SAFE_OUTBOX_FIELDS = {
     "actor_id",
     "aggregate_id",
     "aggregate_type",
+    "document_id",
     "event_version",
     "id",
     "matter_id",
     "organization_id",
     "reference_code",
     "role",
+    "status",
     "target_id",
     "target_type",
+    "upload_id",
+    "user_id",
 }
 
 
@@ -120,7 +129,14 @@ def record_outbox_failure(*, event_id, error_code: str) -> None:
 
 
 def publish_outbox_event(*, event: OutboxEvent) -> None:
-    return None
+    if event.event_type == EVENT_DOCUMENT_UPLOAD_STATUS_CHANGED:
+        publish_document_upload_status(event=event)
+
+
+def publish_document_upload_status(*, event: OutboxEvent) -> None:
+    result = publish_upload_status_from_payload(payload=event.payload)
+    if result == MISSING_EVENT_PAYLOAD:
+        raise OutboxDispatchError(MISSING_EVENT_PAYLOAD)
 
 
 def safe_outbox_payload(*, payload: dict) -> dict:

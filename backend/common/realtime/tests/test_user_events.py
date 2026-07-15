@@ -170,6 +170,7 @@ def test_upload_event_payload_filters_secret_fields(monkeypatch: pytest.MonkeyPa
     assert result == "published"
     assert calls[0][0] == user_group_name(user_id=user_id)
     assert calls[0][1]["event"]["data"] == {
+        "document_id": str(upload_id),
         "upload_id": str(upload_id),
         "status": "available",
         "progress": 100,

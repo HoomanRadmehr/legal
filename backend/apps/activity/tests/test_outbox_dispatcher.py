@@ -114,6 +114,36 @@ def test_dispatch_records_safe_error_code(monkeypatch: pytest.MonkeyPatch) -> No
     assert event.last_error_code == ERROR_DISPATCH_FAILED
 
 
+def test_document_upload_status_dispatches_safe_user_event(monkeypatch: pytest.MonkeyPatch) -> None:
+    document_id = uuid.uuid4()
+    user_id = uuid.uuid4()
+    event = OutboxEventFactory(
+        event_type="document.upload.status_changed",
+        aggregate_type="document",
+        aggregate_id=document_id,
+        payload={
+            "document_id": str(document_id),
+            "status": "available",
+            "user_id": str(user_id),
+            "url": "http://minio.example/presigned",
+        },
+    )
+    calls = []
+
+    def fake_publish_upload_status_from_payload(*, payload):
+        calls.append(payload)
+        return "published"
+
+    monkeypatch.setattr(
+        outbox,
+        "publish_upload_status_from_payload",
+        fake_publish_upload_status_from_payload,
+    )
+
+    assert dispatch_outbox_event(event_id=event.id) == DISPATCHED
+    assert calls == [event.payload]
+
+
 def test_celery_task_dispatches_by_id(monkeypatch: pytest.MonkeyPatch) -> None:
     event = OutboxEventFactory()
     calls = []

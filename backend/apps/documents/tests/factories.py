@@ -1,4 +1,4 @@
-"""Test factories for document upload models."""
+"""Test factories for document models."""
 
 from __future__ import annotations
 
@@ -8,51 +8,33 @@ from datetime import timedelta
 import factory
 from django.utils import timezone
 
-from apps.documents.models import (
-    DOCUMENT_STATUS_AVAILABLE,
-    UPLOAD_STATUS_INITIATED,
-    Document,
-    UploadSession,
-)
+from apps.documents.models import DOCUMENT_STATUS_AVAILABLE, Document
 from apps.matters.tests.factories import MatterFactory
 
 
-class UploadSessionFactory(factory.django.DjangoModelFactory):
+class DocumentFactory(factory.django.DjangoModelFactory):
     id = factory.LazyFunction(uuid.uuid4)
     organization = factory.SelfAttribute("matter.organization")
     matter = factory.SubFactory(MatterFactory)
-    requested_by = factory.SelfAttribute("matter.owner")
     object_key = factory.LazyAttribute(
-        lambda session: (
-            f"organizations/{session.organization.id}/matters/"
-            f"{session.matter.id}/uploads/{session.id}.pdf"
+        lambda document: (
+            f"organizations/{document.organization.id}/matters/"
+            f"{document.matter.id}/documents/{document.id}"
         )
     )
     original_filename = "notice.pdf"
+    content_type = "application/pdf"
     expected_size = 1024
-    expected_content_type = "application/pdf"
+    actual_size = 1024
     expected_checksum = ""
-    description = ""
-    status = UPLOAD_STATUS_INITIATED
-    expires_at = factory.LazyFunction(lambda: timezone.now() + timedelta(minutes=15))
-
-    class Meta:
-        model = UploadSession
-
-
-class DocumentFactory(factory.django.DjangoModelFactory):
-    organization = factory.SelfAttribute("upload_session.organization")
-    matter = factory.SelfAttribute("upload_session.matter")
-    upload_session = factory.SubFactory(UploadSessionFactory)
-    object_key = factory.SelfAttribute("upload_session.object_key")
-    original_filename = factory.SelfAttribute("upload_session.original_filename")
-    content_type = factory.SelfAttribute("upload_session.expected_content_type")
-    size = factory.SelfAttribute("upload_session.expected_size")
-    checksum = factory.SelfAttribute("upload_session.expected_checksum")
+    actual_checksum = ""
+    etag = ""
     status = DOCUMENT_STATUS_AVAILABLE
-    description = factory.SelfAttribute("upload_session.description")
-    uploaded_by = factory.SelfAttribute("upload_session.requested_by")
-    available_at = factory.LazyFunction(timezone.now)
+    description = ""
+    uploaded_by = factory.SelfAttribute("matter.owner")
+    upload_expires_at = factory.LazyFunction(lambda: timezone.now() + timedelta(minutes=15))
+    uploaded_at = factory.LazyFunction(timezone.now)
+    failure_code = ""
 
     class Meta:
         model = Document

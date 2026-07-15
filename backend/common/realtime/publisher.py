@@ -33,8 +33,12 @@ def publish_user_event(*, user_id, event_type: str, data: dict, version: int = 1
     return PUBLISHED
 
 
-def publish_upload_status(*, user_id, upload_id, status: str, progress: int | None = None) -> str:
-    data = {"upload_id": str(upload_id), "status": status}
+def publish_upload_status(*, user_id, document_id, status: str, progress: int | None = None) -> str:
+    data = {
+        "document_id": str(document_id),
+        "upload_id": str(document_id),
+        "status": status,
+    }
     if progress is not None:
         data["progress"] = normalized_progress(progress=progress)
     return publish_user_event(
@@ -46,13 +50,13 @@ def publish_upload_status(*, user_id, upload_id, status: str, progress: int | No
 
 def publish_upload_status_from_payload(*, payload: dict) -> str:
     user_id = payload.get("user_id") or payload.get("requested_by_id")
-    upload_id = payload.get("upload_id") or payload.get("id")
+    document_id = payload.get("document_id") or payload.get("upload_id") or payload.get("id")
     status = payload.get("status")
-    if not user_id or not upload_id or not status:
+    if not user_id or not document_id or not status:
         return MISSING_EVENT_PAYLOAD
     return publish_upload_status(
         user_id=user_id,
-        upload_id=upload_id,
+        document_id=document_id,
         status=status,
         progress=payload.get("progress"),
     )
@@ -81,8 +85,10 @@ def safe_event_data(*, event_type: str, data: dict) -> dict:
 
 
 def upload_status_data(*, data: dict) -> dict:
+    document_id = data.get("document_id") or data.get("upload_id")
     safe_data = {
-        "upload_id": str(data["upload_id"]),
+        "document_id": str(document_id),
+        "upload_id": str(document_id),
         "status": str(data["status"]),
     }
     if data.get("progress") is not None:

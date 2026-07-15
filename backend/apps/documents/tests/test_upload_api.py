@@ -1,4 +1,4 @@
-"""API tests for document upload endpoints."""
+"""API tests for direct document upload endpoints."""
 
 from __future__ import annotations
 
@@ -7,60 +7,74 @@ from django.core.cache import cache
 from django.urls import reverse
 from rest_framework.test import APIClient
 
-from apps.documents.tests.factories import DocumentFactory, UploadSessionFactory
+from apps.documents.models import DOCUMENT_STATUS_PENDING_UPLOAD
+from apps.documents.tests.factories import DocumentFactory
 from apps.matters.models import ACCESS_LEVEL_VIEW
 from apps.matters.tests.factories import MatterAccessFactory, MatterFactory
 from apps.organizations.models import ROLE_LEGAL_ADMIN, ROLE_VIEWER
 from apps.organizations.tests.factories import MembershipFactory, OrganizationFactory
-from common.api.throttles import UploadInitiateThrottle
+from common.api.throttles import DocumentPresignThrottle
 
 pytestmark = pytest.mark.django_db
 
 
-def test_upload_initiate_api_returns_presigned_instructions(monkeypatch) -> None:
+def test_document_presign_api_returns_presigned_instructions(monkeypatch) -> None:
     stub_presign(monkeypatch)
     admin = MembershipFactory(role=ROLE_LEGAL_ADMIN)
     matter = MatterFactory(organization=admin.organization, owner=admin)
 
     response = authenticated_client(member=admin).post(
-        reverse("documents-uploads-list"),
+        reverse("documents-presign"),
         upload_payload(matter_id=matter.id),
         format="json",
+        HTTP_IDEMPOTENCY_KEY="11111111-1111-1111-1111-111111111111",
     )
     data = response.json()
 
     assert response.status_code == 201
-    assert data["id"]
-    assert data["status"] == "initiated"
-    assert data["method"] == "PUT"
-    assert data["url"] == "http://localhost:9000/presigned-upload"
-    assert data["headers"] == {"Content-Type": "application/pdf"}
-    assert "object_key" not in data
+    assert data["document"]["id"]
+    assert data["document"]["status"] == "pending_upload"
+    assert data["upload"]["method"] == "PUT"
+    assert data["upload"]["url"] == "http://localhost:9000/presigned-upload"
+    assert data["upload"]["headers"] == {"Content-Type": "application/pdf"}
+    assert "object_key" not in data["document"]
+    assert "fields" not in data["upload"]
 
 
-def test_upload_poll_api_is_permission_scoped(monkeypatch) -> None:
+def test_document_presign_api_rejects_forbidden_transport_fields(monkeypatch) -> None:
     stub_presign(monkeypatch)
-    organization = OrganizationFactory()
-    owner = MembershipFactory(organization=organization)
-    viewer = MembershipFactory(organization=organization, role=ROLE_VIEWER)
-    other_admin = MembershipFactory(role=ROLE_LEGAL_ADMIN)
-    matter = MatterFactory(organization=organization, owner=owner)
-    session = UploadSessionFactory(matter=matter, requested_by=owner)
-    MatterAccessFactory(matter=matter, membership=viewer, level=ACCESS_LEVEL_VIEW)
+    admin = MembershipFactory(role=ROLE_LEGAL_ADMIN)
+    matter = MatterFactory(organization=admin.organization, owner=admin)
+    payload = upload_payload(matter_id=matter.id)
+    payload["object_key"] = "client/chosen/key"
+    payload["organization_id"] = str(admin.organization_id)
 
-    owner_response = authenticated_client(member=owner).get(upload_detail_url(session=session))
-    viewer_response = authenticated_client(member=viewer).get(upload_detail_url(session=session))
-    hidden_response = authenticated_client(member=other_admin).get(
-        upload_detail_url(session=session)
+    response = authenticated_client(member=admin).post(
+        reverse("documents-presign"),
+        payload,
+        format="json",
+        HTTP_IDEMPOTENCY_KEY="11111111-1111-1111-1111-111111111111",
     )
 
-    assert owner_response.status_code == 200
-    assert owner_response.json()["status"] == "initiated"
-    assert viewer_response.status_code == 200
-    assert hidden_response.status_code == 404
+    assert response.status_code == 400
+    assert "object_key" in response.json()["details"]["forbidden_fields"]
 
 
-def test_upload_initiate_api_denies_viewer_and_hidden_matter(monkeypatch) -> None:
+def test_document_uploads_session_endpoint_no_longer_exists(monkeypatch) -> None:
+    stub_presign(monkeypatch)
+    admin = MembershipFactory(role=ROLE_LEGAL_ADMIN)
+    matter = MatterFactory(organization=admin.organization, owner=admin)
+
+    response = authenticated_client(member=admin).post(
+        "/api/v1/documents/uploads/",
+        upload_payload(matter_id=matter.id),
+        format="json",
+    )
+
+    assert response.status_code == 404
+
+
+def test_document_presign_api_denies_viewer_and_hidden_matter(monkeypatch) -> None:
     stub_presign(monkeypatch)
     organization = OrganizationFactory()
     owner = MembershipFactory(organization=organization)
@@ -70,56 +84,41 @@ def test_upload_initiate_api_denies_viewer_and_hidden_matter(monkeypatch) -> Non
     MatterAccessFactory(matter=matter, membership=viewer, level=ACCESS_LEVEL_VIEW)
 
     viewer_response = authenticated_client(member=viewer).post(
-        reverse("documents-uploads-list"),
+        reverse("documents-presign"),
         upload_payload(matter_id=matter.id),
         format="json",
+        HTTP_IDEMPOTENCY_KEY="viewer",
     )
     hidden_response = authenticated_client(member=other_admin).post(
-        reverse("documents-uploads-list"),
+        reverse("documents-presign"),
         upload_payload(matter_id=matter.id),
         format="json",
+        HTTP_IDEMPOTENCY_KEY="hidden",
     )
 
     assert viewer_response.status_code == 403
     assert hidden_response.status_code == 404
 
 
-def test_upload_initiate_api_returns_stable_policy_errors(monkeypatch) -> None:
-    stub_presign(monkeypatch)
-    admin = MembershipFactory(role=ROLE_LEGAL_ADMIN)
-    matter = MatterFactory(organization=admin.organization, owner=admin)
-
-    response = authenticated_client(member=admin).post(
-        reverse("documents-uploads-list"),
-        upload_payload(
-            matter_id=matter.id,
-            filename="notice.exe",
-            content_type="application/octet-stream",
-        ),
-        format="json",
-    )
-
-    assert response.status_code == 422
-    assert response.json()["code"] == "upload_policy_violation"
-
-
-def test_upload_initiate_api_rate_limit_returns_retry_after(monkeypatch) -> None:
+def test_document_presign_api_rate_limit_returns_retry_after(monkeypatch) -> None:
     cache.clear()
-    monkeypatch.setattr(UploadInitiateThrottle, "rate", "1/hour")
+    monkeypatch.setattr(DocumentPresignThrottle, "rate", "1/hour")
     stub_presign(monkeypatch)
     admin = MembershipFactory(role=ROLE_LEGAL_ADMIN)
     matter = MatterFactory(organization=admin.organization, owner=admin)
     client = authenticated_client(member=admin)
 
     first_response = client.post(
-        reverse("documents-uploads-list"),
+        reverse("documents-presign"),
         upload_payload(matter_id=matter.id),
         format="json",
+        HTTP_IDEMPOTENCY_KEY="first",
     )
     second_response = client.post(
-        reverse("documents-uploads-list"),
+        reverse("documents-presign"),
         upload_payload(matter_id=matter.id),
         format="json",
+        HTTP_IDEMPOTENCY_KEY="second",
     )
 
     assert first_response.status_code == 201
@@ -128,24 +127,26 @@ def test_upload_initiate_api_rate_limit_returns_retry_after(monkeypatch) -> None
     assert int(second_response["Retry-After"]) > 0
 
 
-def test_upload_complete_api_requires_idempotency_and_returns_processing(monkeypatch) -> None:
+def test_document_complete_api_verifies_and_returns_available(monkeypatch) -> None:
     stub_stat(monkeypatch)
-    stub_schedule(monkeypatch)
     admin = MembershipFactory(role=ROLE_LEGAL_ADMIN)
-    session = UploadSessionFactory(matter__organization=admin.organization, requested_by=admin)
-    client = authenticated_client(member=admin)
-
-    missing_header = client.post(upload_complete_url(session=session), {}, format="json")
-    completed = client.post(
-        upload_complete_url(session=session),
-        {},
-        format="json",
-        HTTP_IDEMPOTENCY_KEY="11111111-1111-1111-1111-111111111111",
+    document = DocumentFactory(
+        matter__organization=admin.organization,
+        uploaded_by=admin,
+        status=DOCUMENT_STATUS_PENDING_UPLOAD,
+        actual_size=None,
+        uploaded_at=None,
     )
 
-    assert missing_header.status_code == 400
-    assert completed.status_code == 202
-    assert completed.json()["status"] == "processing"
+    response = authenticated_client(member=admin).post(
+        reverse("documents-complete", args=[document.id]),
+        {},
+        format="json",
+    )
+
+    assert response.status_code == 200
+    assert response.json()["status"] == "available"
+    assert response.json()["size"] == 1024
 
 
 def test_document_list_detail_download_and_revoke_api_are_permission_scoped(monkeypatch) -> None:
@@ -155,7 +156,7 @@ def test_document_list_detail_download_and_revoke_api_are_permission_scoped(monk
     viewer = MembershipFactory(organization=organization, role=ROLE_VIEWER)
     other_admin = MembershipFactory(role=ROLE_LEGAL_ADMIN)
     matter = MatterFactory(organization=organization, owner=owner)
-    document = DocumentFactory(upload_session__matter=matter, upload_session__requested_by=owner)
+    document = DocumentFactory(matter=matter, uploaded_by=owner)
     MatterAccessFactory(matter=matter, membership=viewer, level=ACCESS_LEVEL_VIEW)
 
     viewer_list = authenticated_client(member=viewer).get(reverse("documents-list"))
@@ -182,14 +183,6 @@ def authenticated_client(*, member) -> APIClient:
     return client
 
 
-def upload_detail_url(*, session) -> str:
-    return reverse("documents-uploads-detail", args=[session.id])
-
-
-def upload_complete_url(*, session) -> str:
-    return reverse("documents-uploads-complete", args=[session.id])
-
-
 def upload_payload(
     *,
     matter_id,
@@ -202,7 +195,7 @@ def upload_payload(
         "filename": filename,
         "content_type": content_type,
         "size": size,
-        "checksum": "sha256:abc123",
+        "checksum_sha256": "",
     }
 
 
@@ -218,22 +211,13 @@ def stub_stat(monkeypatch) -> None:
         size = 1024
         content_type = "application/pdf"
         metadata = {}
+        etag = "etag"
 
-    monkeypatch.setattr(
-        "apps.documents.services.upload_object_stat",
-        lambda *, object_key: Stat(),
-    )
+    monkeypatch.setattr("apps.documents.services.upload_object_stat", lambda *, object_key: Stat())
 
 
 def stub_download(monkeypatch) -> None:
     monkeypatch.setattr(
         "apps.documents.services.presign_download_object",
         lambda *, object_key, expires_in_seconds: "http://localhost:9000/presigned-download",
-    )
-
-
-def stub_schedule(monkeypatch) -> None:
-    monkeypatch.setattr(
-        "apps.documents.services.schedule_upload_processing",
-        lambda *, upload_id: None,
     )

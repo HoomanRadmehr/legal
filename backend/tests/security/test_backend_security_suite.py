@@ -19,7 +19,8 @@ from apps.activity.models import ActivityLog, OutboxEvent
 from apps.cases.tests.factories import LegalCaseFactory
 from apps.deadlines.models import STATUS_CANCELLED as DEADLINE_STATUS_CANCELLED
 from apps.deadlines.tests.factories import DeadlineFactory
-from apps.documents.tests.factories import DocumentFactory, UploadSessionFactory
+from apps.documents.models import DOCUMENT_STATUS_PENDING_UPLOAD
+from apps.documents.tests.factories import DocumentFactory
 from apps.matters.models import ACCESS_LEVEL_VIEW
 from apps.matters.tests.factories import MatterAccessFactory, MatterFactory
 from apps.offboarding.models import OffboardingRun
@@ -67,8 +68,8 @@ def test_cross_org_records_are_hidden_from_list_retrieve_update_and_download(
         matter__owner=other_admin,
     )
     other_document = DocumentFactory(
-        upload_session__matter=other_case.matter,
-        upload_session__requested_by=other_admin,
+        matter=other_case.matter,
+        uploaded_by=other_admin,
     )
     client = authenticated_client(member=admin)
 
@@ -207,15 +208,11 @@ def test_login_and_upload_rate_limits_return_429_with_retry_after(
         format="json",
         HTTP_X_CSRFTOKEN=csrf_token(login_client),
     )
-    first_upload = upload_client.post(
-        reverse("documents-uploads-list"),
-        upload_payload(matter_id=matter.id),
-        format="json",
+    first_upload = upload_presign_response(
+        client=upload_client, matter_id=matter.id, idempotency_key="first-upload"
     )
-    upload_limit = upload_client.post(
-        reverse("documents-uploads-list"),
-        upload_payload(matter_id=matter.id),
-        format="json",
+    upload_limit = upload_presign_response(
+        client=upload_client, matter_id=matter.id, idempotency_key="second-upload"
     )
 
     assert login_limit.status_code == 429
@@ -228,40 +225,38 @@ def test_login_and_upload_rate_limits_return_429_with_retry_after(
 def test_upload_completion_rejects_mismatch_expiry_missing_and_duplicate_misuse(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    stub_schedule(monkeypatch)
     member = MembershipFactory(role=ROLE_LEGAL_ADMIN)
-    expired = UploadSessionFactory(
-        matter__organization=member.organization,
-        requested_by=member,
-        expires_at=timezone.now() - timedelta(minutes=1),
+    matter = MatterFactory(organization=member.organization, owner=member)
+    expired = pending_document(
+        matter=matter,
+        member=member,
+        upload_expires_at=timezone.now() - timedelta(minutes=1),
     )
-    missing = UploadSessionFactory(matter__organization=member.organization, requested_by=member)
-    mismatch = UploadSessionFactory(matter__organization=member.organization, requested_by=member)
-    replay = UploadSessionFactory(matter__organization=member.organization, requested_by=member)
+    missing = pending_document(matter=matter, member=member)
+    mismatch = pending_document(matter=matter, member=member)
+    replay = pending_document(matter=matter, member=member)
     client = authenticated_client(member=member)
 
-    expired_response = complete_upload_response(client=client, session=expired, key="expired")
+    expired_response = complete_upload_response(client=client, document=expired)
     monkeypatch.setattr("apps.documents.services.upload_object_stat", raise_missing_object)
-    missing_response = complete_upload_response(client=client, session=missing, key="missing")
+    missing_response = complete_upload_response(client=client, document=missing)
     monkeypatch.setattr(
         "apps.documents.services.upload_object_stat",
         lambda *, object_key: fake_stat(size=999),
     )
-    mismatch_response = complete_upload_response(client=client, session=mismatch, key="mismatch")
+    mismatch_response = complete_upload_response(client=client, document=mismatch)
     monkeypatch.setattr(
         "apps.documents.services.upload_object_stat",
         lambda *, object_key: fake_stat(),
     )
-    first_response = complete_upload_response(client=client, session=replay, key="same")
-    replay_response = complete_upload_response(client=client, session=replay, key="same")
-    conflicting_response = complete_upload_response(client=client, session=replay, key="different")
+    first_response = complete_upload_response(client=client, document=replay)
+    replay_response = complete_upload_response(client=client, document=replay)
 
     assert expired_response.json()["code"] == "upload_expired"
     assert missing_response.json()["code"] == "upload_object_missing"
-    assert mismatch_response.json()["code"] == "upload_object_mismatch"
-    assert first_response.status_code == 202
+    assert mismatch_response.json()["code"] == "upload_size_mismatch"
+    assert first_response.status_code == 200
     assert replay_response.json() == first_response.json()
-    assert conflicting_response.status_code == 409
     assert no_activity_or_outbox_contains("presigned")
 
 
@@ -394,21 +389,29 @@ def upload_payload(*, matter_id) -> dict:
         "filename": "notice.pdf",
         "content_type": "application/pdf",
         "size": 1024,
-        "checksum": "sha256:abc123",
+        "checksum_sha256": "",
     }
 
 
-def complete_upload_response(*, client: APIClient, session, key: str):
+def upload_presign_response(*, client: APIClient, matter_id, idempotency_key: str):
     return client.post(
-        reverse("documents-uploads-complete", args=[session.id]),
+        reverse("documents-presign"),
+        upload_payload(matter_id=matter_id),
+        format="json",
+        HTTP_IDEMPOTENCY_KEY=idempotency_key,
+    )
+
+
+def complete_upload_response(*, client: APIClient, document):
+    return client.post(
+        reverse("documents-complete", args=[document.id]),
         {},
         format="json",
-        HTTP_IDEMPOTENCY_KEY=key,
     )
 
 
 def fake_stat(*, size: int = 1024):
-    return SimpleNamespace(size=size, content_type="application/pdf", metadata={})
+    return SimpleNamespace(size=size, content_type="application/pdf", metadata={}, etag="etag")
 
 
 def raise_missing_object(*, object_key: str):
@@ -429,17 +432,21 @@ def stub_download(monkeypatch: pytest.MonkeyPatch) -> None:
     )
 
 
-def stub_schedule(monkeypatch: pytest.MonkeyPatch) -> None:
-    monkeypatch.setattr(
-        "apps.documents.services.schedule_upload_processing",
-        lambda *, upload_id: None,
-    )
-
-
 def no_activity_or_outbox_contains(value: str) -> bool:
     activities = list(ActivityLog.objects.values("before_values", "after_values", "metadata"))
     outbox_events = list(OutboxEvent.objects.values("payload"))
     return value not in f"{activities}{outbox_events}"
+
+
+def pending_document(*, matter, member, upload_expires_at=None):
+    return DocumentFactory(
+        matter=matter,
+        uploaded_by=member,
+        status=DOCUMENT_STATUS_PENDING_UPLOAD,
+        actual_size=None,
+        uploaded_at=None,
+        upload_expires_at=upload_expires_at or timezone.now() + timedelta(minutes=15),
+    )
 
 
 async def run_websocket_security_checks(

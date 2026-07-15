@@ -15,6 +15,7 @@ def storage_client() -> Minio:
         access_key=settings.MINIO_ACCESS_KEY,
         secret_key=settings.MINIO_SECRET_KEY,
         secure=settings.MINIO_USE_SSL,
+        region=settings.MINIO_REGION,
     )
 
 
@@ -25,6 +26,7 @@ def public_presign_client() -> Minio:
         access_key=settings.MINIO_ACCESS_KEY,
         secret_key=settings.MINIO_SECRET_KEY,
         secure=secure,
+        region=settings.MINIO_REGION,
     )
 
 

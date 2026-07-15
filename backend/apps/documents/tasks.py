@@ -1,16 +1,11 @@
-"""Celery tasks for document upload processing."""
+"""Celery tasks for direct document upload cleanup."""
 
 from __future__ import annotations
 
-from apps.documents.services import expire_abandoned_upload_sessions, process_upload_session
+from apps.documents.services import expire_pending_document_uploads
 from config.celery import app
 
 
-@app.task(name="documents.process_upload_session")
-def process_upload_session_task(upload_id: str) -> str:
-    return process_upload_session(upload_id=upload_id)
-
-
-@app.task(name="documents.expire_abandoned_upload_sessions")
-def expire_abandoned_upload_sessions_task() -> int:
-    return expire_abandoned_upload_sessions()
+@app.task(name="documents.expire_pending_document_uploads")
+def expire_pending_document_uploads_task() -> int:
+    return expire_pending_document_uploads()
